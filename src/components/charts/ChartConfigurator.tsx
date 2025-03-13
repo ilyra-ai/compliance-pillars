@@ -193,19 +193,19 @@ const ChartConfigurator: React.FC<ChartConfiguratorProps> = ({ pillarId, onSave 
                 <Label>Opções de Exibição</Label>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="flex items-center space-x-2">
-                    <input type="checkbox" id="show-legend" className="h-4 w-4" checked />
+                    <input type="checkbox" id="show-legend" className="h-4 w-4" defaultChecked />
                     <Label htmlFor="show-legend">Mostrar Legenda</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <input type="checkbox" id="show-grid" className="h-4 w-4" checked />
+                    <input type="checkbox" id="show-grid" className="h-4 w-4" defaultChecked />
                     <Label htmlFor="show-grid">Mostrar Grade</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <input type="checkbox" id="show-tooltip" className="h-4 w-4" checked />
+                    <input type="checkbox" id="show-tooltip" className="h-4 w-4" defaultChecked />
                     <Label htmlFor="show-tooltip">Mostrar Tooltip</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <input type="checkbox" id="interactive" className="h-4 w-4" checked />
+                    <input type="checkbox" id="interactive" className="h-4 w-4" defaultChecked />
                     <Label htmlFor="interactive">Interativo</Label>
                   </div>
                 </div>
@@ -384,12 +384,12 @@ const ChartConfigurator: React.FC<ChartConfiguratorProps> = ({ pillarId, onSave 
                 <Label>Séries de Dados (Eixo Y)</Label>
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
-                    <input type="checkbox" id="serie-valor" className="h-4 w-4" checked />
+                    <input type="checkbox" id="serie-valor" className="h-4 w-4" defaultChecked />
                     <Label htmlFor="serie-valor">Valor</Label>
                     <Input className="w-20 ml-auto" type="color" defaultValue="#8884d8" />
                   </div>
                   <div className="flex items-center space-x-2">
-                    <input type="checkbox" id="serie-quantidade" className="h-4 w-4" checked />
+                    <input type="checkbox" id="serie-quantidade" className="h-4 w-4" defaultChecked />
                     <Label htmlFor="serie-quantidade">Quantidade</Label>
                     <Input className="w-20 ml-auto" type="color" defaultValue="#82ca9d" />
                   </div>

@@ -15,6 +15,7 @@ import PillarManagement from "./pages/PillarManagement";
 import DocumentEditor from "./pages/DocumentEditor";
 import ReportBuilder from "./pages/ReportBuilder";
 import Settings from "./pages/Settings";
+import ChartManagement from "./pages/ChartManagement";
 
 const queryClient = new QueryClient();
 
@@ -71,6 +72,12 @@ const App = () => (
             <Route path="/documents/editor" element={
               <ProtectedRoute>
                 <DocumentEditor />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/charts" element={
+              <ProtectedRoute>
+                <ChartManagement />
               </ProtectedRoute>
             } />
 
