@@ -58,6 +58,18 @@ export const DroppableArea: React.FC<DroppableAreaProps> = ({
           case 'grid':
             componentName = 'Layout de Grade';
             break;
+          case 'text':
+            componentName = 'Texto';
+            break;
+          case 'table':
+            componentName = 'Tabela';
+            break;
+          case 'chart':
+          case 'chart-bar':
+          case 'chart-line':
+          case 'chart-pie':
+            componentName = 'Gráfico';
+            break;
           default:
             componentName = item.type.charAt(0).toUpperCase() + item.type.slice(1);
         }

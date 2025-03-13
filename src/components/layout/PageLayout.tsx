@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Sidebar from '@/components/layout/Sidebar';
@@ -7,7 +6,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import FloatingThemeButton from '@/components/ui/FloatingThemeButton';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Palette, X, Save, Eye, EyeOff, Trash2, Edit, Copy, LayoutGrid } from 'lucide-react';
+import { Palette, X, Save, Eye, EyeOff, Trash2, Edit, Copy, LayoutGrid, Image } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { toast } from 'sonner';
@@ -83,10 +82,8 @@ const PageLayout: React.FC<PageLayoutProps> = ({
   const [currentPath, setCurrentPath] = useState('');
 
   useEffect(() => {
-    // Get current path for saving layouts
     setCurrentPath(window.location.pathname);
     
-    // Load saved components for this page from localStorage if available
     try {
       const pageKey = `pageComponents-${window.location.pathname}`;
       const savedComponents = localStorage.getItem(pageKey);
@@ -95,7 +92,6 @@ const PageLayout: React.FC<PageLayoutProps> = ({
         setComponents(JSON.parse(savedComponents));
       }
       
-      // Load all saved layouts
       const savedLayoutsStr = localStorage.getItem('savedLayouts');
       if (savedLayoutsStr) {
         setSavedLayouts(JSON.parse(savedLayoutsStr));
@@ -118,7 +114,6 @@ const PageLayout: React.FC<PageLayoutProps> = ({
       setShowPalette(true);
     } else {
       setShowPalette(false);
-      // Save components to localStorage when exiting edit mode
       saveComponentsToLocalStorage();
     }
   };
@@ -144,14 +139,12 @@ const PageLayout: React.FC<PageLayoutProps> = ({
     console.log(`Dropped component: ${templateId} of type ${type}, index: ${index}`);
     
     if (index !== undefined) {
-      // Handle reordering existing components
       const draggedComponent = components[index];
       const newComponents = [...components];
       newComponents.splice(index, 1);
       newComponents.push(draggedComponent);
       setComponents(newComponents);
     } else {
-      // Handle new component drop
       const newComponent = {
         id: uuidv4(),
         title: `Novo Componente ${type}`,
@@ -210,7 +203,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
     const component = components.find(c => c.id === id);
     if (component) {
       const newComponent = {
-        ...JSON.parse(JSON.stringify(component)), // Deep clone
+        ...JSON.parse(JSON.stringify(component)),
         id: uuidv4(),
         title: `${component.title} (Cópia)`
       };
@@ -270,7 +263,6 @@ const PageLayout: React.FC<PageLayoutProps> = ({
   };
   
   const renderComponentContent = (component: Component) => {
-    // Render different component types
     switch (component.type) {
       case 'text':
         return (
@@ -355,7 +347,6 @@ const PageLayout: React.FC<PageLayoutProps> = ({
     }
   };
 
-  // Wrap the content with DndProvider for drag and drop functionality
   const renderContent = () => {
     const content = (
       <>
@@ -559,7 +550,6 @@ const PageLayout: React.FC<PageLayoutProps> = ({
           {!hideFloatingThemeButton && <FloatingThemeButton onClick={() => {}} />}
         </div>
         
-        {/* Edit Text Component Dialog */}
         <Dialog
           open={editComponentId !== null && componentBeingEdited?.type === 'text'}
           onOpenChange={(open) => !open && setEditComponentId(null)}
@@ -589,7 +579,6 @@ const PageLayout: React.FC<PageLayoutProps> = ({
           </DialogContent>
         </Dialog>
         
-        {/* Save Layout Dialog */}
         <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
           <DialogContent>
             <DialogHeader>
@@ -622,7 +611,6 @@ const PageLayout: React.FC<PageLayoutProps> = ({
           </DialogContent>
         </Dialog>
         
-        {/* Load Layout Dialog */}
         <Dialog open={showLoadDialog} onOpenChange={setShowLoadDialog}>
           <DialogContent>
             <DialogHeader>

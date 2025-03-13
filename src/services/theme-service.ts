@@ -1,221 +1,145 @@
 
-interface ThemeColors {
+import { createContext, useContext, useState } from "react";
+import { useTheme } from "next-themes";
+import { toast } from "sonner";
+
+export interface ThemeColors {
   primary: string;
   secondary: string;
   accent: string;
-  background: string;
-  text: string;
+  font: string;
 }
 
-interface ThemeFonts {
-  family: string;
-}
-
-interface ThemeAssets {
-  logo: string;
-}
-
-export interface ThemeConfig {
+interface ThemeContextType {
   colors: ThemeColors;
-  fonts: ThemeFonts;
-  assets: ThemeAssets;
+  updateColors: (colors: Partial<ThemeColors>) => void;
+  resetColors: () => void;
+  applyTheme: (themeName: string) => void;
 }
 
-class ThemeService {
-  private static instance: ThemeService;
-  private themeConfig: ThemeConfig;
-  private readonly STORAGE_KEY = 'themeConfig';
+const defaultColors: ThemeColors = {
+  primary: "221.2 83.2% 53.3%",
+  secondary: "215 27.9% 16.9%",
+  accent: "210 40% 96.1%",
+  font: "Inter"
+};
 
-  private constructor() {
-    // Try to load saved configuration or use default values
-    const savedConfig = localStorage.getItem(this.STORAGE_KEY);
-    if (savedConfig) {
-      try {
-        this.themeConfig = JSON.parse(savedConfig);
-        console.log('Theme loaded from localStorage:', this.themeConfig);
-      } catch (e) {
-        console.error('Error parsing saved theme:', e);
-        this.themeConfig = this.getDefaultTheme();
-      }
-    } else {
-      this.themeConfig = this.getDefaultTheme();
-    }
-
-    // Apply the theme when loading
-    this.applyTheme(this.themeConfig);
-    this.loadImprimaFont();
+export const predefinedThemes = {
+  default: {
+    primary: "221.2 83.2% 53.3%",
+    secondary: "215 27.9% 16.9%",
+    accent: "210 40% 96.1%",
+    font: "Inter"
+  },
+  forest: {
+    primary: "142 76% 36%",
+    secondary: "180 60% 25%",
+    accent: "120 40% 94%",
+    font: "Poppins"
+  },
+  sunset: {
+    primary: "25 95% 53%",
+    secondary: "4 90% 28%",
+    accent: "50 30% 96%",
+    font: "Lato"
+  },
+  ocean: {
+    primary: "198 93% 60%",
+    secondary: "200 98% 24%",
+    accent: "190 40% 96%",
+    font: "Montserrat"
+  },
+  lavender: {
+    primary: "239 84% 67%",
+    secondary: "160 84% 39%",
+    accent: "38 92% 50%",
+    font: "Imprima"
+  },
+  midnight: {
+    primary: "245 58% 51%",
+    secondary: "230 22% 20%",
+    accent: "230 20% 96%",
+    font: "Nunito"
+  },
+  corporate: {
+    primary: "215 100% 38%",
+    secondary: "215 28% 17%",
+    accent: "10 100% 80%",
+    font: "Lato"
+  },
+  modern: {
+    primary: "262 83% 58%",
+    secondary: "250 24% 20%",
+    accent: "270 20% 96%",
+    font: "Montserrat"
   }
+};
 
-  private loadImprimaFont() {
-    // Create a link element for the Imprima font
-    const linkElement = document.createElement('link');
-    linkElement.rel = 'stylesheet';
-    linkElement.href = 'https://fonts.googleapis.com/css2?family=Imprima&display=swap';
-    document.head.appendChild(linkElement);
-    
-    // Apply the font to all elements by default
-    document.documentElement.style.setProperty('--font-family', 'Imprima, sans-serif');
-    document.body.style.fontFamily = 'Imprima, sans-serif';
-    document.body.classList.add('font-imprima');
-  }
+export const availableFonts = [
+  "Inter",
+  "Roboto",
+  "Lato",
+  "Poppins",
+  "Montserrat",
+  "Nunito",
+  "Raleway",
+  "Open Sans",
+  "Playfair Display",
+  "Imprima"
+];
 
-  public static getInstance(): ThemeService {
-    if (!ThemeService.instance) {
-      ThemeService.instance = new ThemeService();
-    }
-    return ThemeService.instance;
-  }
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-  private getDefaultTheme(): ThemeConfig {
-    return {
-      colors: {
-        primary: '#6366f1',
-        secondary: '#10b981',
-        accent: '#f59e0b',
-        background: '#ffffff',
-        text: '#1f2937'
-      },
-      fonts: {
-        family: 'Imprima'
-      },
-      assets: {
-        logo: '/placeholder.svg'
-      }
-    };
-  }
+export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
+  const [colors, setColors] = useState<ThemeColors>(defaultColors);
+  const { theme } = useTheme();
 
-  public getTheme(): ThemeConfig {
-    return {...this.themeConfig};
-  }
-
-  public saveTheme(config: ThemeConfig): void {
-    console.log('Saving theme:', config);
-    this.themeConfig = config;
+  const updateColors = (newColors: Partial<ThemeColors>) => {
     try {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(config));
-      this.applyTheme(config);
-      
-      // Dispatch an event that the theme has changed
-      const themeChangedEvent = new CustomEvent('theme-changed', { detail: config });
-      window.dispatchEvent(themeChangedEvent);
-    } catch (error) {
-      console.error('Error saving theme to localStorage:', error);
-      toast.error('Não foi possível salvar o tema. Verifique o espaço disponível no seu navegador.');
-    }
-  }
-
-  public resetTheme(): void {
-    const defaultTheme = this.getDefaultTheme();
-    this.saveTheme(defaultTheme);
-  }
-
-  private applyTheme(config: ThemeConfig): void {
-    try {
-      // Apply colors as CSS variables
-      document.documentElement.style.setProperty('--color-primary', config.colors.primary);
-      document.documentElement.style.setProperty('--color-secondary', config.colors.secondary);
-      document.documentElement.style.setProperty('--color-accent', config.colors.accent);
-      document.documentElement.style.setProperty('--color-background', config.colors.background);
-      document.documentElement.style.setProperty('--color-text', config.colors.text);
-      
-      // Update Tailwind CSS HSL variables
-      const hslPrimary = this.hexToHSL(config.colors.primary);
-      const hslSecondary = this.hexToHSL(config.colors.secondary);
-      const hslAccent = this.hexToHSL(config.colors.accent);
-      
-      document.documentElement.style.setProperty('--primary', hslPrimary);
-      document.documentElement.style.setProperty('--secondary', hslSecondary);
-      document.documentElement.style.setProperty('--accent', hslAccent);
-      
-      // Apply the font
-      if (config.fonts.family) {
-        document.documentElement.style.setProperty('--font-family', `'${config.fonts.family}', sans-serif`);
-        document.body.style.fontFamily = `'${config.fonts.family}', sans-serif`;
-      }
-
-      // Dispatch a custom event so other components know the theme has changed
-      window.dispatchEvent(new CustomEvent('themechange', { detail: config }));
-      
-      console.log('Theme applied with colors:', {
-        primary: hslPrimary,
-        secondary: hslSecondary,
-        accent: hslAccent,
-        font: config.fonts.family
+      setColors((prev) => {
+        const updated = { ...prev, ...newColors };
+        
+        // Apply colors to CSS variables
+        document.documentElement.style.setProperty("--primary", updated.primary);
+        document.documentElement.style.setProperty("--secondary", updated.secondary);
+        document.documentElement.style.setProperty("--accent", updated.accent);
+        
+        // Save to localStorage
+        localStorage.setItem("theme-colors", JSON.stringify(updated));
+        
+        console.info("Theme applied with colors:", updated);
+        return updated;
       });
+      
+      // Show success toast notification
+      toast.success("Tema atualizado com sucesso");
     } catch (error) {
-      console.error('Error applying theme:', error);
+      console.error("Error updating theme:", error);
+      toast.error("Erro ao atualizar o tema");
     }
-  }
+  };
 
-  private hexToHSL(hex: string): string {
-    try {
-      // Remove the # if it exists
-      hex = hex.replace(/^#/, '');
-      
-      // Convert hex to rgb
-      let r = parseInt(hex.slice(0, 2), 16) / 255;
-      let g = parseInt(hex.slice(2, 4), 16) / 255;
-      let b = parseInt(hex.slice(4, 6), 16) / 255;
-      
-      // Find the maximum and minimum values to calculate the luminance
-      const max = Math.max(r, g, b);
-      const min = Math.min(r, g, b);
-      let h = 0, s = 0, l = (max + min) / 2;
+  const resetColors = () => {
+    updateColors(defaultColors);
+  };
 
-      if (max !== min) {
-        const d = max - min;
-        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-        
-        switch (max) {
-          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-          case g: h = (b - r) / d + 2; break;
-          case b: h = (r - g) / d + 4; break;
-        }
-        
-        h = Math.round(h * 60);
-      }
-      
-      s = Math.round(s * 100);
-      l = Math.round(l * 100);
-      
-      return `${h} ${s}% ${l}%`;
-    } catch (error) {
-      console.error('Error converting hex to HSL:', error, hex);
-      return '0 0% 0%'; // Fallback to black
+  const applyTheme = (themeName: keyof typeof predefinedThemes) => {
+    if (predefinedThemes[themeName]) {
+      updateColors(predefinedThemes[themeName]);
     }
-  }
+  };
 
-  // Apply theme temporarily without saving to localStorage
-  public applyThemeTemporarily(config: ThemeConfig): void {
-    this.applyTheme(config);
-  }
+  return (
+    <ThemeContext.Provider value={{ colors, updateColors, resetColors, applyTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+};
 
-  // Get a preview URL with the current theme
-  public getPreviewUrl(): string {
-    const baseUrl = window.location.origin;
-    const themeParam = encodeURIComponent(JSON.stringify(this.themeConfig));
-    return `${baseUrl}?preview=${themeParam}`;
+export const useThemeService = () => {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error("useThemeService must be used within a ThemeProvider");
   }
-
-  // Get the CSS code for the current theme
-  public getThemeCSS(): string {
-    const { colors, fonts } = this.themeConfig;
-    return `
-:root {
-  --color-primary: ${colors.primary};
-  --color-secondary: ${colors.secondary};
-  --color-accent: ${colors.accent};
-  --color-background: ${colors.background};
-  --color-text: ${colors.text};
-  --font-family: '${fonts.family}', sans-serif;
-  
-  /* Tailwind HSL variants */
-  --primary: ${this.hexToHSL(colors.primary)};
-  --secondary: ${this.hexToHSL(colors.secondary)};
-  --accent: ${this.hexToHSL(colors.accent)};
-}
-    `;
-  }
-}
-
-export const themeService = ThemeService.getInstance();
+  return context;
+};
