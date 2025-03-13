@@ -6,9 +6,10 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { AlertCircle, AtSign, Lock } from 'lucide-react';
+import { AlertCircle, AtSign, Lock, LogIn } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import AnimatedLogo from '@/components/ui/AnimatedLogo';
+import { Separator } from '@/components/ui/separator';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -46,6 +47,18 @@ const Login: React.FC = () => {
     }
   };
 
+  const handleGoogleLogin = () => {
+    // Esta função seria implementada para integrar com OAuth do Google
+    // Usando a documentação que menciona OAuth no item 5.1
+    setLoading(true);
+    console.log('Iniciando login com Google OAuth...');
+    // Simulando para demonstração - na implementação real conectaria com serviço OAuth
+    setTimeout(() => {
+      setLoading(false);
+      setError('Funcionalidade de login com Google em implementação.');
+    }, 1000);
+  };
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-background to-muted/40 p-4">
       <div className="mb-8">
@@ -54,7 +67,7 @@ const Login: React.FC = () => {
 
       <Card className="mx-auto w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-center text-2xl">Acesso ao Sistema</CardTitle>
+          <CardTitle className="text-center text-2xl font-semibold">Sistema de Compliance</CardTitle>
         </CardHeader>
 
         <CardContent>
@@ -103,6 +116,30 @@ const Login: React.FC = () => {
 
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? 'Autenticando...' : 'Entrar no Sistema'}
+              <LogIn className="ml-2 h-4 w-4" />
+            </Button>
+
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                <Separator className="w-full" />
+              </div>
+              <div className="relative flex justify-center">
+                <span className="bg-card px-2 text-xs text-muted-foreground">ou continue com</span>
+              </div>
+            </div>
+
+            <Button 
+              type="button" 
+              variant="outline" 
+              className="w-full" 
+              onClick={handleGoogleLogin}
+              disabled={loading}
+            >
+              <svg className="mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M8 12 L16 12 M12 8 L12 16"/>
+              </svg>
+              Entrar com Google
             </Button>
           </form>
         </CardContent>

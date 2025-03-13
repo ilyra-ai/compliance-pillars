@@ -13,6 +13,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => void;
+  loginWithGoogle: () => void;
   logout: () => void;
   loading: boolean;
 }
@@ -21,6 +22,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   isAuthenticated: false,
   login: () => {},
+  loginWithGoogle: () => {},
   logout: () => {},
   loading: true,
 });
@@ -78,8 +80,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (foundUser) {
       const { password, ...userWithoutPassword } = foundUser;
       
+      // Simula a geração de um token JWT
+      const mockToken = `mock_jwt_token_${Date.now()}`;
+      
       // Salva no localStorage
       localStorage.setItem('user', JSON.stringify(userWithoutPassword));
+      localStorage.setItem('token', mockToken);
       
       // Atualiza estado
       setUser(userWithoutPassword);
@@ -90,9 +96,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const loginWithGoogle = () => {
+    // Simulação de login com Google OAuth
+    // Na implementação real, integraria com as bibliotecas OAuth
+    
+    toast.info('Iniciando autenticação com Google...');
+    
+    // Simula um delay de resposta
+    setTimeout(() => {
+      const mockGoogleUser = {
+        id: 'google-123',
+        name: 'Usuário Google',
+        email: 'usuario@gmail.com',
+        role: 'analista',
+      };
+      
+      // Simula a geração de um token JWT
+      const mockToken = `google_oauth_token_${Date.now()}`;
+      
+      // Salva no localStorage
+      localStorage.setItem('user', JSON.stringify(mockGoogleUser));
+      localStorage.setItem('token', mockToken);
+      
+      // Atualiza estado
+      setUser(mockGoogleUser);
+      
+      toast.success('Login com Google realizado com sucesso!');
+    }, 1500);
+  };
+
   const logout = () => {
     // Remove do localStorage
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
     
     // Limpa estado
     setUser(null);
@@ -106,6 +142,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         user,
         isAuthenticated: !!user,
         login,
+        loginWithGoogle,
         logout,
         loading,
       }}
