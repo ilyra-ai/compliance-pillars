@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import Navbar from '@/components/layout/Navbar';
@@ -17,8 +18,35 @@ import { toast } from 'sonner';
 import { User, UserCheck, UserPlus, UserX, Settings, Shield, Eye, EyeOff, Trash2, Edit, Lock, Filter, Search, RefreshCw, Users, CheckCircle2, XCircle } from 'lucide-react';
 import FloatingThemeButton from '@/components/ui/FloatingThemeButton';
 
+// Define proper types for our data
+interface UserRole {
+  id: string;
+  name: string;
+  description: string;
+}
+
+interface UserData {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  department: string;
+  active: boolean;
+  notes?: string;
+}
+
+interface PillarPermission {
+  id: string;
+  name: string;
+}
+
+interface FeaturePermission {
+  id: string;
+  name: string;
+}
+
 // Dummy data for user roles
-const roles = [
+const roles: UserRole[] = [
   { id: "admin", name: "Administrador", description: "Acesso completo ao sistema" },
   { id: "gestor", name: "Gestor", description: "Gerencia equipes e processos" },
   { id: "analista", name: "Analista", description: "Analisa e processa informações" },
@@ -27,16 +55,16 @@ const roles = [
 ];
 
 // Dummy data for users
-const defaultUsers = [
+const defaultUsers: UserData[] = [
   { id: 1, name: "João Silva", email: "joao@exemplo.com", role: "admin", department: "TI", active: true },
   { id: 2, name: "Maria Santos", email: "maria@exemplo.com", role: "gestor", department: "Compliance", active: true },
   { id: 3, name: "Pedro Alves", email: "pedro@exemplo.com", role: "analista", department: "Jurídico", active: true },
-  { id: 4, name: "Ana Ribeiro", email: "ana@exemplo.com", role: "consultor", department: "Financeiro", active: false },
+  { id: 4, name: "Ana Ribeiro", email: "ana@exemplo.com", role: "consultor", department: "Financeiro", active: false, notes: "Acesso temporário" },
   { id: 5, name: "Lucas Costa", email: "lucas@exemplo.com", role: "auditor", department: "Auditoria", active: true }
 ];
 
 // Access permissions for pillars
-const pillarPermissions = [
+const pillarPermissions: PillarPermission[] = [
   { id: "leadership", name: "Alta Administração" },
   { id: "risk", name: "Gestão de Riscos" },
   { id: "policies", name: "Políticas" },
@@ -51,7 +79,7 @@ const pillarPermissions = [
 ];
 
 // Access permissions for features
-const featurePermissions = [
+const featurePermissions: FeaturePermission[] = [
   { id: "reports", name: "Relatórios" },
   { id: "charts", name: "Gráficos" },
   { id: "documents", name: "Documentos" },
@@ -62,7 +90,7 @@ const featurePermissions = [
 ];
 
 const UserManagement: React.FC = () => {
-  const [users, setUsers] = useState(defaultUsers);
+  const [users, setUsers] = useState<UserData[]>(defaultUsers);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState<string | null>(null);
   const [filterActive, setFilterActive] = useState<boolean | null>(null);
@@ -76,8 +104,8 @@ const UserManagement: React.FC = () => {
   const [themeDialogOpen, setThemeDialogOpen] = useState(false);
   
   // Selected user for editing
-  const [selectedUser, setSelectedUser] = useState<any>(null);
-  const [selectedRole, setSelectedRole] = useState<any>(null);
+  const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
+  const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   
   // New user form state
   const [newUser, setNewUser] = useState({
@@ -131,7 +159,7 @@ const UserManagement: React.FC = () => {
     setUserDialogOpen(true);
   };
   
-  const handleEditUser = (user: any) => {
+  const handleEditUser = (user: UserData) => {
     setSelectedUser(user);
     setNewUser({
       name: user.name,
@@ -166,29 +194,37 @@ const UserManagement: React.FC = () => {
     } else {
       // Add new user
       const newId = users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
-      setUsers([...users, { 
+      const newUserData: UserData = { 
         id: newId, 
         name: newUser.name,
         email: newUser.email,
         role: newUser.role,
         department: newUser.department,
-        active: newUser.active,
-        notes: newUser.notes
-      }]);
+        active: newUser.active
+      };
+      
+      // Only add notes if it's not an empty string
+      if (newUser.notes) {
+        newUserData.notes = newUser.notes;
+      }
+      
+      setUsers([...users, newUserData]);
       toast.success('Usuário adicionado com sucesso!');
     }
     setUserDialogOpen(false);
   };
   
-  const handleDeleteUser = (user: any) => {
+  const handleDeleteUser = (user: UserData) => {
     setSelectedUser(user);
     setDeleteDialogOpen(true);
   };
   
   const confirmDeleteUser = () => {
-    setUsers(users.filter(user => user.id !== selectedUser.id));
-    setDeleteDialogOpen(false);
-    toast.success('Usuário removido com sucesso!');
+    if (selectedUser) {
+      setUsers(users.filter(user => user.id !== selectedUser.id));
+      setDeleteDialogOpen(false);
+      toast.success('Usuário removido com sucesso!');
+    }
   };
   
   const handleToggleUserStatus = (userId: number) => {
@@ -201,7 +237,7 @@ const UserManagement: React.FC = () => {
     toast.success(`Usuário ${newStatus ? 'ativado' : 'desativado'} com sucesso!`);
   };
   
-  const handleManagePermissions = (user: any) => {
+  const handleManagePermissions = (user: UserData) => {
     setSelectedUser(user);
     setPermissionsDialogOpen(true);
   };
@@ -219,17 +255,11 @@ const UserManagement: React.FC = () => {
   const handleSaveRole = () => {
     if (selectedRole) {
       // Update existing role
-      const updatedRoles = roles.map(role => 
-        role.id === selectedRole.id 
-          ? { ...role, name: newRole.name, description: newRole.description } 
-          : role
-      );
-      // In real app, update roles state
+      // In a real application, we would update the roles array
       toast.success('Perfil atualizado com sucesso!');
     } else {
       // Add new role
-      const roleId = newRole.name.toLowerCase().replace(/\s+/g, '-');
-      // In real app, add to roles state
+      // In a real application, we would add to the roles array
       toast.success('Perfil adicionado com sucesso!');
     }
     setRoleDialogOpen(false);
