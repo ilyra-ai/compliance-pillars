@@ -117,14 +117,13 @@ const DraggableComponentItem: React.FC<DraggableComponentItemProps> = ({
 }) => {
   const [{ isDragging }, drag] = useDrag({
     type: 'NEW_COMPONENT',
-    item: { templateId: id, type },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
-    begin: () => {
+    item: () => {
       onDragStart?.();
       return { templateId: id, type };
     },
+    collect: (monitor) => ({
+      isDragging: !!monitor.isDragging(),
+    }),
     end: () => {
       onDragEnd?.();
     }
