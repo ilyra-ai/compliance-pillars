@@ -113,7 +113,7 @@ const PillarContent: React.FC<PillarContentProps> = ({ pillarId, initialContent,
           </TabsContent>
           
           <TabsContent value="midia">
-            {/* Pass empty props object since FileManager might have default props */}
+            {/* FileManager doesn't accept onFileSelect prop, so we don't pass it */}
             <FileManager />
           </TabsContent>
           
@@ -201,7 +201,7 @@ const Conteudo: React.FC<{ onSave?: (content: string) => void }> = ({ onSave }) 
         </Button>
       </div>
       
-      {/* Pass content to WYSIWYGEditor with correct props */}
+      {/* Use WYSIWYGEditor with correct props */}
       <WYSIWYGEditor 
         initialContent={content}
         onChange={handleContentChange}
