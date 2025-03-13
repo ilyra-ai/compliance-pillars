@@ -96,6 +96,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onItemClick }) => {
         </SidebarCategory>
         
         <SidebarCategory title="Pilares de Compliance">
+          <SidebarLink to="/pillars" icon={<Shield size={18} />} text="Visão Geral dos Pilares" onClick={onItemClick} />
           <SidebarLink to="/pillars/leadership" icon={<Shield size={18} />} text="1. Comprometimento da Alta Administração" onClick={onItemClick} />
           <SidebarLink to="/pillars/risk" icon={<AlertTriangle size={18} />} text="2. Gestão de Riscos Corporativo" onClick={onItemClick} />
           <SidebarLink to="/pillars/policies" icon={<FileText size={18} />} text="3. Políticas e Procedimentos" onClick={onItemClick} />
