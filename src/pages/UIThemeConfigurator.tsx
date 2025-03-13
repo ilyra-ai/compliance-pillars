@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import ThemeConfigurator from '@/components/settings/ThemeConfigurator';
 import PageLayout from '@/components/layout/PageLayout';
 import { useThemeDialog } from '@/hooks/use-theme-dialog';
@@ -11,11 +12,13 @@ import {
   Undo,
   Copy,
   Eye,
-  Check
+  Check,
+  Code
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { themeService, ThemeConfig } from '@/services/theme-service';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export function UIThemeConfigurator() {
   const navigate = useNavigate();
@@ -27,6 +30,12 @@ export function UIThemeConfigurator() {
   
   const [previewMode, setPreviewMode] = useState(false);
   const [currentTheme, setCurrentTheme] = useState<ThemeConfig>(themeService.getTheme());
+  const [showCssCode, setShowCssCode] = useState(false);
+  
+  useEffect(() => {
+    // Load the current theme when component mounts
+    setCurrentTheme(themeService.getTheme());
+  }, []);
   
   const goBack = () => {
     navigate('/settings');
@@ -61,6 +70,17 @@ export function UIThemeConfigurator() {
     setPreviewMode(!previewMode);
   };
   
+  const handleCopyCSS = () => {
+    const css = themeService.getThemeCSS();
+    navigator.clipboard.writeText(css)
+      .then(() => toast.success('Código CSS copiado para a área de transferência!'))
+      .catch(() => toast.error('Erro ao copiar o código CSS'));
+  };
+  
+  const toggleCssCode = () => {
+    setShowCssCode(!showCssCode);
+  };
+  
   return (
     <PageLayout hideFloatingThemeButton>
       <div className="container mx-auto py-6">
@@ -75,6 +95,10 @@ export function UIThemeConfigurator() {
             <Button variant="outline" size="sm" onClick={handleReset}>
               <Undo className="mr-2 h-4 w-4" />
               Redefinir
+            </Button>
+            <Button variant="outline" size="sm" onClick={toggleCssCode}>
+              <Code className="mr-2 h-4 w-4" />
+              {showCssCode ? 'Ocultar CSS' : 'Ver CSS'}
             </Button>
             <Button 
               variant={previewMode ? "default" : "outline"} 
@@ -103,6 +127,23 @@ export function UIThemeConfigurator() {
             </Button>
           </div>
         </div>
+        
+        {showCssCode && (
+          <Alert className="mb-6">
+            <AlertTitle className="flex justify-between items-center">
+              <span>Código CSS do Tema</span>
+              <Button size="sm" variant="outline" onClick={handleCopyCSS}>
+                <Copy className="mr-2 h-4 w-4" />
+                Copiar
+              </Button>
+            </AlertTitle>
+            <AlertDescription>
+              <pre className="bg-muted p-4 rounded-md overflow-x-auto text-xs mt-2">
+                {themeService.getThemeCSS()}
+              </pre>
+            </AlertDescription>
+          </Alert>
+        )}
         
         {previewMode ? (
           <div className="border rounded-lg p-6 bg-card text-card-foreground">

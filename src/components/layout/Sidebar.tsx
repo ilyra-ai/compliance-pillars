@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useSidebar } from '@/components/ui/sidebar';
 import { 
@@ -59,13 +60,22 @@ const SidebarCategory: React.FC<SidebarCategoryProps> = ({ title, children }) =>
 };
 
 const Sidebar = () => {
-  const { isOpen } = useSidebar();
-  const { hasRequiredRole } = useAuth();
+  const { state, open } = useSidebar();
+  const { user } = useAuth();
+  
+  // Function to check if a user has required roles
+  const hasRequiredRole = (requiredRoles: string[]) => {
+    if (!user || !user.roles) {
+      return false;
+    }
+    
+    return requiredRoles.some(role => user.roles.includes(role));
+  };
   
   return (
     <div
       className={`${
-        isOpen ? 'translate-x-0' : '-translate-x-full'
+        open ? 'translate-x-0' : '-translate-x-full'
       } transform fixed top-0 left-0 h-full bg-card shadow-lg transition-transform duration-300 ease-in-out z-40 w-64 pt-20 md:translate-x-0 md:pt-20 overflow-y-auto`}
     >
       <div className="px-4 py-2">

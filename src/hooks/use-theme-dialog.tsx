@@ -2,9 +2,11 @@
 import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
 import { themeService, ThemeConfig } from '@/services/theme-service';
+import { useNavigate } from 'react-router-dom';
 
 export const useThemeDialog = () => {
   const [themeDialogOpen, setThemeDialogOpen] = useState(false);
+  const navigate = useNavigate();
   
   const handleOpenUITheme = useCallback(() => {
     setThemeDialogOpen(true);
@@ -26,10 +28,10 @@ export const useThemeDialog = () => {
   }, []);
   
   const handleGoToThemeEditor = useCallback(() => {
-    // Navigate to theme editor page via window.location to avoid Router context issues
-    window.location.href = '/ui/customize';
+    // Navigate to theme editor page via router
+    navigate('/ui/customize');
     toast.info('Redirecionando para o editor de temas...');
-  }, []);
+  }, [navigate]);
   
   return {
     themeDialogOpen,

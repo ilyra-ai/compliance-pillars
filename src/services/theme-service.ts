@@ -27,7 +27,7 @@ class ThemeService {
   private readonly STORAGE_KEY = 'themeConfig';
 
   private constructor() {
-    // Tente carregar a configuração salva ou use os valores padrão
+    // Try to load saved configuration or use default values
     const savedConfig = localStorage.getItem(this.STORAGE_KEY);
     if (savedConfig) {
       try {
@@ -41,7 +41,7 @@ class ThemeService {
       this.themeConfig = this.getDefaultTheme();
     }
 
-    // Aplica o tema ao carregar
+    // Apply the theme when loading
     this.applyTheme(this.themeConfig);
   }
 
@@ -91,14 +91,14 @@ class ThemeService {
   }
 
   private applyTheme(config: ThemeConfig): void {
-    // Aplicar cores como variáveis CSS
+    // Apply colors as CSS variables
     document.documentElement.style.setProperty('--color-primary', config.colors.primary);
     document.documentElement.style.setProperty('--color-secondary', config.colors.secondary);
     document.documentElement.style.setProperty('--color-accent', config.colors.accent);
     document.documentElement.style.setProperty('--color-background', config.colors.background);
     document.documentElement.style.setProperty('--color-text', config.colors.text);
     
-    // Atualizar as variáveis HSL do Tailwind CSS
+    // Update Tailwind CSS HSL variables
     const hslPrimary = this.hexToHSL(config.colors.primary);
     const hslSecondary = this.hexToHSL(config.colors.secondary);
     const hslAccent = this.hexToHSL(config.colors.accent);
@@ -107,13 +107,13 @@ class ThemeService {
     document.documentElement.style.setProperty('--secondary', hslSecondary);
     document.documentElement.style.setProperty('--accent', hslAccent);
     
-    // Aplicar a fonte
+    // Apply the font
     if (config.fonts.family) {
       document.documentElement.style.setProperty('--font-family', `'${config.fonts.family}', sans-serif`);
       document.body.style.fontFamily = `'${config.fonts.family}', sans-serif`;
     }
 
-    // Ativamos um evento personalizado para que outros componentes saibam que o tema mudou
+    // Dispatch a custom event so other components know the theme has changed
     window.dispatchEvent(new CustomEvent('themechange', { detail: config }));
     
     console.log('Theme applied with colors:', {
@@ -125,15 +125,15 @@ class ThemeService {
   }
 
   private hexToHSL(hex: string): string {
-    // Remove o # se existir
+    // Remove the # if it exists
     hex = hex.replace(/^#/, '');
     
-    // Converte hex para rgb
+    // Convert hex to rgb
     let r = parseInt(hex.slice(0, 2), 16) / 255;
     let g = parseInt(hex.slice(2, 4), 16) / 255;
     let b = parseInt(hex.slice(4, 6), 16) / 255;
     
-    // Encontra os valores máximo e mínimo para calcular a luminância
+    // Find the maximum and minimum values to calculate the luminance
     const max = Math.max(r, g, b);
     const min = Math.min(r, g, b);
     let h = 0, s = 0, l = (max + min) / 2;
@@ -157,19 +157,19 @@ class ThemeService {
     return `${h} ${s}% ${l}%`;
   }
 
-  // Método para aplicar o tema imediatamente sem salvar na localStorage
+  // Apply theme temporarily without saving to localStorage
   public applyThemeTemporarily(config: ThemeConfig): void {
     this.applyTheme(config);
   }
 
-  // Método para obter uma URL de preview com o tema atual
+  // Get a preview URL with the current theme
   public getPreviewUrl(): string {
     const baseUrl = window.location.origin;
     const themeParam = encodeURIComponent(JSON.stringify(this.themeConfig));
     return `${baseUrl}?preview=${themeParam}`;
   }
 
-  // Método para copiar o código CSS do tema atual
+  // Get the CSS code for the current theme
   public getThemeCSS(): string {
     const { colors, fonts } = this.themeConfig;
     return `

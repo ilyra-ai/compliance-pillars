@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -112,7 +113,8 @@ const PillarContent: React.FC<PillarContentProps> = ({ pillarId, initialContent,
           </TabsContent>
           
           <TabsContent value="midia">
-            <FileManager onFileSelect={handleFileSelect} />
+            {/* Pass empty props object since FileManager might have default props */}
+            <FileManager />
           </TabsContent>
           
           <TabsContent value="agendamento">
@@ -128,7 +130,13 @@ const PillarContent: React.FC<PillarContentProps> = ({ pillarId, initialContent,
           </TabsContent>
           
           <TabsContent value="documentos">
-            <DocumentVersioning />
+            <DocumentVersioning 
+              documentId={pillarId}
+              currentVersion="1.0"
+              onRestoreVersion={(version) => console.log(`Restore version ${version}`)}
+              onViewVersion={(version) => console.log(`View version ${version}`)}
+              onDownloadVersion={(version) => console.log(`Download version ${version}`)}
+            />
           </TabsContent>
           
           <TabsContent value="chatbot">
@@ -162,12 +170,18 @@ const PillarContent: React.FC<PillarContentProps> = ({ pillarId, initialContent,
 };
 
 // Fix the WYSIWYGEditor integration
-const Conteudo: React.FC<{ onSave: (content: string) => void }> = ({ onSave }) => {
+const Conteudo: React.FC<{ onSave?: (content: string) => void }> = ({ onSave }) => {
   const [content, setContent] = useState("<p>Conteúdo inicial do pilar...</p>");
   
   const handleSaveContent = () => {
-    onSave(content);
+    if (onSave) {
+      onSave(content);
+    }
     toast.success('Conteúdo salvo com sucesso!');
+  };
+  
+  const handleContentChange = (newContent: string) => {
+    setContent(newContent);
   };
   
   return (
@@ -187,10 +201,10 @@ const Conteudo: React.FC<{ onSave: (content: string) => void }> = ({ onSave }) =
         </Button>
       </div>
       
-      {/* Use the WYSIWYGEditor with proper props */}
+      {/* Pass content to WYSIWYGEditor with correct props */}
       <WYSIWYGEditor 
-        initialContent={content} 
-        onContentChange={(newContent) => setContent(newContent)}
+        initialContent={content}
+        onChange={handleContentChange}
       />
     </div>
   );

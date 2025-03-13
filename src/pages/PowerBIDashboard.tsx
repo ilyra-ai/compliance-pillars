@@ -1,20 +1,26 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageLayout from '@/components/layout/PageLayout';
 import PowerBIDashboard from '@/components/dashboard/PowerBIDashboard';
 import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   ChevronLeft, 
   Save, 
   Download, 
   FileUp, 
-  Database
+  Database,
+  BarChart3,
+  PieChart,
+  LineChart
 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function PowerBIDashboardPage() {
   const navigate = useNavigate();
+  const [activeView, setActiveView] = useState('dashboard');
   
   const handleBack = () => {
     navigate('/');
@@ -69,8 +75,64 @@ export default function PowerBIDashboardPage() {
           </div>
         </div>
         
-        <PowerBIDashboard onSave={handleSaveDashboard} />
+        <Tabs value={activeView} onValueChange={setActiveView}>
+          <TabsList>
+            <TabsTrigger value="dashboard">Dashboard Builder</TabsTrigger>
+            <TabsTrigger value="powerbi">Power BI Embeddings</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="dashboard">
+            <PowerBIDashboard onSave={handleSaveDashboard} />
+          </TabsContent>
+          
+          <TabsContent value="powerbi">
+            <Card>
+              <CardHeader>
+                <CardTitle>Incorporar Power BI Externo</CardTitle>
+                <CardDescription>
+                  Conecte-se com painéis Power BI existentes da Microsoft
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex flex-col space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Card className="p-4 hover:border-primary cursor-pointer transition-all">
+                      <div className="flex flex-col items-center text-center">
+                        <BarChart3 className="h-20 w-20 text-primary mb-2" />
+                        <h3 className="text-lg font-medium">Relatório de Vendas</h3>
+                        <p className="text-sm text-muted-foreground">Dashboard Power BI corporativo</p>
+                      </div>
+                    </Card>
+                    
+                    <Card className="p-4 hover:border-primary cursor-pointer transition-all">
+                      <div className="flex flex-col items-center text-center">
+                        <PieChart className="h-20 w-20 text-primary mb-2" />
+                        <h3 className="text-lg font-medium">Análise de Clientes</h3>
+                        <p className="text-sm text-muted-foreground">Segmentação e comportamento</p>
+                      </div>
+                    </Card>
+                    
+                    <Card className="p-4 hover:border-primary cursor-pointer transition-all">
+                      <div className="flex flex-col items-center text-center">
+                        <LineChart className="h-20 w-20 text-primary mb-2" />
+                        <h3 className="text-lg font-medium">Métricas Financeiras</h3>
+                        <p className="text-sm text-muted-foreground">Indicadores e tendências</p>
+                      </div>
+                    </Card>
+                  </div>
+                  
+                  <div className="mt-4">
+                    <Button onClick={() => toast.success('Conectado ao Microsoft Power BI!')}>
+                      <Database className="mr-2 h-4 w-4" />
+                      Conectar ao Power BI
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </PageLayout>
   );
-}
+};
