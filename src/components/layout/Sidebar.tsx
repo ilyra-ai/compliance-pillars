@@ -48,7 +48,7 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({ to, icon, text, className }) 
       } ${className}`}
     >
       {icon}
-      <span className="ml-2 text-sm font-medium">{text}</span>
+      <span className="ml-2 text-sm font-medium truncate">{text}</span>
     </Link>
   );
 };
@@ -81,11 +81,9 @@ const Sidebar = () => {
   
   return (
     <div
-      className={`${
-        open ? 'translate-x-0' : '-translate-x-full'
-      } transform fixed top-0 left-0 h-full bg-card shadow-lg transition-transform duration-300 ease-in-out z-40 w-64 pt-20 md:translate-x-0 md:pt-20 overflow-y-auto`}
+      className="h-full w-full flex flex-col bg-card shadow-lg pt-20 overflow-y-auto z-40"
     >
-      <div className="px-4 py-2">
+      <div className="flex-1 overflow-y-auto scrollbar-thin">
         <SidebarCategory title="Principal">
           <SidebarLink to="/" icon={<Home size={18} />} text="Dashboard" />
           <SidebarLink to="/dashboard/power-bi" icon={<LayoutDashboard size={18} />} text="Dashboard BI" />

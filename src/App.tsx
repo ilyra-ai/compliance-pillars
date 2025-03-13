@@ -52,6 +52,19 @@ const App = () => {
     // Apply font-family directly to ensure it works
     document.documentElement.style.setProperty('--font-family', 'Imprima, sans-serif');
     document.body.style.fontFamily = 'Imprima, sans-serif';
+    
+    // Apply theme from localStorage if available
+    const savedTheme = localStorage.getItem('themeConfig');
+    if (savedTheme) {
+      try {
+        const theme = JSON.parse(savedTheme);
+        document.documentElement.style.setProperty('--primary', theme.colors.primary);
+        document.documentElement.style.setProperty('--secondary', theme.colors.secondary);
+        document.documentElement.style.setProperty('--accent', theme.colors.accent);
+      } catch (e) {
+        console.error('Error applying saved theme:', e);
+      }
+    }
   }, []);
   
   return (
