@@ -1,13 +1,13 @@
 
 import React, { useState } from 'react';
-import { Sidebar } from "@/components/ui/sidebar";
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Folder, Settings, Layers, AlertTriangle, CheckCircle2, BarChart3, FileText } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import PillarCard from '@/components/ui/PillarCard';
 import { toast } from "sonner";
+import Navbar from '@/components/layout/Navbar';
+import Sidebar from '@/components/layout/Sidebar';
 
 const pillars = [
   {
@@ -90,39 +90,40 @@ const pillars = [
 ];
 
 const Pillars: React.FC = () => {
+  const navigate = useNavigate();
+  
   const handleAddPillar = () => {
     toast.success("Funcionalidade de adicionar pilar será implementada em breve.");
   };
 
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen">
-        <Sidebar />
-        <div className="flex-1 p-6">
-          <div className="mb-6 flex justify-between items-center">
-            <h1 className="text-3xl font-bold">Pilares de Compliance</h1>
-            <Button onClick={handleAddPillar}>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Adicionar Pilar
-            </Button>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {pillars.map((pillar, index) => (
-              <PillarCard
-                key={pillar.id}
-                icon={pillar.icon}
-                title={pillar.title}
-                description={pillar.description}
-                href={`/pillars/${pillar.id}`}
-                colorClass={pillar.color}
-                delay={index * 100}
-              />
-            ))}
-          </div>
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <Sidebar />
+      <main className="pb-16 pt-24 md:ml-64 px-4 md:px-8">
+        <div className="mb-6 flex justify-between items-center">
+          <h1 className="text-3xl font-bold">Pilares de Compliance</h1>
+          <Button onClick={handleAddPillar}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Adicionar Pilar
+          </Button>
         </div>
-      </div>
-    </SidebarProvider>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {pillars.map((pillar, index) => (
+            <PillarCard
+              key={pillar.id}
+              icon={pillar.icon}
+              title={pillar.title}
+              description={pillar.description}
+              href={`/pillars/${pillar.id}`}
+              colorClass={pillar.color}
+              delay={index * 100}
+            />
+          ))}
+        </div>
+      </main>
+    </div>
   );
 };
 
