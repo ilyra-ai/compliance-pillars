@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDrop } from 'react-dnd';
 import { PlusCircle } from 'lucide-react';
 import { toast } from 'sonner';
@@ -29,7 +29,7 @@ export const DroppableArea: React.FC<DroppableAreaProps> = ({
         console.log('Dropping new component from palette:', item.templateId, item.type);
         onDrop(item.templateId, item.type);
         setHasDropped(true);
-        toast.success(`Componente ${item.type} adicionado com sucesso`);
+        toast.success(`Component ${item.type} added successfully`);
         return { 
           name: 'DroppableArea', 
           isNewComponent: true, 
@@ -54,7 +54,7 @@ export const DroppableArea: React.FC<DroppableAreaProps> = ({
     if (hasDropped) {
       const timer = setTimeout(() => {
         setHasDropped(false);
-      }, 2000);
+      }, 1000);
       return () => clearTimeout(timer);
     }
   }, [hasDropped]);
@@ -72,14 +72,14 @@ export const DroppableArea: React.FC<DroppableAreaProps> = ({
               ? 'bg-secondary/5 border-2 border-dashed border-secondary' 
               : hasChildren 
                 ? '' 
-                : 'border border-dashed border-muted-foreground'
+                : 'border-2 border-dashed border-muted-foreground'
       } ${allowAnywhereDropping ? 'min-h-[200px]' : ''} ${hasDropped ? 'bg-green-50 border-green-300' : ''} p-4 rounded-md transition-all duration-200`}
     >
       {!hasChildren && (
         <div className="flex flex-col items-center justify-center h-40 text-muted-foreground">
           <PlusCircle className="h-12 w-12 mb-2 text-muted" />
-          <p className="text-center">Arraste componentes aqui ou do painel de componentes</p>
-          <p className="text-xs text-center mt-1">Personalize seu layout arrastando e soltando</p>
+          <p className="text-center">Drag components here or from the component panel</p>
+          <p className="text-xs text-center mt-1">Customize your layout by dragging and dropping</p>
         </div>
       )}
       {children}
