@@ -3,6 +3,7 @@ import React from 'react';
 import { Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useLocation } from 'react-router-dom';
 
 interface ThemeButtonProps {
   onClick: () => void;
@@ -11,10 +12,16 @@ interface ThemeButtonProps {
 
 const ThemeButton: React.FC<ThemeButtonProps> = ({ onClick, className }) => {
   const isMobile = useIsMobile();
+  const location = useLocation();
+  
+  // Active state if we're on a theme-related page
+  const isActive = 
+    location.pathname === '/ui/customize' || 
+    location.pathname === '/settings/theme';
   
   return (
     <Button 
-      variant="outline" 
+      variant={isActive ? "default" : "outline"}
       size={isMobile ? "icon" : "sm"} 
       onClick={onClick}
       className={className}

@@ -21,6 +21,7 @@ import DatabaseManager from "./pages/DatabaseManager";
 import DockerConfigurator from "./pages/DockerConfigurator";
 import { UIThemeConfigurator } from "./pages/UIThemeConfigurator";
 import FloatingThemeButton from "./components/ui/FloatingThemeButton";
+import { useThemeDialog } from "./hooks/use-theme-dialog";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -31,125 +32,137 @@ const queryClient = new QueryClient({
   },
 });
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            {/* Rotas públicas */}
-            <Route path="/login" element={<Login />} />
-            
-            {/* Rotas protegidas */}
-            <Route path="/" element={
-              <ProtectedRoute>
-                <Index />
-              </ProtectedRoute>
-            } />
-            <Route path="/pillars" element={
-              <ProtectedRoute>
-                <Pillars />
-              </ProtectedRoute>
-            } />
-            <Route path="/pillars/new" element={
-              <ProtectedRoute>
-                <PillarManagement />
-              </ProtectedRoute>
-            } />
-            <Route path="/pillars/risk" element={
-              <ProtectedRoute>
-                <RiskManagement />
-              </ProtectedRoute>
-            } />
-            <Route path="/pillars/:pillarId" element={
-              <ProtectedRoute>
-                <PillarManagement />
-              </ProtectedRoute>
-            } />
-            <Route path="/settings" element={
-              <ProtectedRoute requiredRoles={['admin', 'gestor']}>
-                <Settings />
-              </ProtectedRoute>
-            } />
-            <Route path="/settings/ui" element={
-              <ProtectedRoute>
-                <Settings />
-              </ProtectedRoute>
-            } />
-            <Route path="/settings/backup" element={
-              <ProtectedRoute requiredRoles={['admin']}>
-                <Settings />
-              </ProtectedRoute>
-            } />
-            <Route path="/settings/migration" element={
-              <ProtectedRoute requiredRoles={['admin']}>
-                <Settings />
-              </ProtectedRoute>
-            } />
-            <Route path="/settings/hostgator" element={
-              <ProtectedRoute requiredRoles={['admin']}>
-                <Settings />
-              </ProtectedRoute>
-            } />
-            <Route path="/reports" element={
-              <ProtectedRoute>
-                <Index />
-              </ProtectedRoute>
-            } />
-            <Route path="/users" element={
-              <ProtectedRoute requiredRoles={['admin', 'gestor']}>
-                <UserManagement />
-              </ProtectedRoute>
-            } />
-            
-            {/* Rotas para funcionalidades solicitadas */}
-            <Route path="/reports/builder" element={
-              <ProtectedRoute>
-                <ReportBuilder />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/documents/editor" element={
-              <ProtectedRoute>
-                <DocumentEditor />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/charts" element={
-              <ProtectedRoute>
-                <ChartManagement />
-              </ProtectedRoute>
-            } />
+const App = () => {
+  const { handleOpenUITheme } = useThemeDialog();
+  
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              {/* Rotas públicas */}
+              <Route path="/login" element={<Login />} />
+              
+              {/* Rotas protegidas */}
+              <Route path="/" element={
+                <ProtectedRoute>
+                  <Index />
+                </ProtectedRoute>
+              } />
+              <Route path="/pillars" element={
+                <ProtectedRoute>
+                  <Pillars />
+                </ProtectedRoute>
+              } />
+              <Route path="/pillars/new" element={
+                <ProtectedRoute>
+                  <PillarManagement />
+                </ProtectedRoute>
+              } />
+              <Route path="/pillars/risk" element={
+                <ProtectedRoute>
+                  <RiskManagement />
+                </ProtectedRoute>
+              } />
+              <Route path="/pillars/:pillarId" element={
+                <ProtectedRoute>
+                  <PillarManagement />
+                </ProtectedRoute>
+              } />
+              <Route path="/settings" element={
+                <ProtectedRoute requiredRoles={['admin', 'gestor']}>
+                  <Settings />
+                </ProtectedRoute>
+              } />
+              <Route path="/settings/ui" element={
+                <ProtectedRoute>
+                  <Settings />
+                </ProtectedRoute>
+              } />
+              <Route path="/settings/theme" element={
+                <ProtectedRoute>
+                  <UIThemeConfigurator />
+                </ProtectedRoute>
+              } />
+              <Route path="/settings/backup" element={
+                <ProtectedRoute requiredRoles={['admin']}>
+                  <Settings />
+                </ProtectedRoute>
+              } />
+              <Route path="/settings/migration" element={
+                <ProtectedRoute requiredRoles={['admin']}>
+                  <Settings />
+                </ProtectedRoute>
+              } />
+              <Route path="/settings/hostgator" element={
+                <ProtectedRoute requiredRoles={['admin']}>
+                  <Settings />
+                </ProtectedRoute>
+              } />
+              <Route path="/reports" element={
+                <ProtectedRoute>
+                  <Index />
+                </ProtectedRoute>
+              } />
+              <Route path="/users" element={
+                <ProtectedRoute requiredRoles={['admin', 'gestor']}>
+                  <UserManagement />
+                </ProtectedRoute>
+              } />
+              
+              {/* Rotas para funcionalidades solicitadas */}
+              <Route path="/reports/builder" element={
+                <ProtectedRoute>
+                  <ReportBuilder />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/documents/editor" element={
+                <ProtectedRoute>
+                  <DocumentEditor />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/charts" element={
+                <ProtectedRoute>
+                  <ChartManagement />
+                </ProtectedRoute>
+              } />
 
-            {/* Novas rotas para banco de dados e configurações Docker */}
-            <Route path="/database" element={
-              <ProtectedRoute requiredRoles={['admin']}>
-                <DatabaseManager />
-              </ProtectedRoute>
-            } />
+              {/* Novas rotas para banco de dados e configurações Docker */}
+              <Route path="/database" element={
+                <ProtectedRoute requiredRoles={['admin']}>
+                  <DatabaseManager />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/docker" element={
+                <ProtectedRoute requiredRoles={['admin']}>
+                  <DockerConfigurator />
+                </ProtectedRoute>
+              } />
+
+              {/* Rota para o UI Theme Configurator */}
+              <Route path="/ui/customize" element={
+                <ProtectedRoute>
+                  <UIThemeConfigurator />
+                </ProtectedRoute>
+              } />
+
+              {/* Rota de fallback */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
             
-            <Route path="/docker" element={
-              <ProtectedRoute requiredRoles={['admin']}>
-                <DockerConfigurator />
-              </ProtectedRoute>
-            } />
-
-            {/* Rota para o UI Theme Configurator */}
-            <Route path="/ui/customize" element={
-              <ProtectedRoute>
-                <UIThemeConfigurator />
-              </ProtectedRoute>
-            } />
-
-            {/* Rota de fallback */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
-);
+            {/* Floating Theme Button disponível em todas as páginas exceto no próprio configurador */}
+            <FloatingThemeButton onClick={handleOpenUITheme} />
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

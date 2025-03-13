@@ -3,6 +3,7 @@ import React from 'react';
 import { Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useLocation } from 'react-router-dom';
 
 interface FloatingThemeButtonProps {
   onClick: () => void;
@@ -10,6 +11,16 @@ interface FloatingThemeButtonProps {
 
 const FloatingThemeButton: React.FC<FloatingThemeButtonProps> = ({ onClick }) => {
   const isMobile = useIsMobile();
+  const location = useLocation();
+  
+  // Hide button on theme configurator pages
+  const isThemeConfiguratorPage = 
+    location.pathname === '/ui/customize' || 
+    location.pathname === '/settings/theme';
+  
+  if (isThemeConfiguratorPage) {
+    return null;
+  }
   
   return (
     <Button 
