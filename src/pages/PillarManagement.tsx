@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import PageLayout from '@/components/layout/PageLayout';
@@ -7,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PageCustomizer } from '@/components/ui/customizable/PageCustomizer';
 import { CustomizableLayout } from '@/components/ui/customizable/CustomizableLayout';
 
-// Importando o componente PillarContent se já existir
+// Importing the component PillarContent
 import PillarContent from '@/components/ui/PillarContent';
 
 const PillarManagement = () => {
@@ -16,7 +17,7 @@ const PillarManagement = () => {
   const [editMode, setEditMode] = useState(false);
   const [activeTab, setActiveTab] = useState<string>('overview');
   
-  // Extrair o nome do pilar da URL
+  // Extract the pillar name from the URL
   const pillarSlug = location.pathname.split('/').pop() || '';
   const pillarName = getPillarNameFromSlug(pillarSlug);
 
@@ -104,7 +105,8 @@ const PillarManagement = () => {
         </TabsList>
         
         <TabsContent value="overview">
-          <PillarContent pillarSlug={pillarSlug} />
+          {/* Fixed: Removed pillarSlug prop as it's not expected by the component */}
+          <PillarContent />
         </TabsContent>
         
         <TabsContent value="editor">

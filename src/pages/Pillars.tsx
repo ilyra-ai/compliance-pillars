@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import PageLayout from '@/components/layout/PageLayout';
 import { Button } from '@/components/ui/button';
-import { PillarCard } from '@/components/ui/PillarCard';
+import PillarCard from '@/components/ui/PillarCard'; // Fixed import statement
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Shield,
