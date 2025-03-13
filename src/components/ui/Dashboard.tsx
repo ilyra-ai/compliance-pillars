@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Users,
@@ -51,9 +50,12 @@ import {
   ChartLegend, 
   ChartLegendContent 
 } from './chart';
+import ThemeButton from './ThemeButton';
+import { useThemeDialog } from '@/hooks/use-theme-dialog';
 
 const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
+  const { handleOpenUITheme } = useThemeDialog();
 
   const stats = [
     { label: 'Políticas Ativas', value: '28', icon: <CheckCircle size={20} className="text-green-500" />, trend: '+3 esse mês' },
@@ -62,7 +64,6 @@ const Dashboard: React.FC = () => {
     { label: 'Treinamentos', value: '87%', icon: <TrendingUp size={20} className="text-compliance-500" />, trend: 'Conclusão' },
   ];
 
-  // Dados para os gráficos
   const complianceData = [
     { name: 'Jan', políticas: 20, riscos: 15, denúncias: 5 },
     { name: 'Fev', políticas: 22, riscos: 13, denúncias: 7 },
@@ -460,10 +461,11 @@ const Dashboard: React.FC = () => {
       </Tabs>
 
       <div className="mt-12 flex justify-center">
-        <a href="/settings/theme" className="flex items-center text-sm text-muted-foreground hover:text-primary transition">
-          <Settings size={16} className="mr-2" />
-          Personalizar UI
-        </a>
+        <ThemeButton 
+          variant="ghost" 
+          className="text-sm text-muted-foreground hover:text-primary transition"
+          size="sm"
+        />
       </div>
     </div>
   );

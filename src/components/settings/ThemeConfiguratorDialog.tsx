@@ -1,101 +1,157 @@
 
-import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import ThemeConfigurator from '@/components/settings/ThemeConfigurator';
-import { themeService, ThemeConfig } from '@/services/theme-service';
-import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
-import { Palette, Save } from 'lucide-react';
-import { toast } from 'sonner';
+import React, { useEffect, useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { ColorSwatch } from "@/components/ui/color-swatch";
+import { themeService, ThemeConfig } from "@/services/theme-service";
+import { useThemeDialog } from '@/hooks/use-theme-dialog';
 
 interface ThemeConfiguratorDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSave: (config: ThemeConfig) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  onSave?: (theme: ThemeConfig) => void;
 }
 
-const ThemeConfiguratorDialog: React.FC<ThemeConfiguratorDialogProps> = ({ 
-  open, 
-  onOpenChange, 
-  onSave 
+const ThemeConfiguratorDialog: React.FC<ThemeConfiguratorDialogProps> = ({
+  open: propOpen,
+  onOpenChange: propOnOpenChange,
+  onSave: propOnSave
 }) => {
-  const [currentTheme, setCurrentTheme] = useState<ThemeConfig>(themeService.getTheme());
-  const [isChanged, setIsChanged] = useState(false);
-  const navigate = useNavigate();
+  const { 
+    themeDialogOpen, 
+    setThemeDialogOpen, 
+    handleSaveTheme 
+  } = useThemeDialog();
   
-  // Update the current theme when the dialog opens
+  // Use either props or context values
+  const dialogOpen = propOpen !== undefined ? propOpen : themeDialogOpen;
+  const setDialogOpen = propOnOpenChange || setThemeDialogOpen;
+  const saveTheme = propOnSave || handleSaveTheme;
+  
+  const [themeConfig, setThemeConfig] = useState<ThemeConfig>(themeService.getTheme());
+  const [hasChanges, setHasChanges] = useState(false);
+  
+  // Reset theme config when dialog opens
   useEffect(() => {
-    if (open) {
-      try {
-        const theme = themeService.getTheme();
-        setCurrentTheme(theme);
-        setIsChanged(false);
-      } catch (error) {
-        console.error('Error loading theme:', error);
-        toast.error('Erro ao carregar o tema atual');
-      }
+    if (dialogOpen) {
+      setThemeConfig(themeService.getTheme());
+      setHasChanges(false);
     }
-  }, [open]);
+  }, [dialogOpen]);
   
-  const handleSave = (config: ThemeConfig) => {
+  // Apply theme changes in real-time
+  useEffect(() => {
+    if (dialogOpen && hasChanges) {
+      themeService.applyThemeTemporarily(themeConfig);
+    }
+  }, [themeConfig, dialogOpen, hasChanges]);
+  
+  const handleColorChange = (colorKey: keyof ThemeConfig['colors'], color: string) => {
+    setThemeConfig((prev) => ({
+      ...prev,
+      colors: {
+        ...prev.colors,
+        [colorKey]: color
+      }
+    }));
+    setHasChanges(true);
+  };
+  
+  const handleFontChange = (fontFamily: string) => {
+    setThemeConfig((prev) => ({
+      ...prev,
+      fonts: {
+        ...prev.fonts,
+        family: fontFamily
+      }
+    }));
+    setHasChanges(true);
+  };
+  
+  const handleSaveChanges = () => {
     try {
-      onSave(config);
-      toast.success('Configurações de UI salvas com sucesso!');
-      setIsChanged(false);
-      onOpenChange(false);
+      saveTheme(themeConfig);
+      setHasChanges(false);
     } catch (error) {
       console.error('Error saving theme:', error);
-      toast.error('Erro ao salvar configurações de UI');
     }
   };
-
-  const handleThemeChange = (updatedTheme: ThemeConfig) => {
-    setCurrentTheme(updatedTheme);
-    setIsChanged(true);
-  };
-
-  const handleGoToFullEditor = () => {
-    if (isChanged) {
-      const confirmNavigation = window.confirm('Você tem alterações não salvas. Deseja continuar sem salvar?');
-      if (!confirmNavigation) return;
+  
+  const handleResetTheme = () => {
+    try {
+      themeService.resetTheme();
+      setThemeConfig(themeService.getTheme());
+      setHasChanges(true);
+    } catch (error) {
+      console.error('Error resetting theme:', error);
     }
-    onOpenChange(false);
-    navigate('/ui/customize');
   };
   
   return (
-    <Dialog open={open} onOpenChange={(newOpen) => {
-      if (!newOpen && isChanged) {
-        const confirmClose = window.confirm('Você tem alterações não salvas. Deseja sair sem salvar?');
-        if (!confirmClose) return;
-      }
-      onOpenChange(newOpen);
-    }}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Personalizar UI</DialogTitle>
-          <DialogDescription>
-            Personalize as cores, fontes e elementos da interface
-          </DialogDescription>
         </DialogHeader>
-        <ThemeConfigurator 
-          onSave={handleSave} 
-          onChange={handleThemeChange}
-          initialValues={currentTheme}
-        />
-        <DialogFooter className="mt-4 flex justify-between">
-          <Button 
-            variant="default" 
-            onClick={() => handleSave(currentTheme)} 
-            disabled={!isChanged}
-          >
-            <Save className="mr-2 h-4 w-4" />
-            Salvar Alterações
-          </Button>
-          <Button variant="outline" onClick={handleGoToFullEditor}>
-            <Palette className="mr-2 h-4 w-4" />
-            Ir para Editor Completo
-          </Button>
+        
+        <div className="grid gap-6 py-4">
+          <div>
+            <h3 className="text-lg font-medium mb-3">Cores</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <ColorSwatch 
+                color={themeConfig.colors.primary} 
+                onChange={(color) => handleColorChange('primary', color)} 
+                label="Cor Primária" 
+              />
+              <ColorSwatch 
+                color={themeConfig.colors.secondary} 
+                onChange={(color) => handleColorChange('secondary', color)} 
+                label="Cor Secundária" 
+              />
+              <ColorSwatch 
+                color={themeConfig.colors.accent} 
+                onChange={(color) => handleColorChange('accent', color)} 
+                label="Cor de Destaque" 
+              />
+              <ColorSwatch 
+                color={themeConfig.colors.background} 
+                onChange={(color) => handleColorChange('background', color)} 
+                label="Fundo" 
+              />
+              <ColorSwatch 
+                color={themeConfig.colors.text} 
+                onChange={(color) => handleColorChange('text', color)} 
+                label="Texto" 
+              />
+            </div>
+          </div>
+          
+          <div>
+            <h3 className="text-lg font-medium mb-3">Tipografia</h3>
+            <div className="grid gap-4">
+              <div className="flex flex-col space-y-1.5">
+                <label className="text-xs">Fonte</label>
+                <select 
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  value={themeConfig.fonts.family}
+                  onChange={(e) => handleFontChange(e.target.value)}
+                >
+                  <option value="Imprima">Imprima</option>
+                  <option value="Poppins">Poppins</option>
+                  <option value="Inter">Inter</option>
+                  <option value="Roboto">Roboto</option>
+                  <option value="Lato">Lato</option>
+                  <option value="Open Sans">Open Sans</option>
+                  <option value="Montserrat">Montserrat</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <DialogFooter>
+          <Button variant="outline" onClick={handleResetTheme}>Restaurar Padrão</Button>
+          <Button onClick={handleSaveChanges} disabled={!hasChanges}>Salvar Alterações</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 
@@ -14,7 +14,15 @@ export const ColorSwatch: React.FC<ColorSwatchProps> = ({
   onChange, 
   label 
 }) => {
+  const [inputValue, setInputValue] = useState(color);
+  
+  useEffect(() => {
+    setInputValue(color);
+  }, [color]);
+
   const handleColorChange = (value: string) => {
+    setInputValue(value);
+    
     try {
       // Validate hex color
       if (value.match(/^#([0-9A-F]{3}){1,2}$/i)) {
@@ -31,6 +39,13 @@ export const ColorSwatch: React.FC<ColorSwatchProps> = ({
     }
   };
 
+  // Handle direct color picker change
+  const handlePickerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newColor = event.target.value;
+    setInputValue(newColor);
+    onChange(newColor);
+  };
+
   return (
     <div className="flex flex-col space-y-1.5">
       {label && <Label className="text-xs">{label}</Label>}
@@ -42,12 +57,12 @@ export const ColorSwatch: React.FC<ColorSwatchProps> = ({
         <Input 
           type="color" 
           value={color} 
-          onChange={(e) => onChange(e.target.value)} 
+          onChange={handlePickerChange} 
           className="w-16 h-8 p-0" 
         />
         <Input 
           type="text" 
-          value={color} 
+          value={inputValue} 
           onChange={(e) => handleColorChange(e.target.value)} 
           className="w-full" 
         />
