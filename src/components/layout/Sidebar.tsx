@@ -115,7 +115,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onItemClick }) => {
           <SidebarLink to="/documents/editor" icon={<Edit3 size={18} />} text="Editor de Documentos" onClick={onItemClick} />
           <SidebarLink to="/documents/advanced" icon={<File size={18} />} text="Documentos Avançados" onClick={onItemClick} />
           <SidebarLink to="/charts" icon={<PieChart size={18} />} text="Gráficos" onClick={onItemClick} />
-          <SidebarLink to="/power-bi" icon={<BarChart3 size={18} />} text="Power BI" className="text-primary font-medium" onClick={onItemClick} />
+          <SidebarLink to="/power-bi" icon={<BarChart3 size={18} />} text="Power BI" onClick={onItemClick} />
           <SidebarLink to="/analytics" icon={<Activity size={18} />} text="Analytics" onClick={onItemClick} />
           <SidebarLink to="/chatbot" icon={<MessageSquare size={18} />} text="Assistente IA" onClick={onItemClick} />
         </SidebarCategory>
