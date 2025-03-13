@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
@@ -16,8 +17,8 @@ import {
 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import WYSIWYGEditor from '@/components/ui/wysiwyg-editor';
-import ReportBuilder from '@/components/ui/report-builder';
+import WYSIWYGEditor from '@/components/editor/WYSIWYGEditor';
+import ReportBuilder from '@/components/reports/ReportBuilder';
 
 const pillarNames: Record<string, string> = {
   'leadership': 'Alta Administração',
@@ -208,4 +209,35 @@ const PillarContent: React.FC<PillarContentProps> = ({ children }) => {
             <CardHeader>
               <CardTitle>Documentos do Pilar</CardTitle>
               <CardDescription>Políticas, procedimentos e evidências relacionadas</CardDescription>
-           
+            </CardHeader>
+            <CardContent>
+              <p>Lista de documentos relacionados a este pilar...</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="tasks">
+          <Card>
+            <CardHeader>
+              <CardTitle>Tarefas do Pilar</CardTitle>
+              <CardDescription>Pendências, atividades e prazos</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>Lista de tarefas relacionadas a este pilar...</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="reports">
+          <ReportBuilder />
+        </TabsContent>
+        
+        <TabsContent value="editor">
+          <WYSIWYGEditor />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+};
+
+export default PillarContent;
