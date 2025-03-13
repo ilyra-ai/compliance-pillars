@@ -5,7 +5,8 @@ import ThemeConfigurator from '@/components/settings/ThemeConfigurator';
 import { themeService, ThemeConfig } from '@/services/theme-service';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { Palette } from 'lucide-react';
+import { Palette, Save } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ThemeConfiguratorDialogProps {
   open: boolean;
@@ -19,27 +20,52 @@ const ThemeConfiguratorDialog: React.FC<ThemeConfiguratorDialogProps> = ({
   onSave 
 }) => {
   const [currentTheme, setCurrentTheme] = useState<ThemeConfig>(themeService.getTheme());
+  const [isChanged, setIsChanged] = useState(false);
   const navigate = useNavigate();
   
   // Update the current theme when the dialog opens
   useEffect(() => {
     if (open) {
-      setCurrentTheme(themeService.getTheme());
+      const theme = themeService.getTheme();
+      setCurrentTheme(theme);
+      setIsChanged(false);
     }
   }, [open]);
   
   const handleSave = (config: ThemeConfig) => {
-    onSave(config);
-    onOpenChange(false);
+    try {
+      onSave(config);
+      toast.success('Configurações de UI salvas com sucesso!');
+      setIsChanged(false);
+      onOpenChange(false);
+    } catch (error) {
+      console.error('Error saving theme:', error);
+      toast.error('Erro ao salvar configurações de UI');
+    }
+  };
+
+  const handleThemeChange = (updatedTheme: ThemeConfig) => {
+    setCurrentTheme(updatedTheme);
+    setIsChanged(true);
   };
 
   const handleGoToFullEditor = () => {
+    if (isChanged) {
+      const confirmNavigation = window.confirm('Você tem alterações não salvas. Deseja continuar sem salvar?');
+      if (!confirmNavigation) return;
+    }
     onOpenChange(false);
     navigate('/ui/customize');
   };
   
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(newOpen) => {
+      if (!newOpen && isChanged) {
+        const confirmClose = window.confirm('Você tem alterações não salvas. Deseja sair sem salvar?');
+        if (!confirmClose) return;
+      }
+      onOpenChange(newOpen);
+    }}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Personalizar UI</DialogTitle>
@@ -49,10 +75,14 @@ const ThemeConfiguratorDialog: React.FC<ThemeConfiguratorDialogProps> = ({
         </DialogHeader>
         <ThemeConfigurator 
           onSave={handleSave} 
-          onChange={setCurrentTheme}
+          onChange={handleThemeChange}
           initialValues={currentTheme}
         />
-        <DialogFooter className="mt-4">
+        <DialogFooter className="mt-4 flex justify-between">
+          <Button variant="default" onClick={() => handleSave(currentTheme)} disabled={!isChanged}>
+            <Save className="mr-2 h-4 w-4" />
+            Salvar Alterações
+          </Button>
           <Button variant="outline" onClick={handleGoToFullEditor}>
             <Palette className="mr-2 h-4 w-4" />
             Ir para Editor Completo

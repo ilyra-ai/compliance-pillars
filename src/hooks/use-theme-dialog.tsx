@@ -13,9 +13,13 @@ export const useThemeDialog = () => {
     navigate = useNavigate();
   } catch (error) {
     // If useNavigate throws an error, provide a fallback function
+    console.warn('Navigator not available in this context, using fallback');
     navigate = (path: string) => {
       console.warn('Navigation attempted outside Router context to:', path);
-      window.location.href = path; // Fallback to direct navigation if outside Router context
+      // Use a more compatible approach for navigation
+      if (typeof window !== 'undefined') {
+        window.location.href = path;
+      }
     };
   }
   
@@ -53,7 +57,9 @@ export const useThemeDialog = () => {
       toast.error('Não foi possível navegar para o editor de temas.');
       
       // Fallback to direct navigation if router navigation fails
-      window.location.href = '/settings/theme';
+      if (typeof window !== 'undefined') {
+        window.location.href = '/settings/theme';
+      }
     }
   }, [navigate]);
   

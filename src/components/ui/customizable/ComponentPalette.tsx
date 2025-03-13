@@ -124,8 +124,12 @@ const DraggableComponentItem: React.FC<DraggableComponentItemProps> = ({
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
-    end: () => {
+    end: (item, monitor) => {
       onDragEnd?.();
+      const didDrop = monitor.didDrop();
+      if (!didDrop) {
+        console.log('Component was not dropped in a valid drop target');
+      }
     }
   });
 

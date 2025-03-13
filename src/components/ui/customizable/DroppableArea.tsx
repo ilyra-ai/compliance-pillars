@@ -94,8 +94,8 @@ export const DroppableArea: React.FC<DroppableAreaProps> = ({
       return { name: 'DroppableArea', position: dropPosition };
     },
     collect: (monitor) => ({
-      isOver: monitor.isOver(),
-      canDrop: monitor.canDrop(),
+      isOver: !!monitor.isOver(),
+      canDrop: !!monitor.canDrop(),
     }),
   });
 
