@@ -62,7 +62,7 @@ class ThemeService {
         text: '#1f2937'
       },
       fonts: {
-        family: 'Inter'
+        family: 'Imprima'
       },
       assets: {
         logo: '/placeholder.svg'

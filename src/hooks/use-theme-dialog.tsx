@@ -15,8 +15,7 @@ export const useThemeDialog = () => {
     // If useNavigate throws an error, provide a fallback function
     navigate = (path: string) => {
       console.warn('Navigation attempted outside Router context to:', path);
-      // You could handle this differently, perhaps setting a state that
-      // a parent component could use to navigate once in Router context
+      window.location.href = path; // Fallback to direct navigation if outside Router context
     };
   }
   
@@ -47,6 +46,9 @@ export const useThemeDialog = () => {
     } catch (error) {
       console.error('Error navigating to theme editor:', error);
       toast.error('Não foi possível navegar para o editor de temas.');
+      
+      // Fallback to direct navigation if router navigation fails
+      window.location.href = '/ui/customize';
     }
   }, [navigate]);
   

@@ -6,6 +6,8 @@ import PowerBIDashboard from '@/components/dashboard/PowerBIDashboard';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { 
   ChevronLeft, 
   Save, 
@@ -14,13 +16,16 @@ import {
   Database,
   BarChart3,
   PieChart,
-  LineChart
+  LineChart,
+  ExternalLink
 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function PowerBIDashboardPage() {
   const navigate = useNavigate();
   const [activeView, setActiveView] = useState('dashboard');
+  const [embedUrl, setEmbedUrl] = useState('');
+  const [isEmbedded, setIsEmbedded] = useState(false);
   
   const handleBack = () => {
     navigate('/');
@@ -30,6 +35,16 @@ export default function PowerBIDashboardPage() {
     // In a real app, this would save to a database
     toast.success('Dashboard salvo com sucesso!');
     console.log('Dashboard saved:', dashboard);
+  };
+
+  const handleEmbedPowerBI = () => {
+    if (!embedUrl) {
+      toast.error('Por favor, insira uma URL válida do Power BI.');
+      return;
+    }
+    
+    setIsEmbedded(true);
+    toast.success('Dashboard Power BI incorporado com sucesso!');
   };
   
   const actions = (
@@ -94,40 +109,80 @@ export default function PowerBIDashboardPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex flex-col space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Card className="p-4 hover:border-primary cursor-pointer transition-all">
-                      <div className="flex flex-col items-center text-center">
-                        <BarChart3 className="h-20 w-20 text-primary mb-2" />
-                        <h3 className="text-lg font-medium">Relatório de Vendas</h3>
-                        <p className="text-sm text-muted-foreground">Dashboard Power BI corporativo</p>
+                {!isEmbedded ? (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="power-bi-url">URL do Painel Power BI</Label>
+                      <div className="flex space-x-2">
+                        <Input 
+                          id="power-bi-url" 
+                          value={embedUrl} 
+                          onChange={(e) => setEmbedUrl(e.target.value)} 
+                          placeholder="https://app.powerbi.com/view?r=..." 
+                        />
+                        <Button onClick={handleEmbedPowerBI}>
+                          <ExternalLink className="mr-2 h-4 w-4" />
+                          Incorporar
+                        </Button>
                       </div>
-                    </Card>
+                      <p className="text-sm text-muted-foreground">
+                        Cole a URL de incorporação do painel do Power BI
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <Card className="p-4 hover:border-primary cursor-pointer transition-all">
+                        <div className="flex flex-col items-center text-center">
+                          <BarChart3 className="h-20 w-20 text-primary mb-2" />
+                          <h3 className="text-lg font-medium">Relatório de Vendas</h3>
+                          <p className="text-sm text-muted-foreground">Dashboard Power BI corporativo</p>
+                        </div>
+                      </Card>
+                      
+                      <Card className="p-4 hover:border-primary cursor-pointer transition-all">
+                        <div className="flex flex-col items-center text-center">
+                          <PieChart className="h-20 w-20 text-primary mb-2" />
+                          <h3 className="text-lg font-medium">Análise de Clientes</h3>
+                          <p className="text-sm text-muted-foreground">Segmentação e comportamento</p>
+                        </div>
+                      </Card>
+                      
+                      <Card className="p-4 hover:border-primary cursor-pointer transition-all">
+                        <div className="flex flex-col items-center text-center">
+                          <LineChart className="h-20 w-20 text-primary mb-2" />
+                          <h3 className="text-lg font-medium">Métricas Financeiras</h3>
+                          <p className="text-sm text-muted-foreground">Indicadores e tendências</p>
+                        </div>
+                      </Card>
+                    </div>
                     
-                    <Card className="p-4 hover:border-primary cursor-pointer transition-all">
-                      <div className="flex flex-col items-center text-center">
-                        <PieChart className="h-20 w-20 text-primary mb-2" />
-                        <h3 className="text-lg font-medium">Análise de Clientes</h3>
-                        <p className="text-sm text-muted-foreground">Segmentação e comportamento</p>
-                      </div>
-                    </Card>
-                    
-                    <Card className="p-4 hover:border-primary cursor-pointer transition-all">
-                      <div className="flex flex-col items-center text-center">
-                        <LineChart className="h-20 w-20 text-primary mb-2" />
-                        <h3 className="text-lg font-medium">Métricas Financeiras</h3>
-                        <p className="text-sm text-muted-foreground">Indicadores e tendências</p>
-                      </div>
-                    </Card>
+                    <div className="mt-4">
+                      <Button onClick={() => toast.success('Conectado ao Microsoft Power BI!')}>
+                        <Database className="mr-2 h-4 w-4" />
+                        Conectar ao Power BI
+                      </Button>
+                    </div>
                   </div>
-                  
-                  <div className="mt-4">
-                    <Button onClick={() => toast.success('Conectado ao Microsoft Power BI!')}>
-                      <Database className="mr-2 h-4 w-4" />
-                      Conectar ao Power BI
-                    </Button>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="border rounded-lg p-4 bg-muted/20">
+                      <div className="w-full h-[600px] overflow-hidden">
+                        <iframe 
+                          src={embedUrl} 
+                          width="100%" 
+                          height="600" 
+                          style={{ border: 'none' }} 
+                          allowFullScreen
+                        ></iframe>
+                      </div>
+                    </div>
+                    <div className="flex justify-end">
+                      <Button variant="outline" onClick={() => setIsEmbedded(false)}>
+                        Voltar para Configuração
+                      </Button>
+                    </div>
                   </div>
-                </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
