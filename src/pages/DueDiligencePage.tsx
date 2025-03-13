@@ -7,7 +7,8 @@ import {
   FileCheck, 
   PlusCircle, 
   BarChart4 as BarChart, 
-  Settings
+  Settings,
+  Palette
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -20,12 +21,27 @@ const DueDiligencePage = () => {
       description="Gerenciamento de processos de due diligence e avaliação de parceiros"
       actions={
         <div className="flex gap-2">
-          <Button onClick={() => setEditMode(!editMode)} variant={editMode ? "default" : "outline"}>
-            <Settings className="mr-2 h-4 w-4" />
-            {editMode ? "Modo Visualização" : "Modo Edição"}
+          <Button 
+            onClick={() => setEditMode(!editMode)} 
+            variant={editMode ? "default" : "outline"}
+            className="relative overflow-hidden group"
+            size="lg"
+          >
+            {editMode ? (
+              <>
+                <Settings className="mr-2 h-5 w-5" />
+                Modo Visualização
+              </>
+            ) : (
+              <>
+                <Palette className="mr-2 h-5 w-5" />
+                <span>Personalizar UI</span>
+                <span className="absolute right-0 top-0 h-full w-2 bg-primary/20 animate-pulse hidden group-hover:block"></span>
+              </>
+            )}
           </Button>
-          <Button>
-            <PlusCircle className="mr-2 h-4 w-4" />
+          <Button size="lg">
+            <PlusCircle className="mr-2 h-5 w-5" />
             Novo Processo
           </Button>
         </div>
@@ -35,7 +51,12 @@ const DueDiligencePage = () => {
       <Tabs defaultValue={editMode ? "editor" : "dashboard"} value={editMode ? "editor" : "dashboard"}>
         <TabsList className="mb-6">
           <TabsTrigger value="dashboard" onClick={() => setEditMode(false)}>Dashboard</TabsTrigger>
-          <TabsTrigger value="editor" onClick={() => setEditMode(true)}>Editor de Layout</TabsTrigger>
+          <TabsTrigger value="editor" onClick={() => setEditMode(true)} className="relative">
+            Editor de Layout
+            {!editMode && (
+              <span className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-pulse"></span>
+            )}
+          </TabsTrigger>
           <TabsTrigger value="processes">Processos</TabsTrigger>
           <TabsTrigger value="policies">Políticas</TabsTrigger>
           <TabsTrigger value="reports">Relatórios</TabsTrigger>
