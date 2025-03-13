@@ -7,6 +7,10 @@ interface User {
   name: string;
   email: string;
   role: string;
+  permissions: {
+    pillars: string[];
+    features: string[];
+  };
 }
 
 interface AuthContextType {
@@ -16,6 +20,7 @@ interface AuthContextType {
   loginWithGoogle: () => void;
   logout: () => void;
   loading: boolean;
+  updateUserPermissions: (userId: string, pillars: string[], features: string[]) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -25,13 +30,14 @@ const AuthContext = createContext<AuthContextType>({
   loginWithGoogle: () => {},
   logout: () => {},
   loading: true,
+  updateUserPermissions: () => {},
 });
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 
-// Mock dos usuários para demonstração
+// Mock dos usuários para demonstração com permissões avançadas
 const MOCK_USERS = [
   {
     id: '1',
@@ -39,6 +45,10 @@ const MOCK_USERS = [
     email: 'admin@exemplo.com',
     password: 'admin123',
     role: 'admin',
+    permissions: {
+      pillars: ['all'],
+      features: ['all'],
+    },
   },
   {
     id: '2',
@@ -46,6 +56,10 @@ const MOCK_USERS = [
     email: 'gestor@exemplo.com',
     password: 'gestor123',
     role: 'gestor',
+    permissions: {
+      pillars: ['risk', 'compliance', 'performance'],
+      features: ['charts', 'reports', 'documents'],
+    },
   },
   {
     id: '3',
@@ -53,6 +67,10 @@ const MOCK_USERS = [
     email: 'analista@exemplo.com',
     password: 'analista123',
     role: 'analista',
+    permissions: {
+      pillars: ['risk'],
+      features: ['view_charts', 'view_reports'],
+    },
   },
 ];
 
@@ -109,6 +127,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         name: 'Usuário Google',
         email: 'usuario@gmail.com',
         role: 'analista',
+        permissions: {
+          pillars: ['risk'],
+          features: ['view_charts', 'view_reports'],
+        },
       };
       
       // Simula a geração de um token JWT
@@ -123,6 +145,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       toast.success('Login com Google realizado com sucesso!');
     }, 1500);
+  };
+
+  const updateUserPermissions = (userId: string, pillars: string[], features: string[]) => {
+    if (!user) return;
+    
+    const updatedUser = {
+      ...user,
+      permissions: {
+        pillars,
+        features,
+      }
+    };
+    
+    // Atualiza no localStorage e no estado
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    setUser(updatedUser);
+    
+    toast.success('Permissões do usuário atualizadas com sucesso!');
   };
 
   const logout = () => {
@@ -145,6 +185,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         loginWithGoogle,
         logout,
         loading,
+        updateUserPermissions,
       }}
     >
       {children}

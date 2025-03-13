@@ -17,7 +17,14 @@ import ReportBuilder from "./pages/ReportBuilder";
 import Settings from "./pages/Settings";
 import ChartManagement from "./pages/ChartManagement";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -62,7 +69,7 @@ const App = () => (
               </ProtectedRoute>
             } />
             
-            {/* Novas rotas */}
+            {/* Rotas para funcionalidades solicitadas */}
             <Route path="/reports/builder" element={
               <ProtectedRoute>
                 <ReportBuilder />
