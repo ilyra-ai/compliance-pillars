@@ -10,6 +10,10 @@ export interface ThemeColors {
   font: string;
 }
 
+export interface ThemeConfig {
+  colors: ThemeColors;
+}
+
 interface ThemeContextType {
   colors: ThemeColors;
   updateColors: (colors: Partial<ThemeColors>) => void;
@@ -90,6 +94,7 @@ export const availableFonts = [
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+// Separate the React component from the service
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [colors, setColors] = useState<ThemeColors>(defaultColors);
   const { theme } = useTheme();
@@ -129,10 +134,11 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  return (
-    <ThemeContext.Provider value={{ colors, updateColors, resetColors, applyTheme }}>
-      {children}
-    </ThemeContext.Provider>
+  // Create the context provider without JSX
+  return React.createElement(
+    ThemeContext.Provider,
+    { value: { colors, updateColors, resetColors, applyTheme } },
+    children
   );
 };
 
@@ -142,4 +148,90 @@ export const useThemeService = () => {
     throw new Error("useThemeService must be used within a ThemeProvider");
   }
   return context;
+};
+
+// Create a utility for theme service
+export const themeService = {
+  getTheme(): ThemeConfig {
+    try {
+      const savedTheme = localStorage.getItem("theme-colors");
+      if (savedTheme) {
+        return { colors: JSON.parse(savedTheme) };
+      }
+    } catch (error) {
+      console.error("Error loading theme:", error);
+    }
+    return { colors: defaultColors };
+  },
+
+  saveTheme(config: ThemeConfig): void {
+    try {
+      const { colors } = config;
+      
+      // Apply colors to CSS variables
+      document.documentElement.style.setProperty("--primary", colors.primary);
+      document.documentElement.style.setProperty("--secondary", colors.secondary);
+      document.documentElement.style.setProperty("--accent", colors.accent);
+      
+      // Save to localStorage
+      localStorage.setItem("theme-colors", JSON.stringify(colors));
+      
+      console.info("Theme saved with colors:", colors);
+    } catch (error) {
+      console.error("Error saving theme:", error);
+      throw new Error("Failed to save theme");
+    }
+  },
+
+  resetTheme(): void {
+    this.saveTheme({ colors: defaultColors });
+  },
+  
+  applyThemeTemporarily(config: ThemeConfig): void {
+    try {
+      const { colors } = config;
+      
+      // Apply colors to CSS variables without saving to localStorage
+      document.documentElement.style.setProperty("--primary", colors.primary);
+      document.documentElement.style.setProperty("--secondary", colors.secondary);
+      document.documentElement.style.setProperty("--accent", colors.accent);
+      
+      console.info("Theme applied temporarily with colors:", colors);
+    } catch (error) {
+      console.error("Error applying temporary theme:", error);
+    }
+  },
+  
+  getThemeCSS(): string {
+    const colors = this.getTheme().colors;
+    
+    return `
+:root {
+  --primary: ${colors.primary};
+  --secondary: ${colors.secondary};
+  --accent: ${colors.accent};
+  --font: ${colors.font || "Inter"};
+}
+
+/* Primary color variants */
+.bg-primary { background-color: hsl(var(--primary)); }
+.text-primary { color: hsl(var(--primary)); }
+.border-primary { border-color: hsl(var(--primary)); }
+
+/* Secondary color variants */
+.bg-secondary { background-color: hsl(var(--secondary)); }
+.text-secondary { color: hsl(var(--secondary)); }
+.border-secondary { border-color: hsl(var(--secondary)); }
+
+/* Accent color variants */
+.bg-accent { background-color: hsl(var(--accent)); }
+.text-accent { color: hsl(var(--accent)); }
+.border-accent { border-color: hsl(var(--accent)); }
+
+/* Font family */
+body {
+  font-family: var(--font), system-ui, sans-serif;
+}
+`.trim();
+  }
 };
