@@ -20,6 +20,7 @@ import ChartManagement from "./pages/ChartManagement";
 import DatabaseManager from "./pages/DatabaseManager";
 import DockerConfigurator from "./pages/DockerConfigurator";
 import { UIThemeConfigurator } from "./pages/UIThemeConfigurator";
+import FloatingThemeButton from "./components/ui/FloatingThemeButton";
 
 const queryClient = new QueryClient({
   defaultOptions: {

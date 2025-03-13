@@ -14,6 +14,7 @@ import { Settings, Palette, FileText, Plus, PanelLeftOpen } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import ThemeConfigurator from '@/components/settings/ThemeConfigurator';
+import FloatingThemeButton from '@/components/ui/FloatingThemeButton';
 
 const Index: React.FC = () => {
   const location = useLocation();
@@ -97,16 +98,6 @@ const Index: React.FC = () => {
               <ChartConfigurator />
             </TabsContent>
           </Tabs>
-
-          <div className="mt-12 flex justify-center">
-            <button 
-              onClick={handleOpenUITheme}
-              className="flex items-center text-sm text-muted-foreground hover:text-primary transition"
-            >
-              <Palette size={16} className="mr-2" />
-              Personalizar UI
-            </button>
-          </div>
         </main>
 
         {/* Theme Customization Dialog */}
@@ -121,6 +112,9 @@ const Index: React.FC = () => {
             <ThemeConfigurator onSave={handleSaveTheme} />
           </DialogContent>
         </Dialog>
+        
+        {/* Floating Theme Button */}
+        <FloatingThemeButton onClick={handleOpenUITheme} />
       </div>
     </SidebarProvider>
   );

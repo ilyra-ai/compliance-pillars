@@ -22,6 +22,7 @@ import {
   Server,
   ContainerIcon,
   Plus,
+  Archive,
 } from 'lucide-react';
 
 interface PillarLink {
@@ -159,10 +160,10 @@ const settingsItems = [
     description: 'Migrar para outro servidor',
   },
   {
-    name: 'Integração Hostgator',
-    icon: <CloudUpload size={18} />,
+    name: 'Compactar APP e Banco de Dados',
+    icon: <Archive size={18} />,
     href: '/settings/hostgator',
-    description: 'Integração com hospedagem',
+    description: 'Compactar aplicação e dados',
   },
 ];
 
@@ -220,7 +221,8 @@ const Sidebar: React.FC = () => {
             <span>Adicionar Pilar</span>
           </Link>
 
-          <div className="max-h-[calc(100vh-350px)]">
+          {/* Mostrando todos os pilares sem barra de rolagem, como solicitado */}
+          <div>
             {pillars.map((pillar) => (
               <Link
                 key={pillar.href}

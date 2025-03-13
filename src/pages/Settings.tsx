@@ -22,11 +22,14 @@ import {
   Upload,
   RefreshCw,
   Palette,
-  Clock
+  Clock,
+  Archive,
+  FileZip
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import ThemeConfigurator from '@/components/settings/ThemeConfigurator';
+import FloatingThemeButton from '@/components/ui/FloatingThemeButton';
 
 const Settings: React.FC = () => {
   const location = useLocation();
@@ -48,7 +51,7 @@ const Settings: React.FC = () => {
     if (location.pathname === '/settings/ui') setActiveTab('ui');
     else if (location.pathname === '/settings/backup') setActiveTab('backup');
     else if (location.pathname === '/settings/migration') setActiveTab('migration');
-    else if (location.pathname === '/settings/hostgator') setActiveTab('hostgator');
+    else if (location.pathname === '/settings/hostgator') setActiveTab('compress');
     else if (location.pathname === '/database') navigate('/database');
     else if (location.pathname === '/docker') navigate('/docker');
     else setActiveTab('general');
@@ -73,10 +76,10 @@ const Settings: React.FC = () => {
     }, 2000);
   };
 
-  const handleHostgatorDeploy = () => {
-    toast.loading('Implantando no Hostgator...');
+  const handleCompressSystem = () => {
+    toast.loading('Compactando aplicação e banco de dados...');
     setTimeout(() => {
-      toast.success('Implantação no Hostgator concluída com sucesso!');
+      toast.success('Arquivo ZIP criado com sucesso!');
     }, 3000);
   };
 
@@ -105,7 +108,7 @@ const Settings: React.FC = () => {
               <TabsTrigger value="general">Configurações Gerais</TabsTrigger>
               <TabsTrigger value="backup">Backup do Sistema</TabsTrigger>
               <TabsTrigger value="migration">Migração de Servidor</TabsTrigger>
-              <TabsTrigger value="hostgator">Integração Hostgator</TabsTrigger>
+              <TabsTrigger value="compress">Compactar APP e BD</TabsTrigger>
             </TabsList>
             
             {/* Configurações Gerais */}
@@ -294,74 +297,105 @@ const Settings: React.FC = () => {
               </Card>
             </TabsContent>
             
-            {/* Integração Hostgator */}
-            <TabsContent value="hostgator">
+            {/* Compactar APP e Banco de Dados */}
+            <TabsContent value="compress">
               <Card>
                 <CardHeader>
-                  <CardTitle>Integração Hostgator</CardTitle>
-                  <CardDescription>Configure a integração com a Hostgator para hospedagem</CardDescription>
+                  <CardTitle>Compactar APP e Banco de Dados</CardTitle>
+                  <CardDescription>Compacte toda a aplicação e banco de dados em um único arquivo</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="hostgator-account">Conta Hostgator</Label>
-                      <Input id="hostgator-account" placeholder="Seu nome de usuário Hostgator" />
+                    <div className="border p-4 rounded-md mb-4">
+                      <h3 className="text-lg font-medium mb-2">Opções de Compactação</h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Selecione o que deseja incluir no arquivo compactado
+                      </p>
+                      
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center space-x-2">
+                          <Switch id="include-app" defaultChecked />
+                          <Label htmlFor="include-app">Incluir Aplicação</Label>
+                        </div>
+                        <p className="text-sm text-muted-foreground ml-7">
+                          Inclui todos os arquivos da aplicação
+                        </p>
+                      </div>
+                      
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center space-x-2">
+                          <Switch id="include-db" defaultChecked />
+                          <Label htmlFor="include-db">Incluir Banco de Dados</Label>
+                        </div>
+                        <p className="text-sm text-muted-foreground ml-7">
+                          Inclui um dump completo do banco de dados
+                        </p>
+                      </div>
+                      
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center space-x-2">
+                          <Switch id="include-config" defaultChecked />
+                          <Label htmlFor="include-config">Incluir Configurações</Label>
+                        </div>
+                        <p className="text-sm text-muted-foreground ml-7">
+                          Inclui todos os arquivos de configuração
+                        </p>
+                      </div>
+                      
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center space-x-2">
+                          <Switch id="include-logs" />
+                          <Label htmlFor="include-logs">Incluir Logs</Label>
+                        </div>
+                        <p className="text-sm text-muted-foreground ml-7">
+                          Inclui arquivos de log do sistema
+                        </p>
+                      </div>
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="hostgator-password">Senha</Label>
-                      <Input id="hostgator-password" type="password" placeholder="Sua senha Hostgator" />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="hostgator-domain">Domínio</Label>
-                      <Input id="hostgator-domain" placeholder="exemplo.com.br" />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="hostgator-plan">Plano Contratado</Label>
+                      <Label htmlFor="compression-level">Nível de Compressão</Label>
                       <select 
-                        id="hostgator-plan" 
+                        id="compression-level" 
                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        defaultValue="normal"
                       >
-                        <option value="">Selecione um plano</option>
-                        <option value="basic">Plano Básico</option>
-                        <option value="professional">Plano Profissional</option>
-                        <option value="enterprise">Plano Empresarial</option>
+                        <option value="low">Baixo (mais rápido, arquivo maior)</option>
+                        <option value="normal">Normal (equilibrado)</option>
+                        <option value="high">Alto (mais lento, arquivo menor)</option>
+                        <option value="ultra">Ultra (muito lento, arquivo mínimo)</option>
                       </select>
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="hostgator-database">Nome do Banco de Dados</Label>
-                      <Input id="hostgator-database" placeholder="Nome do banco de dados na Hostgator" />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="hostgator-db-user">Usuário do Banco de Dados</Label>
-                      <Input id="hostgator-db-user" placeholder="Usuário do banco de dados" />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="hostgator-db-password">Senha do Banco de Dados</Label>
-                      <Input id="hostgator-db-password" type="password" placeholder="Senha do banco de dados" />
+                      <Label htmlFor="output-filename">Nome do Arquivo ZIP</Label>
+                      <Input id="output-filename" defaultValue="integrityapp_backup" />
                     </div>
                     
                     <div className="space-y-2">
                       <div className="flex items-center space-x-2">
-                        <Switch id="hostgator-ssl" defaultChecked />
-                        <Label htmlFor="hostgator-ssl">Ativar SSL</Label>
+                        <Switch id="encrypt-file" />
+                        <Label htmlFor="encrypt-file">Criptografar Arquivo</Label>
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        Ativar certificado SSL para o domínio
+                        Adiciona proteção por senha ao arquivo ZIP
                       </p>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="encrypt-password">Senha de Criptografia</Label>
+                      <Input id="encrypt-password" type="password" placeholder="Deixe em branco para não criptografar" />
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter className="flex justify-between">
-                  <Button variant="outline">Testar Conexão</Button>
-                  <Button onClick={handleHostgatorDeploy}>
-                    <CloudUpload className="mr-2 h-4 w-4" />
-                    Implantar na Hostgator
+                <CardFooter className="flex flex-col sm:flex-row justify-between gap-2">
+                  <Button variant="outline" className="w-full sm:w-auto">
+                    <FileZip className="mr-2 h-4 w-4" />
+                    Estimar Tamanho
+                  </Button>
+                  <Button onClick={handleCompressSystem} className="w-full sm:w-auto">
+                    <Archive className="mr-2 h-4 w-4" />
+                    Compactar Agora
                   </Button>
                 </CardFooter>
               </Card>
@@ -381,6 +415,9 @@ const Settings: React.FC = () => {
             <ThemeConfigurator onSave={handleSaveTheme} />
           </DialogContent>
         </Dialog>
+        
+        {/* Floating Theme Button */}
+        <FloatingThemeButton onClick={handleOpenUITheme} />
       </div>
     </SidebarProvider>
   );
