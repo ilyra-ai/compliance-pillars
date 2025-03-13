@@ -1,5 +1,5 @@
 
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useState, useEffect } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Sidebar from '@/components/layout/Sidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
@@ -11,6 +11,10 @@ import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
+// New import for drag-and-drop functionality
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+
 interface PageLayoutProps {
   children: ReactNode;
   title?: string;
@@ -18,6 +22,7 @@ interface PageLayoutProps {
   actions?: ReactNode;
   hideFloatingThemeButton?: boolean;
   contentClassName?: string;
+  customizable?: boolean;
 }
 
 const PageLayout: React.FC<PageLayoutProps> = ({
@@ -27,6 +32,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
   actions,
   hideFloatingThemeButton = false,
   contentClassName = '',
+  customizable = false,
 }) => {
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -34,6 +40,32 @@ const PageLayout: React.FC<PageLayoutProps> = ({
 
   const handlePanelResize = (sizes: number[]) => {
     setSidebarWidth(sizes[0]);
+  };
+
+  // Wrap the content with DndProvider for drag and drop functionality if customizable
+  const renderContent = () => {
+    const content = (
+      <>
+        {(title || actions) && (
+          <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            {title && (
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold">{title}</h1>
+                {description && <p className="text-muted-foreground">{description}</p>}
+              </div>
+            )}
+            {actions && <div className="flex flex-wrap gap-2 self-start mt-2 md:mt-0">{actions}</div>}
+          </div>
+        )}
+        {children}
+      </>
+    );
+
+    return customizable ? (
+      <DndProvider backend={HTML5Backend}>
+        {content}
+      </DndProvider>
+    ) : content;
   };
 
   return (
@@ -57,18 +89,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
               </Sheet>
               
               <main className={`pb-16 pt-20 md:pt-24 px-4 md:px-8 transition-all duration-300 ease-in-out ${contentClassName}`}>
-                {(title || actions) && (
-                  <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    {title && (
-                      <div>
-                        <h1 className="text-2xl md:text-3xl font-bold">{title}</h1>
-                        {description && <p className="text-muted-foreground">{description}</p>}
-                      </div>
-                    )}
-                    {actions && <div className="flex flex-wrap gap-2 self-start mt-2 md:mt-0">{actions}</div>}
-                  </div>
-                )}
-                {children}
+                {renderContent()}
               </main>
             </>
           ) : (
@@ -88,18 +109,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
               <ResizableHandle withHandle className="bg-border" />
               <ResizablePanel defaultSize={80}>
                 <main className={`pb-16 pt-24 px-8 transition-all duration-300 ease-in-out ${contentClassName}`}>
-                  {(title || actions) && (
-                    <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                      {title && (
-                        <div>
-                          <h1 className="text-2xl md:text-3xl font-bold">{title}</h1>
-                          {description && <p className="text-muted-foreground">{description}</p>}
-                        </div>
-                      )}
-                      {actions && <div className="flex flex-wrap gap-2 self-start mt-2 md:mt-0">{actions}</div>}
-                    </div>
-                  )}
-                  {children}
+                  {renderContent()}
                 </main>
               </ResizablePanel>
             </ResizablePanelGroup>
