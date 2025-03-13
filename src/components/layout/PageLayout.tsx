@@ -15,7 +15,6 @@ import { toast } from 'sonner';
 // New import for drag-and-drop functionality
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { CustomizableLayout } from '@/components/ui/customizable/CustomizableLayout';
 import { DroppableArea } from '@/components/ui/customizable/DroppableArea';
 import { ComponentPalette } from '@/components/ui/customizable/ComponentPalette';
 
@@ -36,17 +35,26 @@ const PageLayout: React.FC<PageLayoutProps> = ({
   actions,
   hideFloatingThemeButton = false,
   contentClassName = '',
-  customizable = false,
+  customizable = true, // Default to true to enable customization on all pages
 }) => {
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(20);
-  const [editMode, setEditMode] = useState(customizable || false);
+  const [editMode, setEditMode] = useState(false);
   const [showPalette, setShowPalette] = useState(false);
+  const [components, setComponents] = useState<any[]>([]);
 
   useEffect(() => {
-    setEditMode(customizable);
-  }, [customizable]);
+    // Load saved components from localStorage if available
+    try {
+      const savedComponents = localStorage.getItem('pageComponents');
+      if (savedComponents) {
+        setComponents(JSON.parse(savedComponents));
+      }
+    } catch (error) {
+      console.error('Error loading saved components:', error);
+    }
+  }, []);
 
   const handlePanelResize = (sizes: number[]) => {
     setSidebarWidth(sizes[0]);
@@ -59,20 +67,52 @@ const PageLayout: React.FC<PageLayoutProps> = ({
       setShowPalette(true);
     } else {
       setShowPalette(false);
+      // Save components to localStorage when exiting edit mode
+      try {
+        localStorage.setItem('pageComponents', JSON.stringify(components));
+      } catch (error) {
+        console.error('Error saving components:', error);
+      }
     }
   };
 
-  const handleDrop = (templateId: string, type: string) => {
-    console.log(`Dropped component: ${templateId} of type ${type}`);
-    // Implementation for handling drops would go here
-    toast.success(`Componente adicionado: ${type}`);
+  const handleDrop = (templateId: string, type: string, index?: number) => {
+    console.log(`Dropped component: ${templateId} of type ${type}, index: ${index}`);
+    
+    if (index !== undefined) {
+      // Handle reordering existing components
+      const draggedComponent = components[index];
+      const newComponents = [...components];
+      newComponents.splice(index, 1);
+      newComponents.push(draggedComponent);
+      setComponents(newComponents);
+    } else {
+      // Handle new component drop
+      const newComponent = {
+        id: Date.now().toString(),
+        type,
+        templateId,
+        content: {
+          title: `New ${type} Component`,
+          data: []
+        }
+      };
+      setComponents([...components, newComponent]);
+    }
+    
+    toast.success(`Componente ${type} adicionado!`);
   };
 
-  // Wrap the content with DndProvider for drag and drop functionality if customizable
+  const handleDelete = (id: string) => {
+    setComponents(components.filter(c => c.id !== id));
+    toast.success('Componente removido!');
+  };
+
+  // Wrap the content with DndProvider for drag and drop functionality
   const renderContent = () => {
     const content = (
       <>
-        {(title || actions) && (
+        {(title || actions || customizable) && (
           <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             {title && (
               <div>
@@ -81,25 +121,27 @@ const PageLayout: React.FC<PageLayoutProps> = ({
               </div>
             )}
             <div className="flex flex-wrap gap-2 self-start mt-2 md:mt-0">
-              <Button 
-                onClick={toggleEditMode} 
-                variant={editMode ? "default" : "outline"}
-                className="relative overflow-hidden group mr-2"
-                size="sm"
-              >
-                {editMode ? (
-                  <>
-                    <X className="mr-2 h-4 w-4" />
-                    Sair do Modo Edição
-                  </>
-                ) : (
-                  <>
-                    <Palette className="mr-2 h-4 w-4" />
-                    <span>Personalizar UI</span>
-                    <span className="absolute right-0 top-0 h-full w-2 bg-primary/20 animate-pulse hidden group-hover:block"></span>
-                  </>
-                )}
-              </Button>
+              {customizable && (
+                <Button 
+                  onClick={toggleEditMode} 
+                  variant={editMode ? "default" : "outline"}
+                  className="relative overflow-hidden group mr-2"
+                  size="sm"
+                >
+                  {editMode ? (
+                    <>
+                      <X className="mr-2 h-4 w-4" />
+                      Sair do Modo Edição
+                    </>
+                  ) : (
+                    <>
+                      <Palette className="mr-2 h-4 w-4" />
+                      <span>Personalizar UI</span>
+                      <span className="absolute right-0 top-0 h-full w-2 bg-primary/20 animate-pulse hidden group-hover:block"></span>
+                    </>
+                  )}
+                </Button>
+              )}
               {actions}
             </div>
           </div>
@@ -108,7 +150,18 @@ const PageLayout: React.FC<PageLayoutProps> = ({
         {editMode ? (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="md:col-span-3">
-              <DroppableArea onDrop={handleDrop} className="min-h-[200px]" allowAnywhereDropping={true}>
+              <DroppableArea onDrop={handleDrop} className="min-h-[300px]" allowAnywhereDropping={true}>
+                {components.map((component, index) => (
+                  <div key={component.id} className="mb-4 p-4 border rounded-md">
+                    <div className="flex justify-between mb-2">
+                      <h3 className="font-medium">{component.content.title || `Component ${index + 1}`}</h3>
+                      <Button size="sm" variant="destructive" onClick={() => handleDelete(component.id)}>Remove</Button>
+                    </div>
+                    <div className="bg-muted/20 p-4 rounded-md">
+                      <p>Type: {component.type}</p>
+                    </div>
+                  </div>
+                ))}
                 {children}
               </DroppableArea>
             </div>

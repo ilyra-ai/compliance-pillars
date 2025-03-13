@@ -1,7 +1,8 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDrop } from 'react-dnd';
 import { PlusCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface DroppableAreaProps {
   onDrop: (id: string, type: string, index?: number) => void;
@@ -16,12 +17,19 @@ export const DroppableArea: React.FC<DroppableAreaProps> = ({
   className = '',
   allowAnywhereDropping = true,
 }) => {
+  const [hasDropped, setHasDropped] = useState(false);
+
   const [{ isOver, canDrop }, drop] = useDrop({
     accept: ['COMPONENT', 'NEW_COMPONENT'],
-    drop: (item: any) => {
+    drop: (item: any, monitor) => {
+      console.log('Drop detected:', item);
+      
       if (item.templateId) {
         // This is a new component from the palette
+        console.log('Dropping new component from palette:', item.templateId, item.type);
         onDrop(item.templateId, item.type);
+        setHasDropped(true);
+        toast.success(`Componente ${item.type} adicionado com sucesso`);
         return { 
           name: 'DroppableArea', 
           isNewComponent: true, 
@@ -29,7 +37,9 @@ export const DroppableArea: React.FC<DroppableAreaProps> = ({
           type: item.type 
         };
       }
+      
       // This is an existing component being reordered
+      console.log('Reordering existing component:', item.id, item.type, item.index);
       onDrop(item.id, item.type, item.index);
       return { name: 'DroppableArea' };
     },
@@ -39,6 +49,16 @@ export const DroppableArea: React.FC<DroppableAreaProps> = ({
     }),
   });
 
+  // Reset the hasDropped state after animation completes
+  useEffect(() => {
+    if (hasDropped) {
+      const timer = setTimeout(() => {
+        setHasDropped(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [hasDropped]);
+
   const isActive = isOver && canDrop;
   const hasChildren = React.Children.count(children) > 0;
 
@@ -47,13 +67,13 @@ export const DroppableArea: React.FC<DroppableAreaProps> = ({
       ref={drop}
       className={`${className} ${
         isActive 
-          ? 'bg-primary/10 border-2 border-dashed border-primary shadow-lg' 
+          ? 'bg-primary/10 border-2 border-dashed border-primary shadow-lg transition-all duration-300 scale-[1.02]' 
           : canDrop 
               ? 'bg-secondary/5 border-2 border-dashed border-secondary' 
               : hasChildren 
                 ? '' 
                 : 'border border-dashed border-muted-foreground'
-      } ${allowAnywhereDropping ? 'min-h-[200px]' : ''} p-4 rounded-md transition-all duration-200`}
+      } ${allowAnywhereDropping ? 'min-h-[200px]' : ''} ${hasDropped ? 'bg-green-50 border-green-300' : ''} p-4 rounded-md transition-all duration-200`}
     >
       {!hasChildren && (
         <div className="flex flex-col items-center justify-center h-40 text-muted-foreground">

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -56,16 +55,25 @@ interface DraggableTemplateProps {
   onDragEnd?: () => void;
 }
 
+interface DragItemType {
+  templateId: string;
+  type: string;
+}
+
+interface DragCollectedProps {
+  isDragging: boolean;
+}
+
 const DraggableTemplate: React.FC<DraggableTemplateProps> = ({ 
   template, 
   onDragStart,
   onDragEnd
 }) => {
-  const [collected, drag] = useDrag(() => ({
+  const [{ isDragging }, drag] = useDrag<DragItemType, unknown, DragCollectedProps>(() => ({
     type: 'NEW_COMPONENT',
     item: { templateId: template.id, type: template.type },
     collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
+      isDragging: !!monitor.isDragging(),
     }),
     end: (item, monitor) => {
       const didDrop = monitor.didDrop();
@@ -73,24 +81,19 @@ const DraggableTemplate: React.FC<DraggableTemplateProps> = ({
         onDragEnd();
       }
     },
-    // Correctly handle drag start
-    options: {
-      dropEffect: 'copy',
-    }
   }));
 
-  // Call onDragStart when dragging begins
   React.useEffect(() => {
-    if (collected.isDragging && onDragStart) {
+    if (isDragging && onDragStart) {
       onDragStart();
     }
-  }, [collected.isDragging, onDragStart]);
+  }, [isDragging, onDragStart]);
 
   return (
     <div
       ref={drag}
       className={`flex items-center p-3 rounded-md cursor-move border hover:bg-secondary/10 transition-colors ${
-        collected.isDragging ? 'opacity-50 border-primary' : 'border-transparent'
+        isDragging ? 'opacity-50 border-primary' : 'border-transparent'
       }`}
     >
       <div className="mr-3 text-primary bg-primary/10 p-2 rounded-md">
@@ -111,7 +114,6 @@ export const ComponentPalette: React.FC<{
   onDragEnd?: () => void;
 }> = ({ onComponentDropped, onDragStart, onDragEnd }) => {
   const templates: ComponentTemplate[] = [
-    // Charts
     { 
       id: 'chart-bar', 
       name: 'Bar Chart', 
@@ -154,7 +156,6 @@ export const ComponentPalette: React.FC<{
       type: 'chart-trending',
       description: 'Análise de tendências' 
     },
-    // Data Display
     { 
       id: 'table', 
       name: 'Table', 
@@ -183,7 +184,6 @@ export const ComponentPalette: React.FC<{
       type: 'timeline',
       description: 'Visualização temporal de eventos' 
     },
-    // Content
     { 
       id: 'text', 
       name: 'Text Block', 
@@ -212,7 +212,6 @@ export const ComponentPalette: React.FC<{
       type: 'image',
       description: 'Adicionar imagens' 
     },
-    // Calendar & Time
     { 
       id: 'calendar', 
       name: 'Calendar', 
@@ -234,7 +233,6 @@ export const ComponentPalette: React.FC<{
       type: 'timer',
       description: 'Cronômetro ou temporizador' 
     },
-    // People & Users
     { 
       id: 'users', 
       name: 'Users', 
@@ -249,7 +247,6 @@ export const ComponentPalette: React.FC<{
       type: 'user-settings',
       description: 'Configurações de usuário' 
     },
-    // External Content
     { 
       id: 'iframe', 
       name: 'Embed', 
@@ -264,7 +261,6 @@ export const ComponentPalette: React.FC<{
       type: 'map',
       description: 'Exibir mapa geográfico' 
     },
-    // Indicators & Status
     { 
       id: 'status', 
       name: 'Status Indicator', 
@@ -286,7 +282,6 @@ export const ComponentPalette: React.FC<{
       type: 'metrics',
       description: 'Painel com métricas principais' 
     },
-    // Alerts & Notifications
     { 
       id: 'alert-info', 
       name: 'Info Alert', 
@@ -308,7 +303,6 @@ export const ComponentPalette: React.FC<{
       type: 'alert-success',
       description: 'Alerta de sucesso' 
     },
-    // Interactive
     { 
       id: 'chatbot', 
       name: 'Chatbot', 
@@ -323,7 +317,6 @@ export const ComponentPalette: React.FC<{
       type: 'filter',
       description: 'Controles para filtrar dados' 
     },
-    // Technical
     { 
       id: 'database', 
       name: 'Database', 
@@ -366,6 +359,90 @@ export const ComponentPalette: React.FC<{
       type: 'layers',
       description: 'Visualização em camadas' 
     },
+    { 
+      id: 'menu', 
+      name: 'Menu', 
+      icon: <Layout size={18} />, 
+      type: 'menu',
+      description: 'Menu de navegação' 
+    },
+    { 
+      id: 'submenu', 
+      name: 'Submenu', 
+      icon: <PanelLeft size={18} />, 
+      type: 'submenu',
+      description: 'Submenu para navegação' 
+    },
+    { 
+      id: 'button', 
+      name: 'Button', 
+      icon: <Layout size={18} />, 
+      type: 'button',
+      description: 'Botão interativo' 
+    },
+    { 
+      id: 'form', 
+      name: 'Form', 
+      icon: <Layout size={18} />, 
+      type: 'form',
+      description: 'Formulário para entrada de dados' 
+    },
+    { 
+      id: 'input', 
+      name: 'Input', 
+      icon: <Layout size={18} />, 
+      type: 'input',
+      description: 'Campo de entrada de texto' 
+    },
+    { 
+      id: 'select', 
+      name: 'Select', 
+      icon: <Layout size={18} />, 
+      type: 'select',
+      description: 'Campo de seleção' 
+    },
+    { 
+      id: 'checkbox', 
+      name: 'Checkbox', 
+      icon: <Layout size={18} />, 
+      type: 'checkbox',
+      description: 'Checkbox' 
+    },
+    { 
+      id: 'radio', 
+      name: 'Radio', 
+      icon: <Layout size={18} />, 
+      type: 'radio',
+      description: 'Botão de rádio' 
+    },
+    { 
+      id: 'tabs', 
+      name: 'Tabs', 
+      icon: <Layout size={18} />, 
+      type: 'tabs',
+      description: 'Abas para organização de conteúdo' 
+    },
+    { 
+      id: 'divider', 
+      name: 'Divider', 
+      icon: <Layout size={18} />, 
+      type: 'divider',
+      description: 'Linha divisória' 
+    },
+    { 
+      id: 'header', 
+      name: 'Header', 
+      icon: <Layout size={18} />, 
+      type: 'header',
+      description: 'Cabeçalho da página' 
+    },
+    { 
+      id: 'footer', 
+      name: 'Footer', 
+      icon: <Layout size={18} />, 
+      type: 'footer',
+      description: 'Rodapé da página' 
+    },
   ];
 
   const handleComponentDragStart = () => {
@@ -379,9 +456,7 @@ export const ComponentPalette: React.FC<{
       onDragEnd();
     }
     
-    // Notify parent that a component was dropped
     if (onComponentDropped) {
-      // This will be called when the drop happens
       console.log("Component was dropped from palette");
     }
   };
