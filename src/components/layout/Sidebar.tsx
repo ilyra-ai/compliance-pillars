@@ -20,9 +20,12 @@ import {
   HardDrive,
   CloudUpload,
   Server,
-  ContainerIcon,
+  Package,
   Plus,
   Archive,
+  Menu,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 
 interface PillarLink {
@@ -174,119 +177,170 @@ const Sidebar: React.FC = () => {
     tools: true,
     system: true
   });
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    setCollapsed(!collapsed);
+  };
+
+  const toggleMobileSidebar = () => {
+    setMobileOpen(!mobileOpen);
+  };
 
   return (
-    <aside className="fixed bottom-0 left-0 top-16 z-30 w-64 border-r border-border bg-background/90 backdrop-blur-sm transition-all duration-300">
-      <div className="flex h-full flex-col p-4">
-        <div className="mb-4 px-3 flex justify-between items-center">
-          <h2 className="text-xs font-medium uppercase text-muted-foreground">
-            Pilares de Compliance
-          </h2>
-        </div>
+    <>
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-20 md:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+      
+      {/* Mobile menu button */}
+      <button 
+        className="fixed top-20 left-4 z-30 md:hidden bg-background rounded-full p-2 shadow-md border border-border"
+        onClick={toggleMobileSidebar}
+      >
+        <Menu size={20} />
+      </button>
 
-        <div className="space-y-1">
-          <Link
-            to="/"
-            className={cn(
-              'sidebar-item',
-              location.pathname === '/' && 'sidebar-item-active'
+      <aside 
+        className={`fixed bottom-0 left-0 top-16 z-30 border-r border-border bg-background/90 backdrop-blur-sm transition-all duration-300
+          ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} 
+          md:translate-x-0 
+          ${collapsed ? 'w-16' : 'w-64'}`}
+      >
+        <div className="flex h-full flex-col p-4">
+          <div className="flex justify-between items-center mb-4 px-3">
+            {!collapsed && (
+              <h2 className="text-xs font-medium uppercase text-muted-foreground">
+                Pilares de Compliance
+              </h2>
             )}
-            title="Dashboard"
-          >
-            <BarChart3 size={18} />
-            <span>Dashboard</span>
-          </Link>
+            <button
+              onClick={toggleSidebar}
+              className="hidden md:block text-muted-foreground p-1 rounded hover:bg-secondary"
+            >
+              {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+            </button>
+          </div>
 
-          <Link
-            to="/pillars"
-            className={cn(
-              'sidebar-item',
-              location.pathname === '/pillars' && 'sidebar-item-active'
-            )}
-            title="Todos os Pilares"
-          >
-            <ShieldCheck size={18} />
-            <span>Todos os Pilares</span>
-          </Link>
-          
-          <Link
-            to="/pillars/new"
-            className={cn(
-              'sidebar-item',
-              location.pathname === '/pillars/new' && 'sidebar-item-active'
-            )}
-            title="Adicionar Novo Pilar"
-          >
-            <Plus size={18} />
-            <span>Adicionar Pilar</span>
-          </Link>
+          <div className="space-y-1 overflow-y-auto max-h-[calc(100vh-8rem)]">
+            <Link
+              to="/"
+              className={cn(
+                'sidebar-item',
+                location.pathname === '/' && 'sidebar-item-active',
+                collapsed && 'justify-center px-2'
+              )}
+              title="Dashboard"
+            >
+              <BarChart3 size={18} />
+              {!collapsed && <span>Dashboard</span>}
+            </Link>
 
-          {/* Mostrando todos os pilares sem barra de rolagem, como solicitado */}
-          <div>
-            {pillars.map((pillar) => (
+            <Link
+              to="/pillars"
+              className={cn(
+                'sidebar-item',
+                location.pathname === '/pillars' && 'sidebar-item-active',
+                collapsed && 'justify-center px-2'
+              )}
+              title="Todos os Pilares"
+            >
+              <ShieldCheck size={18} />
+              {!collapsed && <span>Todos os Pilares</span>}
+            </Link>
+            
+            <Link
+              to="/pillars/new"
+              className={cn(
+                'sidebar-item',
+                location.pathname === '/pillars/new' && 'sidebar-item-active',
+                collapsed && 'justify-center px-2'
+              )}
+              title="Adicionar Novo Pilar"
+            >
+              <Plus size={18} />
+              {!collapsed && <span>Adicionar Pilar</span>}
+            </Link>
+
+            {/* Mostrando todos os pilares com barra de rolagem */}
+            <div className="max-h-[40vh] overflow-y-auto pr-1 scrollbar-thin">
+              {pillars.map((pillar) => (
+                <Link
+                  key={pillar.href}
+                  to={pillar.href}
+                  className={cn(
+                    'sidebar-item',
+                    location.pathname === pillar.href && 'sidebar-item-active',
+                    collapsed && 'justify-center px-2'
+                  )}
+                  title={pillar.description}
+                >
+                  {pillar.icon}
+                  {!collapsed && <span>{pillar.name}</span>}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-6 px-3">
+            {!collapsed && (
+              <h2 className="text-xs font-medium uppercase text-muted-foreground">
+                Ferramentas
+              </h2>
+            )}
+          </div>
+
+          <div className="space-y-1">
+            {toolsItems.map((item) => (
               <Link
-                key={pillar.href}
-                to={pillar.href}
+                key={item.href}
+                to={item.href}
                 className={cn(
                   'sidebar-item',
-                  location.pathname === pillar.href && 'sidebar-item-active'
+                  location.pathname === item.href && 'sidebar-item-active',
+                  collapsed && 'justify-center px-2'
                 )}
-                title={pillar.description}
+                title={item.description}
               >
-                {pillar.icon}
-                <span>{pillar.name}</span>
+                {item.icon}
+                {!collapsed && <span>{item.name}</span>}
+              </Link>
+            ))}
+          </div>
+
+          <div className="mt-auto px-3 pt-6">
+            {!collapsed && (
+              <h2 className="text-xs font-medium uppercase text-muted-foreground">
+                Sistema
+              </h2>
+            )}
+          </div>
+
+          <div className="space-y-1 overflow-y-auto max-h-[30vh]">
+            {settingsItems.map((item) => (
+              <Link
+                key={item.href}
+                to={item.href}
+                className={cn(
+                  'sidebar-item',
+                  location.pathname === item.href && 'sidebar-item-active',
+                  collapsed && 'justify-center px-2'
+                )}
+                title={item.description}
+              >
+                {item.icon}
+                {!collapsed && <span>{item.name}</span>}
               </Link>
             ))}
           </div>
         </div>
-
-        <div className="mt-6 px-3">
-          <h2 className="text-xs font-medium uppercase text-muted-foreground">
-            Ferramentas
-          </h2>
-        </div>
-
-        <div className="space-y-1">
-          {toolsItems.map((item) => (
-            <Link
-              key={item.href}
-              to={item.href}
-              className={cn(
-                'sidebar-item',
-                location.pathname === item.href && 'sidebar-item-active'
-              )}
-              title={item.description}
-            >
-              {item.icon}
-              <span>{item.name}</span>
-            </Link>
-          ))}
-        </div>
-
-        <div className="mt-auto px-3 pt-6">
-          <h2 className="text-xs font-medium uppercase text-muted-foreground">
-            Sistema
-          </h2>
-        </div>
-
-        <div className="space-y-1">
-          {settingsItems.map((item) => (
-            <Link
-              key={item.href}
-              to={item.href}
-              className={cn(
-                'sidebar-item',
-                location.pathname === item.href && 'sidebar-item-active'
-              )}
-              title={item.description}
-            >
-              {item.icon}
-              <span>{item.name}</span>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 };
 

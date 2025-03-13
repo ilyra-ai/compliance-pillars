@@ -185,7 +185,7 @@ const ThemeConfigurator: React.FC<ThemeConfiguratorProps> = ({ onSave }) => {
 
         <div className="flex-1 p-4 md:p-6 overflow-y-auto">
           <div className="max-w-5xl mx-auto">
-            <TabsContent value="colors" className={activeTab === 'colors' ? 'block' : 'hidden'}>
+            <div className={activeTab === 'colors' ? 'block' : 'hidden'}>
               <Card>
                 <CardHeader>
                   <CardTitle className="text-xl">Paleta de Cores</CardTitle>
@@ -324,9 +324,9 @@ const ThemeConfigurator: React.FC<ThemeConfiguratorProps> = ({ onSave }) => {
                   </Button>
                 </CardFooter>
               </Card>
-            </TabsContent>
+            </div>
             
-            <TabsContent value="typography" className={activeTab === 'typography' ? 'block' : 'hidden'}>
+            <div className={activeTab === 'typography' ? 'block' : 'hidden'}>
               <Card>
                 <CardHeader>
                   <CardTitle className="text-xl">Tipografia</CardTitle>
@@ -414,9 +414,9 @@ const ThemeConfigurator: React.FC<ThemeConfiguratorProps> = ({ onSave }) => {
                   </Button>
                 </CardFooter>
               </Card>
-            </TabsContent>
+            </div>
             
-            <TabsContent value="layout" className={activeTab === 'layout' ? 'block' : 'hidden'}>
+            <div className={activeTab === 'layout' ? 'block' : 'hidden'}>
               <Card>
                 <CardHeader>
                   <CardTitle className="text-xl">Configurações de Layout</CardTitle>
@@ -513,9 +513,9 @@ const ThemeConfigurator: React.FC<ThemeConfiguratorProps> = ({ onSave }) => {
                   </Button>
                 </CardFooter>
               </Card>
-            </TabsContent>
+            </div>
             
-            <TabsContent value="assets" className={activeTab === 'assets' ? 'block' : 'hidden'}>
+            <div className={activeTab === 'assets' ? 'block' : 'hidden'}>
               <Card>
                 <CardHeader>
                   <CardTitle className="text-xl">Elementos Visuais</CardTitle>
@@ -597,7 +597,7 @@ const ThemeConfigurator: React.FC<ThemeConfiguratorProps> = ({ onSave }) => {
                   </Button>
                 </CardFooter>
               </Card>
-            </TabsContent>
+            </div>
           </div>
         </div>
       </div>

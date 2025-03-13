@@ -22,6 +22,7 @@ import DockerConfigurator from "./pages/DockerConfigurator";
 import { UIThemeConfigurator } from "./pages/UIThemeConfigurator";
 import FloatingThemeButton from "./components/ui/FloatingThemeButton";
 import { useThemeDialog } from "./hooks/use-theme-dialog";
+import ThemeConfiguratorDialog from "./components/settings/ThemeConfiguratorDialog";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,7 +34,12 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
-  const { handleOpenUITheme } = useThemeDialog();
+  const { 
+    themeDialogOpen, 
+    setThemeDialogOpen, 
+    handleOpenUITheme, 
+    handleSaveTheme 
+  } = useThemeDialog();
   
   return (
     <QueryClientProvider client={queryClient}>
@@ -42,6 +48,12 @@ const App = () => {
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <ThemeConfiguratorDialog
+              open={themeDialogOpen}
+              onOpenChange={setThemeDialogOpen}
+              onSave={handleSaveTheme}
+            />
+            
             <Routes>
               {/* Rotas públicas */}
               <Route path="/login" element={<Login />} />
@@ -79,14 +91,17 @@ const App = () => {
               } />
               <Route path="/settings/ui" element={
                 <ProtectedRoute>
-                  <Settings />
+                  <UIThemeConfigurator />
                 </ProtectedRoute>
               } />
-              <Route path="/settings/theme" element={
+              
+              {/* Corrigido para apontar para o UIThemeConfigurator que já existe */}
+              <Route path="/ui/customize" element={
                 <ProtectedRoute>
                   <UIThemeConfigurator />
                 </ProtectedRoute>
               } />
+              
               <Route path="/settings/backup" element={
                 <ProtectedRoute requiredRoles={['admin']}>
                   <Settings />
@@ -142,13 +157,6 @@ const App = () => {
               <Route path="/docker" element={
                 <ProtectedRoute requiredRoles={['admin']}>
                   <DockerConfigurator />
-                </ProtectedRoute>
-              } />
-
-              {/* Rota para o UI Theme Configurator */}
-              <Route path="/ui/customize" element={
-                <ProtectedRoute>
-                  <UIThemeConfigurator />
                 </ProtectedRoute>
               } />
 
