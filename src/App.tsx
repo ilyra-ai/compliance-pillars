@@ -87,6 +87,12 @@ const App = () => {
                     </ProtectedRoute>
                   } />
                   
+                  <Route path="/dashboard/overview" element={
+                    <ProtectedRoute>
+                      <PowerBIDashboardPage />
+                    </ProtectedRoute>
+                  } />
+                  
                   <Route path="/pillars" element={
                     <ProtectedRoute>
                       <Pillars />
@@ -148,42 +154,8 @@ const App = () => {
                       <PillarManagement />
                     </ProtectedRoute>
                   } />
-                  <Route path="/pillars/:pillarId" element={
-                    <ProtectedRoute>
-                      <PillarManagement />
-                    </ProtectedRoute>
-                  } />
                   
-                  <Route path="/settings" element={
-                    <ProtectedRoute requiredRoles={['admin', 'gestor']}>
-                      <Settings />
-                    </ProtectedRoute>
-                  } />
-                  
-                  <Route path="/settings/theme" element={
-                    <ProtectedRoute>
-                      <UIThemeConfigurator />
-                    </ProtectedRoute>
-                  } />
-                  
-                  <Route path="/ui/customize" element={
-                    <ProtectedRoute>
-                      <UIThemeConfigurator />
-                    </ProtectedRoute>
-                  } />
-                  
-                  <Route path="/settings/backup" element={
-                    <ProtectedRoute requiredRoles={['admin']}>
-                      <Settings />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/settings/migration" element={
-                    <ProtectedRoute requiredRoles={['admin']}>
-                      <Settings />
-                    </ProtectedRoute>
-                  } />
-                  
-                  <Route path="/reports" element={
+                  <Route path="/reports/view" element={
                     <ProtectedRoute>
                       <Index />
                     </ProtectedRoute>
@@ -193,6 +165,7 @@ const App = () => {
                       <ReportBuilder />
                     </ProtectedRoute>
                   } />
+                  
                   <Route path="/documents/editor" element={
                     <ProtectedRoute>
                       <DocumentEditor />
@@ -203,48 +176,87 @@ const App = () => {
                       <AdvancedDocumentsPage />
                     </ProtectedRoute>
                   } />
-                  <Route path="/charts" element={
+                  
+                  <Route path="/charts/view" element={
                     <ProtectedRoute>
                       <ChartManagement />
                     </ProtectedRoute>
                   } />
-                  <Route path="/analytics" element={
+                  
+                  <Route path="/dashboards/power-bi" element={
+                    <ProtectedRoute>
+                      <PowerBIDashboardPage />
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/analytics/data" element={
                     <ProtectedRoute>
                       <AnalyticsPage />
                     </ProtectedRoute>
                   } />
-                  <Route path="/chatbot" element={
+                  
+                  <Route path="/assist/chatbot" element={
                     <ProtectedRoute>
                       <ChatbotAssistantPage />
                     </ProtectedRoute>
                   } />
-                  <Route path="/users" element={
+                  
+                  <Route path="/admin/users" element={
                     <ProtectedRoute requiredRoles={['admin', 'gestor']}>
                       <UserManagement />
                     </ProtectedRoute>
                   } />
-
-                  <Route path="/power-bi" element={
-                    <ProtectedRoute>
-                      <PowerBIDashboardPage />
+                  
+                  <Route path="/admin/kpis" element={
+                    <ProtectedRoute requiredRoles={['admin', 'gestor']}>
+                      <Index />
                     </ProtectedRoute>
                   } />
-                  <Route path="/dashboard/power-bi" element={
-                    <ProtectedRoute>
-                      <PowerBIDashboardPage />
-                    </ProtectedRoute>
-                  } />
-
-                  <Route path="/database" element={
+                  
+                  <Route path="/admin/database" element={
                     <ProtectedRoute requiredRoles={['admin']}>
                       <DatabaseManager />
                     </ProtectedRoute>
                   } />
-                  <Route path="/docker" element={
+                  
+                  <Route path="/admin/docker" element={
                     <ProtectedRoute requiredRoles={['admin']}>
                       <DockerConfigurator />
                     </ProtectedRoute>
                   } />
+                  
+                  <Route path="/settings/general" element={
+                    <ProtectedRoute>
+                      <Settings />
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/settings/theme" element={
+                    <ProtectedRoute>
+                      <UIThemeConfigurator />
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/settings/backup" element={
+                    <ProtectedRoute requiredRoles={['admin']}>
+                      <Settings />
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/settings/migration" element={
+                    <ProtectedRoute requiredRoles={['admin']}>
+                      <Settings />
+                    </ProtectedRoute>
+                  } />
+
+                  {/* Redirect old routes to new ones */}
+                  <Route path="/power-bi" element={<Navigate to="/dashboards/power-bi" replace />} />
+                  <Route path="/database" element={<Navigate to="/admin/database" replace />} />
+                  <Route path="/docker" element={<Navigate to="/admin/docker" replace />} />
+                  <Route path="/users" element={<Navigate to="/admin/users" replace />} />
+                  <Route path="/chatbot" element={<Navigate to="/assist/chatbot" replace />} />
+                  <Route path="/analytics" element={<Navigate to="/analytics/data" replace />} />
+                  <Route path="/ui/customize" element={<Navigate to="/settings/theme" replace />} />
 
                   <Route path="*" element={<NotFound />} />
                 </Routes>
