@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useSidebar } from '@/components/ui/sidebar';
 import { 
@@ -95,18 +96,18 @@ const Sidebar: React.FC<SidebarProps> = ({ onItemClick }) => {
         </SidebarCategory>
         
         <SidebarCategory title="Pilares de Compliance">
-          <SidebarLink to="/pillars" icon={<Shield size={18} />} text="Visão Geral dos Pilares" onClick={onItemClick} />
-          <SidebarLink to="/pillars/leadership" icon={<Shield size={18} />} text="Comprometimento da Alta Administração" onClick={onItemClick} />
-          <SidebarLink to="/pillars/risk" icon={<AlertTriangle size={18} />} text="Gestão de Riscos Corporativo" onClick={onItemClick} />
-          <SidebarLink to="/pillars/policies" icon={<FileText size={18} />} text="Políticas e Procedimentos" onClick={onItemClick} />
-          <SidebarLink to="/pillars/controls" icon={<CheckCircle size={18} />} text="Controles Internos" onClick={onItemClick} />
-          <SidebarLink to="/pillars/training" icon={<BookOpen size={18} />} text="Treinamento e Comunicação" onClick={onItemClick} />
-          <SidebarLink to="/pillars/complaints" icon={<MessageSquare size={18} />} text="Canal de Denúncias" onClick={onItemClick} />
-          <SidebarLink to="/pillars/investigations" icon={<Activity size={18} />} text="Investigações Internas" onClick={onItemClick} />
-          <SidebarLink to="/pillars/due-diligence" icon={<File size={18} />} text="Due Diligence" onClick={onItemClick} />
-          <SidebarLink to="/pillars/audits" icon={<LayoutList size={18} />} text="Gestão das Auditorias" onClick={onItemClick} />
-          <SidebarLink to="/pillars/monitoring" icon={<BarChart3 size={18} />} text="Monitoramento dos Riscos" onClick={onItemClick} />
-          <SidebarLink to="/pillars/lgpd" icon={<Shield size={18} />} text="LGPD" onClick={onItemClick} />
+          <SidebarLink to="/pillars" icon={<Shield size={18} />} text="Pillars" onClick={onItemClick} />
+          <SidebarLink to="/pillars/leadership" icon={<Shield size={18} />} text="PillarManagement" onClick={onItemClick} />
+          <SidebarLink to="/pillars/risk" icon={<AlertTriangle size={18} />} text="RiskManagement" onClick={onItemClick} />
+          <SidebarLink to="/pillars/policies" icon={<FileText size={18} />} text="PillarManagement" onClick={onItemClick} />
+          <SidebarLink to="/pillars/controls" icon={<CheckCircle size={18} />} text="PillarManagement" onClick={onItemClick} />
+          <SidebarLink to="/pillars/training" icon={<BookOpen size={18} />} text="PillarManagement" onClick={onItemClick} />
+          <SidebarLink to="/pillars/complaints" icon={<MessageSquare size={18} />} text="PillarManagement" onClick={onItemClick} />
+          <SidebarLink to="/pillars/investigations" icon={<Activity size={18} />} text="PillarManagement" onClick={onItemClick} />
+          <SidebarLink to="/pillars/due-diligence" icon={<File size={18} />} text="DueDiligencePage" onClick={onItemClick} />
+          <SidebarLink to="/pillars/audits" icon={<LayoutList size={18} />} text="PillarManagement" onClick={onItemClick} />
+          <SidebarLink to="/pillars/monitoring" icon={<BarChart3 size={18} />} text="PillarManagement" onClick={onItemClick} />
+          <SidebarLink to="/pillars/lgpd" icon={<Shield size={18} />} text="PillarManagement" onClick={onItemClick} />
         </SidebarCategory>
         
         <SidebarCategory title="Ferramentas">
