@@ -52,7 +52,7 @@ export default function PowerBIDashboardPage() {
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row w-full justify-between gap-4 mb-8 md:items-center">
           <div>
-            <h1 className="text-2xl font-bold">Dashboard Interativo</h1>
+            <h2 className="text-2xl font-bold">Dashboard Interativo</h2>
             <p className="text-muted-foreground">
               Crie visualizações personalizadas com dados externos e internos
             </p>

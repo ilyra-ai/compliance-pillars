@@ -11,6 +11,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 interface PageLayoutProps {
   children: ReactNode;
   title?: string;
+  description?: string;
   actions?: ReactNode;
   hideFloatingThemeButton?: boolean;
 }
@@ -18,6 +19,7 @@ interface PageLayoutProps {
 const PageLayout: React.FC<PageLayoutProps> = ({ 
   children, 
   title, 
+  description,
   actions,
   hideFloatingThemeButton = false
 }) => {
@@ -37,7 +39,10 @@ const PageLayout: React.FC<PageLayoutProps> = ({
         <main className="pb-16 pt-24 md:ml-64 px-4 md:px-8">
           {(title || actions) && (
             <div className="mb-6 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-              {title && <h1 className="text-3xl font-bold">{title}</h1>}
+              <div>
+                {title && <h1 className="text-3xl font-bold">{title}</h1>}
+                {description && <p className="text-muted-foreground mt-1">{description}</p>}
+              </div>
               {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
             </div>
           )}

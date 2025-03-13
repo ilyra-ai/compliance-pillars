@@ -1,12 +1,10 @@
 
 import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
 import { themeService, ThemeConfig } from '@/services/theme-service';
 
 export const useThemeDialog = () => {
   const [themeDialogOpen, setThemeDialogOpen] = useState(false);
-  const navigate = useNavigate();
   
   const handleOpenUITheme = useCallback(() => {
     setThemeDialogOpen(true);
@@ -28,8 +26,10 @@ export const useThemeDialog = () => {
   }, []);
   
   const handleGoToThemeEditor = useCallback(() => {
-    navigate('/settings/ui');
-  }, [navigate]);
+    // Aqui vamos remover a navegação direta para evitar o erro
+    // A navegação pode ser feita através de botões ou links nos componentes
+    toast.info('Clique no botão "Personalizar UI" para abrir o editor completo');
+  }, []);
   
   return {
     themeDialogOpen,

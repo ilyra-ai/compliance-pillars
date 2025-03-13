@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import {
@@ -17,7 +18,6 @@ import {
   Palette,
   Database,
   HardDrive,
-  CloudUpload,
   Server,
   Package,
   Plus,
@@ -186,6 +186,28 @@ const Sidebar: React.FC = () => {
   });
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  // Para indicar que a altura da sidebar está sendo ajustada
+  const [isScrollable, setIsScrollable] = useState(false);
+
+  // Efeito para verificar se a sidebar precisa ser scrollável
+  useEffect(() => {
+    const checkScrollHeight = () => {
+      const sidebar = document.querySelector('.sidebar-content');
+      const window = document.documentElement.clientHeight;
+      
+      if (sidebar) {
+        setIsScrollable(sidebar.scrollHeight > window - 100);
+      }
+    };
+
+    // Verificar ao carregar e ao redimensionar
+    checkScrollHeight();
+    window.addEventListener('resize', checkScrollHeight);
+    
+    return () => {
+      window.removeEventListener('resize', checkScrollHeight);
+    };
+  }, []);
 
   const toggleSidebar = () => {
     setCollapsed(!collapsed);
@@ -193,6 +215,13 @@ const Sidebar: React.FC = () => {
 
   const toggleMobileSidebar = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  const toggleSection = (section: keyof typeof expanded) => {
+    setExpanded(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
   };
 
   return (
@@ -217,8 +246,8 @@ const Sidebar: React.FC = () => {
           md:translate-x-0 
           ${collapsed ? 'w-16' : 'w-64'}`}
       >
-        <div className="flex h-full flex-col p-4">
-          <div className="flex justify-between items-center mb-4 px-3">
+        <div className="flex h-full flex-col p-2">
+          <div className="flex justify-between items-center mb-4 px-2">
             {!collapsed && (
               <h2 className="text-xs font-medium uppercase text-muted-foreground">
                 Pilares de Compliance
@@ -232,115 +261,117 @@ const Sidebar: React.FC = () => {
             </button>
           </div>
 
-          <div className="space-y-1 overflow-y-auto max-h-[calc(100vh-8rem)]">
-            <Link
-              to="/"
-              className={cn(
-                'sidebar-item',
-                location.pathname === '/' && 'sidebar-item-active',
-                collapsed && 'justify-center px-2'
-              )}
-              title="Dashboard"
-            >
-              <BarChart3 size={18} />
-              {!collapsed && <span>Dashboard</span>}
-            </Link>
+          <div className={`sidebar-content ${isScrollable ? 'overflow-y-auto' : ''} flex-1`}>
+            <div className="space-y-1">
+              <Link
+                to="/"
+                className={cn(
+                  'sidebar-item',
+                  location.pathname === '/' && 'sidebar-item-active',
+                  collapsed && 'justify-center px-2'
+                )}
+                title="Dashboard"
+              >
+                <BarChart3 size={18} />
+                {!collapsed && <span>Dashboard</span>}
+              </Link>
 
-            <Link
-              to="/pillars"
-              className={cn(
-                'sidebar-item',
-                location.pathname === '/pillars' && 'sidebar-item-active',
-                collapsed && 'justify-center px-2'
-              )}
-              title="Todos os Pilares"
-            >
-              <ShieldCheck size={18} />
-              {!collapsed && <span>Todos os Pilares</span>}
-            </Link>
-            
-            <Link
-              to="/pillars/new"
-              className={cn(
-                'sidebar-item',
-                location.pathname === '/pillars/new' && 'sidebar-item-active',
-                collapsed && 'justify-center px-2'
-              )}
-              title="Adicionar Novo Pilar"
-            >
-              <Plus size={18} />
-              {!collapsed && <span>Adicionar Pilar</span>}
-            </Link>
+              <Link
+                to="/pillars"
+                className={cn(
+                  'sidebar-item',
+                  location.pathname === '/pillars' && 'sidebar-item-active',
+                  collapsed && 'justify-center px-2'
+                )}
+                title="Todos os Pilares"
+              >
+                <ShieldCheck size={18} />
+                {!collapsed && <span>Todos os Pilares</span>}
+              </Link>
+              
+              <Link
+                to="/pillars/new"
+                className={cn(
+                  'sidebar-item',
+                  location.pathname === '/pillars/new' && 'sidebar-item-active',
+                  collapsed && 'justify-center px-2'
+                )}
+                title="Adicionar Novo Pilar"
+              >
+                <Plus size={18} />
+                {!collapsed && <span>Adicionar Pilar</span>}
+              </Link>
 
-            <div className="max-h-[40vh] overflow-y-auto pr-1 scrollbar-thin">
-              {pillars.map((pillar) => (
+              <div className={`${collapsed ? 'overflow-visible' : 'max-h-[40vh] overflow-y-auto'} pr-1 scrollbar-thin`}>
+                {pillars.map((pillar) => (
+                  <Link
+                    key={pillar.href}
+                    to={pillar.href}
+                    className={cn(
+                      'sidebar-item',
+                      location.pathname === pillar.href && 'sidebar-item-active',
+                      collapsed && 'justify-center px-2'
+                    )}
+                    title={pillar.description}
+                  >
+                    {pillar.icon}
+                    {!collapsed && <span>{pillar.name}</span>}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-6 px-3">
+              {!collapsed && (
+                <h2 className="text-xs font-medium uppercase text-muted-foreground">
+                  Ferramentas
+                </h2>
+              )}
+            </div>
+
+            <div className="space-y-1">
+              {toolsItems.map((item) => (
                 <Link
-                  key={pillar.href}
-                  to={pillar.href}
+                  key={item.href}
+                  to={item.href}
                   className={cn(
                     'sidebar-item',
-                    location.pathname === pillar.href && 'sidebar-item-active',
+                    location.pathname === item.href && 'sidebar-item-active',
                     collapsed && 'justify-center px-2'
                   )}
-                  title={pillar.description}
+                  title={item.description}
                 >
-                  {pillar.icon}
-                  {!collapsed && <span>{pillar.name}</span>}
+                  {item.icon}
+                  {!collapsed && <span>{item.name}</span>}
                 </Link>
               ))}
             </div>
-          </div>
 
-          <div className="mt-6 px-3">
-            {!collapsed && (
-              <h2 className="text-xs font-medium uppercase text-muted-foreground">
-                Ferramentas
-              </h2>
-            )}
-          </div>
+            <div className="mt-6 px-3">
+              {!collapsed && (
+                <h2 className="text-xs font-medium uppercase text-muted-foreground">
+                  Sistema
+                </h2>
+              )}
+            </div>
 
-          <div className="space-y-1">
-            {toolsItems.map((item) => (
-              <Link
-                key={item.href}
-                to={item.href}
-                className={cn(
-                  'sidebar-item',
-                  location.pathname === item.href && 'sidebar-item-active',
-                  collapsed && 'justify-center px-2'
-                )}
-                title={item.description}
-              >
-                {item.icon}
-                {!collapsed && <span>{item.name}</span>}
-              </Link>
-            ))}
-          </div>
-
-          <div className="mt-auto px-3 pt-6">
-            {!collapsed && (
-              <h2 className="text-xs font-medium uppercase text-muted-foreground">
-                Sistema
-              </h2>
-            )}
-          </div>
-
-          <div className="space-y-1 overflow-y-auto max-h-[30vh]">
-            {settingsItems.map((item) => (
-              <Link
-                key={item.href}
-                to={item.href}
-                className={cn(
-                  'sidebar-item',
-                  location.pathname === item.href && 'sidebar-item-active',
-                  collapsed && 'justify-center px-2'
-                )}
-                title={item.description}
-              >
-                {item.icon}
-                {!collapsed && <span>{item.name}</span>}
-              </Link>
-            ))}
+            <div className={`${collapsed ? 'overflow-visible' : 'max-h-[30vh] overflow-y-auto'} space-y-1 scrollbar-thin`}>
+              {settingsItems.map((item) => (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  className={cn(
+                    'sidebar-item',
+                    location.pathname === item.href && 'sidebar-item-active',
+                    collapsed && 'justify-center px-2'
+                  )}
+                  title={item.description}
+                >
+                  {item.icon}
+                  {!collapsed && <span>{item.name}</span>}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </aside>

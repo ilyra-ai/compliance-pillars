@@ -24,14 +24,17 @@ export interface ThemeConfig {
 class ThemeService {
   private static instance: ThemeService;
   private themeConfig: ThemeConfig;
+  private readonly STORAGE_KEY = 'themeConfig';
 
   private constructor() {
     // Tente carregar a configuração salva ou use os valores padrão
-    const savedConfig = localStorage.getItem('themeConfig');
+    const savedConfig = localStorage.getItem(this.STORAGE_KEY);
     if (savedConfig) {
       try {
         this.themeConfig = JSON.parse(savedConfig);
+        console.log('Theme loaded from localStorage:', this.themeConfig);
       } catch (e) {
+        console.error('Error parsing saved theme:', e);
         this.themeConfig = this.getDefaultTheme();
       }
     } else {
@@ -72,8 +75,9 @@ class ThemeService {
   }
 
   public saveTheme(config: ThemeConfig): void {
+    console.log('Saving theme:', config);
     this.themeConfig = config;
-    localStorage.setItem('themeConfig', JSON.stringify(config));
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(config));
     this.applyTheme(config);
   }
 
@@ -83,6 +87,7 @@ class ThemeService {
   }
 
   private applyTheme(config: ThemeConfig): void {
+    // Aplicar cores
     document.documentElement.style.setProperty('--color-primary', config.colors.primary);
     document.documentElement.style.setProperty('--color-secondary', config.colors.secondary);
     document.documentElement.style.setProperty('--color-accent', config.colors.accent);
@@ -103,6 +108,17 @@ class ThemeService {
       document.documentElement.style.setProperty('--font-family', `'${config.fonts.family}', sans-serif`);
       document.body.style.fontFamily = `'${config.fonts.family}', sans-serif`;
     }
+
+    // Para debug
+    console.log('Theme applied:', {
+      primary: hslPrimary,
+      secondary: hslSecondary,
+      accent: hslAccent,
+      font: config.fonts.family
+    });
+
+    // Dispara um evento customizado para que outros componentes possam reagir à mudança de tema
+    window.dispatchEvent(new CustomEvent('themechange', { detail: config }));
   }
 
   private hexToHSL(hex: string): string {
@@ -136,6 +152,33 @@ class ThemeService {
     l = Math.round(l * 100);
     
     return `${h} ${s}% ${l}%`;
+  }
+
+  // Adicione um método para obter uma URL de preview com o tema atual
+  public getPreviewUrl(): string {
+    const baseUrl = window.location.origin;
+    const themeParam = encodeURIComponent(JSON.stringify(this.themeConfig));
+    return `${baseUrl}?preview=${themeParam}`;
+  }
+
+  // Adicione um método para copiar o código CSS do tema atual
+  public getThemeCSS(): string {
+    const { colors, fonts } = this.themeConfig;
+    return `
+:root {
+  --color-primary: ${colors.primary};
+  --color-secondary: ${colors.secondary};
+  --color-accent: ${colors.accent};
+  --color-background: ${colors.background};
+  --color-text: ${colors.text};
+  --font-family: '${fonts.family}', sans-serif;
+  
+  /* Tailwind HSL variants */
+  --primary: ${this.hexToHSL(colors.primary)};
+  --secondary: ${this.hexToHSL(colors.secondary)};
+  --accent: ${this.hexToHSL(colors.accent)};
+}
+    `;
   }
 }
 
