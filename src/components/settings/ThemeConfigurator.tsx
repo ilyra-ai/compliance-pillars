@@ -67,6 +67,7 @@ const ThemeConfigurator: React.FC<ThemeConfiguratorProps> = ({
           primary: primaryColor,
           secondary: secondaryColor,
           accent: accentColor,
+          font: fontFamily,
           background: backgroundColor,
           text: textColor
         },
@@ -89,6 +90,7 @@ const ThemeConfigurator: React.FC<ThemeConfiguratorProps> = ({
         primary: primaryColor,
         secondary: secondaryColor,
         accent: accentColor,
+        font: fontFamily,
         background: backgroundColor,
         text: textColor
       },
