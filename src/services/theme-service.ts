@@ -43,6 +43,20 @@ class ThemeService {
 
     // Apply the theme when loading
     this.applyTheme(this.themeConfig);
+    this.loadImprimaFont();
+  }
+
+  private loadImprimaFont() {
+    // Create a link element for the Imprima font
+    const linkElement = document.createElement('link');
+    linkElement.rel = 'stylesheet';
+    linkElement.href = 'https://fonts.googleapis.com/css2?family=Imprima&display=swap';
+    document.head.appendChild(linkElement);
+    
+    // Apply the font to all elements by default
+    document.documentElement.style.setProperty('--font-family', 'Imprima, sans-serif');
+    document.body.style.fontFamily = 'Imprima, sans-serif';
+    document.body.classList.add('font-imprima');
   }
 
   public static getInstance(): ThemeService {

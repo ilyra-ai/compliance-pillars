@@ -24,12 +24,15 @@ import {
   Filter,
   RefreshCw,
   SlidersHorizontal,
-  CalendarIcon
+  CalendarIcon,
+  Settings
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { format, subDays } from 'date-fns';
+import { themeService } from '@/services/theme-service';
+import { useThemeDialog } from '@/hooks/use-theme-dialog';
 
 // Helper function to get date range options
 const getDateRangeOptions = () => {
@@ -56,6 +59,9 @@ export default function PowerBIDashboardPage() {
   const [category, setCategory] = useState<string>('todos');
   const [valueRange, setValueRange] = useState<number[]>([0, 100]);
   const [onlyActive, setOnlyActive] = useState<boolean>(true);
+  
+  // Theme Customization
+  const { setThemeDialogOpen } = useThemeDialog();
   
   const handleBack = () => {
     navigate('/');
@@ -92,6 +98,10 @@ export default function PowerBIDashboardPage() {
     toast.success('Filtros reiniciados');
   };
   
+  const handleOpenThemeCustomizer = () => {
+    setThemeDialogOpen(true);
+  };
+  
   const actions = (
     <>
       <Button onClick={handleBack} variant="outline" size="sm">
@@ -105,6 +115,10 @@ export default function PowerBIDashboardPage() {
       <Button onClick={() => toast.success('Dashboard exportado!')} variant="outline" size="sm">
         <Download className="mr-2 h-4 w-4" />
         Exportar
+      </Button>
+      <Button onClick={handleOpenThemeCustomizer} variant="outline" size="sm">
+        <Settings className="mr-2 h-4 w-4" />
+        Personalizar
       </Button>
       <Button onClick={() => toast.success('Dashboard salvo!')} size="sm">
         <Save className="mr-2 h-4 w-4" />
@@ -127,7 +141,7 @@ export default function PowerBIDashboardPage() {
               Crie visualizações personalizadas com dados externos e internos
             </p>
           </div>
-          <div className="flex space-x-2">
+          <div className="flex flex-wrap space-x-2">
             <Button variant="outline">
               <FileUp className="mr-2 h-4 w-4" />
               Importar Arquivo CSV
@@ -251,7 +265,139 @@ export default function PowerBIDashboardPage() {
           </TabsList>
           
           <TabsContent value="dashboard">
-            <PowerBIDashboard onSave={handleSaveDashboard} />
+            <Card>
+              <CardHeader>
+                <CardTitle>Configurar Gráficos</CardTitle>
+                <CardDescription>
+                  Personalize e configure os gráficos do seu dashboard
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <Card className="p-4 hover:border-primary cursor-pointer transition-all">
+                      <div className="flex flex-col items-center text-center">
+                        <BarChart3 className="h-10 w-10 text-primary mb-2" />
+                        <h3 className="text-lg font-medium">Gráfico de Barras</h3>
+                        <p className="text-xs text-muted-foreground">Comparação de valores</p>
+                      </div>
+                    </Card>
+                    
+                    <Card className="p-4 hover:border-primary cursor-pointer transition-all">
+                      <div className="flex flex-col items-center text-center">
+                        <PieChart className="h-10 w-10 text-primary mb-2" />
+                        <h3 className="text-lg font-medium">Gráfico de Pizza</h3>
+                        <p className="text-xs text-muted-foreground">Distribuição proporcional</p>
+                      </div>
+                    </Card>
+                    
+                    <Card className="p-4 hover:border-primary cursor-pointer transition-all">
+                      <div className="flex flex-col items-center text-center">
+                        <LineChart className="h-10 w-10 text-primary mb-2" />
+                        <h3 className="text-lg font-medium">Gráfico de Linha</h3>
+                        <p className="text-xs text-muted-foreground">Evolução ao longo do tempo</p>
+                      </div>
+                    </Card>
+                  </div>
+                </div>
+                
+                <PowerBIDashboard onSave={handleSaveDashboard} />
+                
+                <div className="mt-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Card className="p-4">
+                      <CardTitle className="text-lg mb-4">Filtros do Gráfico</CardTitle>
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label>Tipo de Dados</Label>
+                          <Select defaultValue="monthly">
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione o tipo" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="daily">Diário</SelectItem>
+                              <SelectItem value="weekly">Semanal</SelectItem>
+                              <SelectItem value="monthly">Mensal</SelectItem>
+                              <SelectItem value="yearly">Anual</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label>Limitar Resultados</Label>
+                          <Slider defaultValue={[10]} max={50} step={5} />
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>5</span>
+                            <span>25</span>
+                            <span>50</span>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label>Ordenação</Label>
+                          <Select defaultValue="desc">
+                            <SelectTrigger>
+                              <SelectValue placeholder="Ordem" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="asc">Crescente</SelectItem>
+                              <SelectItem value="desc">Decrescente</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <Button className="w-full">
+                          <Filter className="mr-2 h-4 w-4" />
+                          Aplicar Filtros ao Gráfico
+                        </Button>
+                      </div>
+                    </Card>
+                    
+                    <Card className="p-4">
+                      <CardTitle className="text-lg mb-4">Personalização</CardTitle>
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label>Cores do Gráfico</Label>
+                          <Select defaultValue="default">
+                            <SelectTrigger>
+                              <SelectValue placeholder="Esquema de cores" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="default">Padrão</SelectItem>
+                              <SelectItem value="blues">Azuis</SelectItem>
+                              <SelectItem value="greens">Verdes</SelectItem>
+                              <SelectItem value="reds">Vermelhos</SelectItem>
+                              <SelectItem value="custom">Personalizado</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label>Exibir Legendas</Label>
+                          <div className="flex items-center space-x-2">
+                            <Switch defaultChecked id="legends" />
+                            <Label htmlFor="legends">Ativado</Label>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label>Exibir Valores</Label>
+                          <div className="flex items-center space-x-2">
+                            <Switch defaultChecked id="values" />
+                            <Label htmlFor="values">Ativado</Label>
+                          </div>
+                        </div>
+                        
+                        <Button className="w-full">
+                          <Settings className="mr-2 h-4 w-4" />
+                          Aplicar Estilo
+                        </Button>
+                      </div>
+                    </Card>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
           
           <TabsContent value="powerbi">

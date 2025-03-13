@@ -34,9 +34,10 @@ interface SidebarLinkProps {
   icon: React.ReactNode;
   text: string;
   className?: string;
+  onClick?: () => void;
 }
 
-const SidebarLink: React.FC<SidebarLinkProps> = ({ to, icon, text, className }) => {
+const SidebarLink: React.FC<SidebarLinkProps> = ({ to, icon, text, className, onClick }) => {
   const location = useLocation();
   const isActive = location.pathname === to;
   
@@ -46,6 +47,7 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({ to, icon, text, className }) 
       className={`flex items-center px-4 py-2 rounded-md hover:bg-primary/10 ${
         isActive ? 'bg-primary/10 text-primary font-medium' : 'text-muted-foreground'
       } ${className}`}
+      onClick={onClick}
     >
       {icon}
       <span className="ml-2 text-sm font-medium truncate">{text}</span>
@@ -67,7 +69,11 @@ const SidebarCategory: React.FC<SidebarCategoryProps> = ({ title, children }) =>
   );
 };
 
-const Sidebar = () => {
+interface SidebarProps {
+  onItemClick?: () => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ onItemClick }) => {
   const { state, open } = useSidebar();
   const { user } = useAuth();
   
@@ -85,54 +91,54 @@ const Sidebar = () => {
     >
       <div className="flex-1 overflow-y-auto scrollbar-thin">
         <SidebarCategory title="Principal">
-          <SidebarLink to="/" icon={<Home size={18} />} text="Dashboard" />
-          <SidebarLink to="/dashboard/power-bi" icon={<LayoutDashboard size={18} />} text="Dashboard BI" />
+          <SidebarLink to="/" icon={<Home size={18} />} text="Dashboard" onClick={onItemClick} />
+          <SidebarLink to="/dashboard/power-bi" icon={<LayoutDashboard size={18} />} text="Dashboard BI" onClick={onItemClick} />
         </SidebarCategory>
         
         <SidebarCategory title="Pilares de Compliance">
-          <SidebarLink to="/pillars/leadership" icon={<Shield size={18} />} text="1. Comprometimento da Alta Administração" />
-          <SidebarLink to="/pillars/risk" icon={<AlertTriangle size={18} />} text="2. Gestão de Riscos Corporativo" />
-          <SidebarLink to="/pillars/policies" icon={<FileText size={18} />} text="3. Políticas e Procedimentos" />
-          <SidebarLink to="/pillars/controls" icon={<CheckCircle size={18} />} text="4. Controles Internos" />
-          <SidebarLink to="/pillars/training" icon={<BookOpen size={18} />} text="5. Treinamento e Comunicação" />
-          <SidebarLink to="/pillars/complaints" icon={<MessageSquare size={18} />} text="6. Canal de Denúncias" />
-          <SidebarLink to="/pillars/investigations" icon={<Activity size={18} />} text="7. Investigações Internas" />
-          <SidebarLink to="/pillars/due-diligence" icon={<File size={18} />} text="8. Due Diligence" />
-          <SidebarLink to="/pillars/audits" icon={<LayoutList size={18} />} text="9. Gestão das Auditorias" />
-          <SidebarLink to="/pillars/monitoring" icon={<BarChart3 size={18} />} text="10. Monitoramento dos Riscos" />
-          <SidebarLink to="/pillars/lgpd" icon={<Shield size={18} />} text="11. LGPD" />
+          <SidebarLink to="/pillars/leadership" icon={<Shield size={18} />} text="1. Comprometimento da Alta Administração" onClick={onItemClick} />
+          <SidebarLink to="/pillars/risk" icon={<AlertTriangle size={18} />} text="2. Gestão de Riscos Corporativo" onClick={onItemClick} />
+          <SidebarLink to="/pillars/policies" icon={<FileText size={18} />} text="3. Políticas e Procedimentos" onClick={onItemClick} />
+          <SidebarLink to="/pillars/controls" icon={<CheckCircle size={18} />} text="4. Controles Internos" onClick={onItemClick} />
+          <SidebarLink to="/pillars/training" icon={<BookOpen size={18} />} text="5. Treinamento e Comunicação" onClick={onItemClick} />
+          <SidebarLink to="/pillars/complaints" icon={<MessageSquare size={18} />} text="6. Canal de Denúncias" onClick={onItemClick} />
+          <SidebarLink to="/pillars/investigations" icon={<Activity size={18} />} text="7. Investigações Internas" onClick={onItemClick} />
+          <SidebarLink to="/pillars/due-diligence" icon={<File size={18} />} text="8. Due Diligence" onClick={onItemClick} />
+          <SidebarLink to="/pillars/audits" icon={<LayoutList size={18} />} text="9. Gestão das Auditorias" onClick={onItemClick} />
+          <SidebarLink to="/pillars/monitoring" icon={<BarChart3 size={18} />} text="10. Monitoramento dos Riscos" onClick={onItemClick} />
+          <SidebarLink to="/pillars/lgpd" icon={<Shield size={18} />} text="11. LGPD" onClick={onItemClick} />
         </SidebarCategory>
         
         <SidebarCategory title="Ferramentas">
-          <SidebarLink to="/reports" icon={<FileText size={18} />} text="Relatórios" />
-          <SidebarLink to="/reports/builder" icon={<FileUp size={18} />} text="Construtor de Relatórios" />
-          <SidebarLink to="/documents/editor" icon={<Edit3 size={18} />} text="Editor de Documentos" />
-          <SidebarLink to="/documents/advanced" icon={<File size={18} />} text="Documentos Avançados" />
-          <SidebarLink to="/charts" icon={<PieChart size={18} />} text="Gráficos" />
-          <SidebarLink to="/power-bi" icon={<BarChart3 size={18} />} text="Power BI" className="text-primary font-medium" />
-          <SidebarLink to="/analytics" icon={<Activity size={18} />} text="Analytics" />
-          <SidebarLink to="/chatbot" icon={<MessageSquare size={18} />} text="Assistente IA" />
+          <SidebarLink to="/reports" icon={<FileText size={18} />} text="Relatórios" onClick={onItemClick} />
+          <SidebarLink to="/reports/builder" icon={<FileUp size={18} />} text="Construtor de Relatórios" onClick={onItemClick} />
+          <SidebarLink to="/documents/editor" icon={<Edit3 size={18} />} text="Editor de Documentos" onClick={onItemClick} />
+          <SidebarLink to="/documents/advanced" icon={<File size={18} />} text="Documentos Avançados" onClick={onItemClick} />
+          <SidebarLink to="/charts" icon={<PieChart size={18} />} text="Gráficos" onClick={onItemClick} />
+          <SidebarLink to="/power-bi" icon={<BarChart3 size={18} />} text="Power BI" className="text-primary font-medium" onClick={onItemClick} />
+          <SidebarLink to="/analytics" icon={<Activity size={18} />} text="Analytics" onClick={onItemClick} />
+          <SidebarLink to="/chatbot" icon={<MessageSquare size={18} />} text="Assistente IA" onClick={onItemClick} />
         </SidebarCategory>
         
         {hasRequiredRole(['admin', 'gestor']) && (
           <SidebarCategory title="Gestão">
-            <SidebarLink to="/users" icon={<Users size={18} />} text="Usuários" />
-            <SidebarLink to="/kpis" icon={<Gauge size={18} />} text="Indicadores (KPIs)" />
+            <SidebarLink to="/users" icon={<Users size={18} />} text="Usuários" onClick={onItemClick} />
+            <SidebarLink to="/kpis" icon={<Gauge size={18} />} text="Indicadores (KPIs)" onClick={onItemClick} />
           </SidebarCategory>
         )}
         
         {hasRequiredRole(['admin']) && (
           <SidebarCategory title="Administração">
-            <SidebarLink to="/database" icon={<Database size={18} />} text="Banco de Dados" />
-            <SidebarLink to="/docker" icon={<Container size={18} />} text="Docker" />
+            <SidebarLink to="/database" icon={<Database size={18} />} text="Banco de Dados" onClick={onItemClick} />
+            <SidebarLink to="/docker" icon={<Container size={18} />} text="Docker" onClick={onItemClick} />
           </SidebarCategory>
         )}
         
         <SidebarCategory title="Configurações">
-          <SidebarLink to="/settings" icon={<Settings size={18} />} text="Configurações Gerais" />
-          <SidebarLink to="/ui/customize" icon={<Palette size={18} />} text="Personalizar UI" />
-          <SidebarLink to="/settings/backup" icon={<HardDrive size={18} />} text="Backup" />
-          <SidebarLink to="/settings/migration" icon={<MoveRight size={18} />} text="Migração" />
+          <SidebarLink to="/settings" icon={<Settings size={18} />} text="Configurações Gerais" onClick={onItemClick} />
+          <SidebarLink to="/ui/customize" icon={<Palette size={18} />} text="Personalizar UI" onClick={onItemClick} />
+          <SidebarLink to="/settings/backup" icon={<HardDrive size={18} />} text="Backup" onClick={onItemClick} />
+          <SidebarLink to="/settings/migration" icon={<MoveRight size={18} />} text="Migração" onClick={onItemClick} />
         </SidebarCategory>
       </div>
     </div>

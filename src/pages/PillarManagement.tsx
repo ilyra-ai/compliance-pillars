@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { ChevronLeft, Save, Plus, BarChart3, FileText, MessageSquare } from 'lucide-react';
+import { ChevronLeft, Save, Plus, BarChart3, FileText, MessageSquare, Grip } from 'lucide-react';
 import { toast } from 'sonner';
 import PageLayout from '@/components/layout/PageLayout';
 import PillarContent from '@/components/ui/PillarContent';
@@ -24,9 +24,10 @@ interface Pilar {
 // Interface for the layout sections
 interface LayoutSection {
   id: string;
-  type: 'content' | 'chart' | 'document' | 'chatbot';
+  type: 'content' | 'chart' | 'document' | 'chatbot' | 'text';
   title: string;
   content?: string;
+  customText?: string;
 }
 
 const PillarManagement: React.FC = () => {
@@ -46,6 +47,8 @@ const PillarManagement: React.FC = () => {
   const [isNewPilar, setIsNewPilar] = useState(true);
   const [layoutSections, setLayoutSections] = useState<LayoutSection[]>([]);
   const [isEditingLayout, setIsEditingLayout] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [draggedItem, setDraggedItem] = useState<number | null>(null);
 
   // Get pillar name based on ID
   const getPillarName = (id: string) => {
@@ -143,7 +146,9 @@ const PillarManagement: React.FC = () => {
       type,
       title: type === 'content' ? 'Novo Conteúdo' : 
              type === 'chart' ? 'Novo Gráfico' : 
-             type === 'document' ? 'Novo Documento' : 'Novo Chatbot'
+             type === 'document' ? 'Novo Documento' : 
+             type === 'chatbot' ? 'Novo Chatbot' : 'Texto Personalizado',
+      customText: type === 'text' ? 'Edite este texto personalizado' : undefined
     };
     
     setLayoutSections(prev => [...prev, newSection]);
@@ -165,6 +170,44 @@ const PillarManagement: React.FC = () => {
     setLayoutSections(newSections);
   };
   
+  const handleDragStart = (index: number) => {
+    setIsDragging(true);
+    setDraggedItem(index);
+  };
+  
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>, index: number) => {
+    e.preventDefault();
+    if (draggedItem === null || draggedItem === index) return;
+    
+    const newSections = [...layoutSections];
+    const draggedItemContent = newSections[draggedItem];
+    
+    newSections.splice(draggedItem, 1);
+    newSections.splice(index, 0, draggedItemContent);
+    
+    setDraggedItem(index);
+    setLayoutSections(newSections);
+  };
+  
+  const handleDragEnd = () => {
+    setIsDragging(false);
+    setDraggedItem(null);
+  };
+  
+  const handleEditText = (index: number, newText: string) => {
+    const newSections = [...layoutSections];
+    if (newSections[index].type === 'text') {
+      newSections[index].customText = newText;
+      setLayoutSections(newSections);
+    }
+  };
+  
+  const handleEditTitle = (index: number, newTitle: string) => {
+    const newSections = [...layoutSections];
+    newSections[index].title = newTitle;
+    setLayoutSections(newSections);
+  };
+  
   const renderSection = (section: LayoutSection, index: number) => {
     switch (section.type) {
       case 'content':
@@ -182,11 +225,49 @@ const PillarManagement: React.FC = () => {
             draggable={isEditingLayout}
           />
         );
+      case 'text':
+        return (
+          <Card>
+            <CardHeader className={isEditingLayout ? "cursor-move" : ""}>
+              {isEditingLayout ? (
+                <Input
+                  value={section.title}
+                  onChange={(e) => handleEditTitle(index, e.target.value)}
+                  className="font-bold text-lg"
+                />
+              ) : (
+                <CardTitle className="text-lg">{section.title}</CardTitle>
+              )}
+            </CardHeader>
+            <CardContent>
+              {isEditingLayout ? (
+                <Textarea
+                  value={section.customText}
+                  onChange={(e) => handleEditText(index, e.target.value)}
+                  rows={4}
+                  className="w-full"
+                />
+              ) : (
+                <div className="prose max-w-none">
+                  {section.customText}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        );
       case 'document':
         return (
           <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Documentos do Pilar</CardTitle>
+            <CardHeader className={isEditingLayout ? "cursor-move" : ""}>
+              {isEditingLayout ? (
+                <Input
+                  value={section.title}
+                  onChange={(e) => handleEditTitle(index, e.target.value)}
+                  className="font-bold text-lg"
+                />
+              ) : (
+                <CardTitle className="text-lg">{section.title}</CardTitle>
+              )}
             </CardHeader>
             <CardContent>
               <div className="text-center p-6">
@@ -204,8 +285,16 @@ const PillarManagement: React.FC = () => {
       case 'chatbot':
         return (
           <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Assistente IA do Pilar</CardTitle>
+            <CardHeader className={isEditingLayout ? "cursor-move" : ""}>
+              {isEditingLayout ? (
+                <Input
+                  value={section.title}
+                  onChange={(e) => handleEditTitle(index, e.target.value)}
+                  className="font-bold text-lg"
+                />
+              ) : (
+                <CardTitle className="text-lg">{section.title}</CardTitle>
+              )}
             </CardHeader>
             <CardContent>
               <div className="text-center p-6">
@@ -236,7 +325,7 @@ const PillarManagement: React.FC = () => {
       {!isNewPilar && (
         <Button 
           onClick={() => setIsEditingLayout(!isEditingLayout)} 
-          variant="outline" 
+          variant={isEditingLayout ? "default" : "outline"} 
           size="sm"
           className="mr-2"
         >
@@ -333,7 +422,7 @@ const PillarManagement: React.FC = () => {
               <Card className="p-4 bg-muted/30">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-lg font-medium">Editar Layout da Página</h2>
-                  <div className="flex space-x-2">
+                  <div className="flex flex-wrap gap-2">
                     <Button size="sm" variant="outline" onClick={() => handleAddSection('content')}>
                       <Plus className="mr-2 h-4 w-4" />
                       Conteúdo
@@ -350,6 +439,10 @@ const PillarManagement: React.FC = () => {
                       <MessageSquare className="mr-2 h-4 w-4" />
                       Chatbot
                     </Button>
+                    <Button size="sm" variant="outline" onClick={() => handleAddSection('text')}>
+                      <FileText className="mr-2 h-4 w-4" />
+                      Texto
+                    </Button>
                   </div>
                 </div>
                 <p className="text-sm text-muted-foreground mb-4">
@@ -360,7 +453,15 @@ const PillarManagement: React.FC = () => {
             
             <div className="space-y-6">
               {layoutSections.map((section, index) => (
-                <div key={section.id} className="relative">
+                <div 
+                  key={section.id} 
+                  className="relative"
+                  draggable={isEditingLayout}
+                  onDragStart={() => isEditingLayout && handleDragStart(index)}
+                  onDragOver={(e) => isEditingLayout && handleDragOver(e, index)}
+                  onDragEnd={handleDragEnd}
+                  style={{ opacity: draggedItem === index ? 0.5 : 1 }}
+                >
                   {isEditingLayout && (
                     <div className="absolute -top-3 -right-3 z-10 flex space-x-1">
                       <Button size="icon" variant="outline" className="h-6 w-6 bg-card" 
@@ -377,6 +478,9 @@ const PillarManagement: React.FC = () => {
                         onClick={() => setLayoutSections(prev => prev.filter((_, i) => i !== index))}>
                         ×
                       </Button>
+                      <div className="h-6 w-6 flex items-center justify-center bg-muted text-muted-foreground rounded cursor-move">
+                        <Grip size={12} />
+                      </div>
                     </div>
                   )}
                   {renderSection(section, index)}

@@ -28,6 +28,7 @@ import AdvancedDocumentsPage from "./pages/AdvancedDocuments";
 import ChatbotAssistantPage from "./pages/ChatbotAssistant";
 import AnalyticsPage from "./pages/Analytics";
 import { useEffect } from "react";
+import { themeService } from "./services/theme-service";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -45,24 +46,21 @@ const App = () => {
     handleSaveTheme 
   } = useThemeDialog();
   
-  // Apply the Imprima font to the body when the app loads
+  // Apply the Imprima font and theme when the app loads
   useEffect(() => {
-    document.body.classList.add('font-imprima');
+    // Ensure the theme service is initialized
+    const theme = themeService.getTheme();
     
-    // Apply font-family directly to ensure it works
-    document.documentElement.style.setProperty('--font-family', 'Imprima, sans-serif');
-    document.body.style.fontFamily = 'Imprima, sans-serif';
+    // Check for URL parameters for theme preview
+    const urlParams = new URLSearchParams(window.location.search);
+    const previewTheme = urlParams.get('preview');
     
-    // Apply theme from localStorage if available
-    const savedTheme = localStorage.getItem('themeConfig');
-    if (savedTheme) {
+    if (previewTheme) {
       try {
-        const theme = JSON.parse(savedTheme);
-        document.documentElement.style.setProperty('--primary', theme.colors.primary);
-        document.documentElement.style.setProperty('--secondary', theme.colors.secondary);
-        document.documentElement.style.setProperty('--accent', theme.colors.accent);
+        const previewConfig = JSON.parse(decodeURIComponent(previewTheme));
+        themeService.applyThemeTemporarily(previewConfig);
       } catch (e) {
-        console.error('Error applying saved theme:', e);
+        console.error('Error applying preview theme:', e);
       }
     }
   }, []);

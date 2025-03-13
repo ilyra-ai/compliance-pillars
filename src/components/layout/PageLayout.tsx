@@ -1,5 +1,5 @@
 
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Sidebar from '@/components/layout/Sidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
@@ -7,6 +7,9 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import FloatingThemeButton from '@/components/ui/FloatingThemeButton';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Menu } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 interface PageLayoutProps {
   children: ReactNode;
@@ -24,6 +27,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
   hideFloatingThemeButton = false,
 }) => {
   const isMobile = useIsMobile();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <SidebarProvider>
@@ -31,7 +35,19 @@ const PageLayout: React.FC<PageLayoutProps> = ({
         <Navbar />
         {isMobile ? (
           <>
-            <Sidebar />
+            <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="fixed top-4 left-4 z-50 lg:hidden">
+                  <Menu />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="p-0" onCloseAutoFocus={() => setSidebarOpen(false)}>
+                <div className="h-full overflow-y-auto">
+                  <Sidebar onItemClick={() => setSidebarOpen(false)} />
+                </div>
+              </SheetContent>
+            </Sheet>
+            
             <main className="pb-16 pt-20 md:pt-24 px-4 md:px-8 transition-all duration-300 ease-in-out">
               {(title || actions) && (
                 <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
