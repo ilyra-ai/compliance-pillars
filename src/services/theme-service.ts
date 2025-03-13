@@ -1,4 +1,5 @@
 
+import React from "react";
 import { createContext, useContext, useState } from "react";
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
@@ -8,10 +9,18 @@ export interface ThemeColors {
   secondary: string;
   accent: string;
   font: string;
+  background: string;
+  text: string;
 }
 
 export interface ThemeConfig {
   colors: ThemeColors;
+  fonts: {
+    family: string;
+  };
+  assets: {
+    logo: string;
+  };
 }
 
 interface ThemeContextType {
@@ -25,7 +34,9 @@ const defaultColors: ThemeColors = {
   primary: "221.2 83.2% 53.3%",
   secondary: "215 27.9% 16.9%",
   accent: "210 40% 96.1%",
-  font: "Inter"
+  font: "Inter",
+  background: "#ffffff",
+  text: "#1f2937"
 };
 
 export const predefinedThemes = {
@@ -33,49 +44,65 @@ export const predefinedThemes = {
     primary: "221.2 83.2% 53.3%",
     secondary: "215 27.9% 16.9%",
     accent: "210 40% 96.1%",
-    font: "Inter"
+    font: "Inter",
+    background: "#ffffff",
+    text: "#1f2937"
   },
   forest: {
     primary: "142 76% 36%",
     secondary: "180 60% 25%",
     accent: "120 40% 94%",
-    font: "Poppins"
+    font: "Poppins",
+    background: "#f8faf6",
+    text: "#2c3e2e"
   },
   sunset: {
     primary: "25 95% 53%",
     secondary: "4 90% 28%",
     accent: "50 30% 96%",
-    font: "Lato"
+    font: "Lato",
+    background: "#fffaf5",
+    text: "#3d2b20"
   },
   ocean: {
     primary: "198 93% 60%",
     secondary: "200 98% 24%",
     accent: "190 40% 96%",
-    font: "Montserrat"
+    font: "Montserrat",
+    background: "#f5fafd",
+    text: "#1a3b4c"
   },
   lavender: {
     primary: "239 84% 67%",
     secondary: "160 84% 39%",
     accent: "38 92% 50%",
-    font: "Imprima"
+    font: "Imprima",
+    background: "#f9f7ff",
+    text: "#2e2a3d"
   },
   midnight: {
     primary: "245 58% 51%",
     secondary: "230 22% 20%",
     accent: "230 20% 96%",
-    font: "Nunito"
+    font: "Nunito",
+    background: "#1a1a24",
+    text: "#e1e1e8"
   },
   corporate: {
     primary: "215 100% 38%",
     secondary: "215 28% 17%",
     accent: "10 100% 80%",
-    font: "Lato"
+    font: "Lato",
+    background: "#f5f8fc",
+    text: "#1c2333"
   },
   modern: {
     primary: "262 83% 58%",
     secondary: "250 24% 20%",
     accent: "270 20% 96%",
-    font: "Montserrat"
+    font: "Montserrat",
+    background: "#f8f7fc",
+    text: "#2a2639"
   }
 };
 
@@ -156,12 +183,21 @@ export const themeService = {
     try {
       const savedTheme = localStorage.getItem("theme-colors");
       if (savedTheme) {
-        return { colors: JSON.parse(savedTheme) };
+        const colors = JSON.parse(savedTheme);
+        return { 
+          colors, 
+          fonts: { family: colors.font || "Inter" },
+          assets: { logo: "/placeholder.svg" }
+        };
       }
     } catch (error) {
       console.error("Error loading theme:", error);
     }
-    return { colors: defaultColors };
+    return { 
+      colors: defaultColors,
+      fonts: { family: defaultColors.font },
+      assets: { logo: "/placeholder.svg" }
+    };
   },
 
   saveTheme(config: ThemeConfig): void {
@@ -172,6 +208,7 @@ export const themeService = {
       document.documentElement.style.setProperty("--primary", colors.primary);
       document.documentElement.style.setProperty("--secondary", colors.secondary);
       document.documentElement.style.setProperty("--accent", colors.accent);
+      document.documentElement.style.setProperty("--font", colors.font);
       
       // Save to localStorage
       localStorage.setItem("theme-colors", JSON.stringify(colors));
@@ -184,7 +221,11 @@ export const themeService = {
   },
 
   resetTheme(): void {
-    this.saveTheme({ colors: defaultColors });
+    this.saveTheme({ 
+      colors: defaultColors,
+      fonts: { family: defaultColors.font },
+      assets: { logo: "/placeholder.svg" }
+    });
   },
   
   applyThemeTemporarily(config: ThemeConfig): void {
@@ -195,6 +236,7 @@ export const themeService = {
       document.documentElement.style.setProperty("--primary", colors.primary);
       document.documentElement.style.setProperty("--secondary", colors.secondary);
       document.documentElement.style.setProperty("--accent", colors.accent);
+      document.documentElement.style.setProperty("--font", colors.font);
       
       console.info("Theme applied temporarily with colors:", colors);
     } catch (error) {
@@ -211,6 +253,8 @@ export const themeService = {
   --secondary: ${colors.secondary};
   --accent: ${colors.accent};
   --font: ${colors.font || "Inter"};
+  --background: ${colors.background || "#ffffff"};
+  --text: ${colors.text || "#1f2937"};
 }
 
 /* Primary color variants */
@@ -227,6 +271,10 @@ export const themeService = {
 .bg-accent { background-color: hsl(var(--accent)); }
 .text-accent { color: hsl(var(--accent)); }
 .border-accent { border-color: hsl(var(--accent)); }
+
+/* Background and text colors */
+.custom-bg { background-color: var(--background); }
+.custom-text { color: var(--text); }
 
 /* Font family */
 body {
