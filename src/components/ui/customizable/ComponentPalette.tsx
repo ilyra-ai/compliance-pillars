@@ -61,7 +61,7 @@ const DraggableTemplate: React.FC<DraggableTemplateProps> = ({
   onDragStart,
   onDragEnd
 }) => {
-  const [{ isDragging }, drag] = useDrag({
+  const [collected, drag] = useDrag(() => ({
     type: 'NEW_COMPONENT',
     item: { templateId: template.id, type: template.type },
     collect: (monitor) => ({
@@ -73,18 +73,24 @@ const DraggableTemplate: React.FC<DraggableTemplateProps> = ({
         onDragEnd();
       }
     },
-    begin: () => {
-      if (onDragStart) {
-        onDragStart();
-      }
+    // Correctly handle drag start
+    options: {
+      dropEffect: 'copy',
     }
-  });
+  }));
+
+  // Call onDragStart when dragging begins
+  React.useEffect(() => {
+    if (collected.isDragging && onDragStart) {
+      onDragStart();
+    }
+  }, [collected.isDragging, onDragStart]);
 
   return (
     <div
       ref={drag}
       className={`flex items-center p-3 rounded-md cursor-move border hover:bg-secondary/10 transition-colors ${
-        isDragging ? 'opacity-50 border-primary' : 'border-transparent'
+        collected.isDragging ? 'opacity-50 border-primary' : 'border-transparent'
       }`}
     >
       <div className="mr-3 text-primary bg-primary/10 p-2 rounded-md">
