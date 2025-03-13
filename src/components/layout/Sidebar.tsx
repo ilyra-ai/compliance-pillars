@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useSidebar } from '@/components/ui/sidebar';
 import { 
@@ -71,7 +70,6 @@ const Sidebar = () => {
   const { state, open } = useSidebar();
   const { user } = useAuth();
   
-  // Function to check if a user has required roles
   const hasRequiredRole = (requiredRoles: string[]) => {
     if (!user || !user.role) {
       return false;
