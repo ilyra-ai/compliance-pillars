@@ -26,7 +26,7 @@ import {
   Calendar as CalendarIcon,
   RotateCcw,
   RotateCw,
-  FileWord,
+  File,
   FileSpreadsheet,
   FileType,
   ExternalLink
@@ -155,7 +155,7 @@ const PillarContent: React.FC<PillarContentProps> = ({ pillarId, initialContent,
               Conteúdo
             </TabsTrigger>
             <TabsTrigger value="documentos-avancados">
-              <FileWord className="mr-2 h-4 w-4" />
+              <File className="mr-2 h-4 w-4" />
               Documentos Avançados
             </TabsTrigger>
             <TabsTrigger value="midia">

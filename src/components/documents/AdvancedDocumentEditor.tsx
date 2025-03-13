@@ -8,11 +8,10 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import {
-  FileWord,
+  FileText,
   FileSpreadsheet,
   FileImage,
-  FilePower,
-  FileText,
+  File,
   Upload,
   Download,
   Save,
@@ -100,7 +99,7 @@ const AdvancedDocumentEditor: React.FC<AdvancedDocumentEditorProps> = ({ pillarI
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
                 <Card className="p-4 text-center hover:border-primary cursor-pointer transition-all">
-                  <FileWord className="h-12 w-12 mx-auto text-blue-600 mb-2" />
+                  <FileText className="h-12 w-12 mx-auto text-blue-600 mb-2" />
                   <p className="text-sm font-medium">Word</p>
                 </Card>
                 <Card className="p-4 text-center hover:border-primary cursor-pointer transition-all">
@@ -108,7 +107,7 @@ const AdvancedDocumentEditor: React.FC<AdvancedDocumentEditorProps> = ({ pillarI
                   <p className="text-sm font-medium">Excel</p>
                 </Card>
                 <Card className="p-4 text-center hover:border-primary cursor-pointer transition-all">
-                  <FilePower className="h-12 w-12 mx-auto text-red-600 mb-2" />
+                  <FileImage className="h-12 w-12 mx-auto text-red-600 mb-2" />
                   <p className="text-sm font-medium">PowerPoint</p>
                 </Card>
                 <Card className="p-4 text-center hover:border-primary cursor-pointer transition-all">
@@ -196,7 +195,7 @@ const AdvancedDocumentEditor: React.FC<AdvancedDocumentEditorProps> = ({ pillarI
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
                 <Card className="p-4 text-center hover:border-primary cursor-pointer transition-all">
-                  <FileWord className="h-12 w-12 mx-auto text-blue-600 mb-2" />
+                  <FileText className="h-12 w-12 mx-auto text-blue-600 mb-2" />
                   <p className="text-sm font-medium">Word Online</p>
                 </Card>
                 <Card className="p-4 text-center hover:border-primary cursor-pointer transition-all">
@@ -204,7 +203,7 @@ const AdvancedDocumentEditor: React.FC<AdvancedDocumentEditorProps> = ({ pillarI
                   <p className="text-sm font-medium">Excel Online</p>
                 </Card>
                 <Card className="p-4 text-center hover:border-primary cursor-pointer transition-all">
-                  <FilePower className="h-12 w-12 mx-auto text-red-600 mb-2" />
+                  <File className="h-12 w-12 mx-auto text-red-600 mb-2" />
                   <p className="text-sm font-medium">PowerPoint Online</p>
                 </Card>
               </div>

@@ -17,7 +17,7 @@ import {
   HardDrive, 
   MoveRight,
   BarChart3,
-  FileWord,
+  File,
   MessageSquare,
   Gauge,
   Shield,
@@ -104,7 +104,7 @@ const Sidebar = () => {
           <SidebarLink to="/reports" icon={<FileText size={18} />} text="Relatórios" />
           <SidebarLink to="/reports/builder" icon={<FileUp size={18} />} text="Construtor de Relatórios" />
           <SidebarLink to="/documents/editor" icon={<Edit3 size={18} />} text="Editor de Documentos" />
-          <SidebarLink to="/documents/advanced" icon={<FileWord size={18} />} text="Documentos Avançados" />
+          <SidebarLink to="/documents/advanced" icon={<File size={18} />} text="Documentos Avançados" />
           <SidebarLink to="/charts" icon={<PieChart size={18} />} text="Gráficos" />
           <SidebarLink to="/power-bi" icon={<BarChart3 size={18} />} text="Power BI" className="text-primary font-medium" />
           <SidebarLink to="/analytics" icon={<Activity size={18} />} text="Analytics" />
