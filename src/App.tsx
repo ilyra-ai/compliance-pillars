@@ -24,6 +24,10 @@ import FloatingThemeButton from "./components/ui/FloatingThemeButton";
 import { useThemeDialog } from "./hooks/use-theme-dialog";
 import ThemeConfiguratorDialog from "./components/settings/ThemeConfiguratorDialog";
 import PowerBIDashboardPage from "./pages/PowerBIDashboard";
+import AdvancedDocumentsPage from "./pages/AdvancedDocuments";
+import ChatbotAssistantPage from "./pages/ChatbotAssistant";
+import AnalyticsPage from "./pages/Analytics";
+import { useEffect } from "react";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,6 +44,11 @@ const App = () => {
     setThemeDialogOpen, 
     handleSaveTheme 
   } = useThemeDialog();
+  
+  // Apply the Imprima font to the body when the app loads
+  useEffect(() => {
+    document.body.classList.add('font-imprima');
+  }, []);
   
   return (
     <QueryClientProvider client={queryClient}>
@@ -75,6 +84,21 @@ const App = () => {
               <Route path="/pillars/risk" element={
                 <ProtectedRoute>
                   <RiskManagement />
+                </ProtectedRoute>
+              } />
+              <Route path="/pillars/audit" element={
+                <ProtectedRoute>
+                  <PillarManagement />
+                </ProtectedRoute>
+              } />
+              <Route path="/pillars/governance" element={
+                <ProtectedRoute>
+                  <PillarManagement />
+                </ProtectedRoute>
+              } />
+              <Route path="/pillars/ethics" element={
+                <ProtectedRoute>
+                  <PillarManagement />
                 </ProtectedRoute>
               } />
               <Route path="/pillars/:pillarId" element={
@@ -138,9 +162,27 @@ const App = () => {
                 </ProtectedRoute>
               } />
               
+              <Route path="/documents/advanced" element={
+                <ProtectedRoute>
+                  <AdvancedDocumentsPage />
+                </ProtectedRoute>
+              } />
+              
               <Route path="/charts" element={
                 <ProtectedRoute>
                   <ChartManagement />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/analytics" element={
+                <ProtectedRoute>
+                  <AnalyticsPage />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/chatbot" element={
+                <ProtectedRoute>
+                  <ChatbotAssistantPage />
                 </ProtectedRoute>
               } />
 
