@@ -11,6 +11,7 @@ import RiskManagement from "./pages/RiskManagement";
 import Login from "./pages/Login";
 import UserManagement from "./pages/UserManagement";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import PillarManagement from "./pages/PillarManagement";
 
 const queryClient = new QueryClient();
 
@@ -38,7 +39,7 @@ const App = () => (
             } />
             <Route path="/pillars/:pillarId" element={
               <ProtectedRoute>
-                <Index />
+                <PillarManagement />
               </ProtectedRoute>
             } />
             <Route path="/settings" element={
