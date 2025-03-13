@@ -28,6 +28,11 @@ const PageLayout: React.FC<PageLayoutProps> = ({
 }) => {
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarWidth, setSidebarWidth] = useState(20);
+
+  const handlePanelResize = (sizes: number[]) => {
+    setSidebarWidth(sizes[0]);
+  };
 
   return (
     <SidebarProvider>
@@ -65,8 +70,17 @@ const PageLayout: React.FC<PageLayoutProps> = ({
               </main>
             </>
           ) : (
-            <ResizablePanelGroup direction="horizontal" className="h-full min-h-screen">
-              <ResizablePanel defaultSize={20} minSize={15} maxSize={30} className="hidden md:block">
+            <ResizablePanelGroup 
+              direction="horizontal" 
+              className="h-full min-h-screen"
+              onLayout={handlePanelResize}
+            >
+              <ResizablePanel 
+                defaultSize={20} 
+                minSize={15} 
+                maxSize={40} 
+                className="hidden md:block"
+              >
                 <Sidebar />
               </ResizablePanel>
               <ResizableHandle withHandle className="bg-border" />

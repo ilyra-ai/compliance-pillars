@@ -34,7 +34,7 @@ const Navbar: React.FC = () => {
         <div className="flex items-center gap-8">
           <Link to="/" className="flex items-center gap-2">
             <AnimatedLogo />
-            <span className="text-xl font-semibold tracking-tight">
+            <span className="text-xl font-semibold tracking-tight font-imprima">
               IntegrityHub
             </span>
           </Link>
@@ -43,8 +43,8 @@ const Navbar: React.FC = () => {
             <Link
               to="/"
               className={cn(
-                'nav-item',
-                location.pathname === '/' && 'nav-item-active'
+                'nav-item px-3 py-2 text-sm font-medium rounded-md hover:bg-secondary transition-colors',
+                location.pathname === '/' && 'bg-secondary/70 text-foreground'
               )}
             >
               Dashboard
@@ -52,8 +52,8 @@ const Navbar: React.FC = () => {
             <Link
               to="/pillars"
               className={cn(
-                'nav-item',
-                location.pathname.includes('/pillars') && 'nav-item-active'
+                'nav-item px-3 py-2 text-sm font-medium rounded-md hover:bg-secondary transition-colors',
+                location.pathname.includes('/pillars') && 'bg-secondary/70 text-foreground'
               )}
             >
               Pilares
@@ -61,8 +61,8 @@ const Navbar: React.FC = () => {
             <Link
               to="/reports"
               className={cn(
-                'nav-item',
-                location.pathname.includes('/reports') && 'nav-item-active'
+                'nav-item px-3 py-2 text-sm font-medium rounded-md hover:bg-secondary transition-colors',
+                location.pathname.includes('/reports') && 'bg-secondary/70 text-foreground'
               )}
             >
               Relatórios
@@ -71,8 +71,8 @@ const Navbar: React.FC = () => {
               <Link
                 to="/users"
                 className={cn(
-                  'nav-item',
-                  location.pathname.includes('/users') && 'nav-item-active'
+                  'nav-item px-3 py-2 text-sm font-medium rounded-md hover:bg-secondary transition-colors',
+                  location.pathname.includes('/users') && 'bg-secondary/70 text-foreground'
                 )}
               >
                 Usuários

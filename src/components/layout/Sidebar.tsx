@@ -74,7 +74,7 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ onItemClick }) => {
-  const { state, open } = useSidebar();
+  const { state } = useSidebar();
   const { user } = useAuth();
   
   const hasRequiredRole = (requiredRoles: string[]) => {
