@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { PlusCircle, Folder, Settings, Layers, AlertTriangle, CheckCircle2, BarChart3, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import PillarCard from '@/components/ui/PillarCard';
+import { toast } from "sonner";
 
 const pillars = [
   {
@@ -89,6 +90,10 @@ const pillars = [
 ];
 
 const Pillars: React.FC = () => {
+  const handleAddPillar = () => {
+    toast.success("Funcionalidade de adicionar pilar será implementada em breve.");
+  };
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen">
@@ -96,7 +101,7 @@ const Pillars: React.FC = () => {
         <div className="flex-1 p-6">
           <div className="mb-6 flex justify-between items-center">
             <h1 className="text-3xl font-bold">Pilares de Compliance</h1>
-            <Button>
+            <Button onClick={handleAddPillar}>
               <PlusCircle className="mr-2 h-4 w-4" />
               Adicionar Pilar
             </Button>

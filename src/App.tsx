@@ -11,6 +11,7 @@ import RiskManagement from "./pages/RiskManagement";
 import Login from "./pages/Login";
 import UserManagement from "./pages/UserManagement";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import Pillars from "./pages/Pillars";
 import PillarManagement from "./pages/PillarManagement";
 import DocumentEditor from "./pages/DocumentEditor";
 import ReportBuilder from "./pages/ReportBuilder";
@@ -43,6 +44,11 @@ const App = () => (
             <Route path="/" element={
               <ProtectedRoute>
                 <Index />
+              </ProtectedRoute>
+            } />
+            <Route path="/pillars" element={
+              <ProtectedRoute>
+                <Pillars />
               </ProtectedRoute>
             } />
             <Route path="/pillars/risk" element={
