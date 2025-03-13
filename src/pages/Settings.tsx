@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
@@ -24,7 +23,7 @@ import {
   Palette,
   Clock,
   Archive,
-  FileZip
+  File
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -46,7 +45,6 @@ const Settings: React.FC = () => {
     setThemeDialogOpen(false);
   };
 
-  // Set active tab based on URL
   React.useEffect(() => {
     if (location.pathname === '/settings/ui') setActiveTab('ui');
     else if (location.pathname === '/settings/backup') setActiveTab('backup');
@@ -111,7 +109,6 @@ const Settings: React.FC = () => {
               <TabsTrigger value="compress">Compactar APP e BD</TabsTrigger>
             </TabsList>
             
-            {/* Configurações Gerais */}
             <TabsContent value="general">
               <Card>
                 <CardHeader>
@@ -171,7 +168,6 @@ const Settings: React.FC = () => {
               </Card>
             </TabsContent>
             
-            {/* Backup do Sistema */}
             <TabsContent value="backup">
               <Card>
                 <CardHeader>
@@ -236,7 +232,6 @@ const Settings: React.FC = () => {
               </Card>
             </TabsContent>
             
-            {/* Migração de Servidor */}
             <TabsContent value="migration">
               <Card>
                 <CardHeader>
@@ -297,7 +292,6 @@ const Settings: React.FC = () => {
               </Card>
             </TabsContent>
             
-            {/* Compactar APP e Banco de Dados */}
             <TabsContent value="compress">
               <Card>
                 <CardHeader>
@@ -390,7 +384,7 @@ const Settings: React.FC = () => {
                 </CardContent>
                 <CardFooter className="flex flex-col sm:flex-row justify-between gap-2">
                   <Button variant="outline" className="w-full sm:w-auto">
-                    <FileZip className="mr-2 h-4 w-4" />
+                    <File className="mr-2 h-4 w-4" />
                     Estimar Tamanho
                   </Button>
                   <Button onClick={handleCompressSystem} className="w-full sm:w-auto">
@@ -403,7 +397,6 @@ const Settings: React.FC = () => {
           </Tabs>
         </main>
         
-        {/* Theme Customization Dialog */}
         <Dialog open={themeDialogOpen} onOpenChange={setThemeDialogOpen}>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
@@ -416,7 +409,6 @@ const Settings: React.FC = () => {
           </DialogContent>
         </Dialog>
         
-        {/* Floating Theme Button */}
         <FloatingThemeButton onClick={handleOpenUITheme} />
       </div>
     </SidebarProvider>
