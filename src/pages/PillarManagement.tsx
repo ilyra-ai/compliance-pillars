@@ -214,19 +214,10 @@ const PillarManagement: React.FC = () => {
   
   const handleTabChange = (value: string) => {
     setActiveTab(value);
+    
     // If switching to editor tab, enable edit mode
     if (value === 'editor') {
       setEditMode(true);
-    } else if (editMode && value !== 'editor') {
-      // If leaving editor tab and edit mode is on, ask for confirmation
-      const confirmed = window.confirm("Sair do modo de edição? Alterações não salvas serão perdidas.");
-      if (confirmed) {
-        setEditMode(false);
-      } else {
-        // If user cancels, stay on editor tab
-        setActiveTab('editor');
-        return;
-      }
     }
   };
   
@@ -345,31 +336,6 @@ const PillarManagement: React.FC = () => {
         Voltar
       </Button>
       
-      {!isNewPilar && (
-        <Button 
-          onClick={() => {
-            setEditMode(!editMode);
-            setActiveTab(editMode ? 'info' : 'editor');
-          }} 
-          variant={editMode ? "default" : "outline"}
-          className="relative overflow-hidden group mr-2"
-          size="sm"
-        >
-          {editMode ? (
-            <>
-              <Settings className="mr-2 h-4 w-4" />
-              Modo Visualização
-            </>
-          ) : (
-            <>
-              <Palette className="mr-2 h-4 w-4" />
-              <span>Personalizar UI</span>
-              <span className="absolute right-0 top-0 h-full w-2 bg-primary/20 animate-pulse hidden group-hover:block"></span>
-            </>
-          )}
-        </Button>
-      )}
-      
       <Button onClick={handleSubmit} disabled={isLoading} size="sm">
         <Save className="mr-2 h-4 w-4" />
         {isLoading ? 'Salvando...' : 'Salvar Pilar'}
@@ -388,7 +354,7 @@ const PillarManagement: React.FC = () => {
     >
       {!isNewPilar ? (
         <Tabs 
-          value={editMode ? "editor" : activeTab} 
+          value={activeTab} 
           onValueChange={handleTabChange}
           className="mb-6"
         >

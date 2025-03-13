@@ -4,25 +4,33 @@ import { useDrop } from 'react-dnd';
 import { PlusCircle } from 'lucide-react';
 
 interface DroppableAreaProps {
-  onDrop: (id: string, index: number) => void;
+  onDrop: (id: string, type: string, index?: number) => void;
   children: React.ReactNode;
   className?: string;
+  allowAnywhereDropping?: boolean;
 }
 
 export const DroppableArea: React.FC<DroppableAreaProps> = ({
   onDrop,
   children,
   className = '',
+  allowAnywhereDropping = true,
 }) => {
   const [{ isOver, canDrop }, drop] = useDrop({
     accept: ['COMPONENT', 'NEW_COMPONENT'],
     drop: (item: any) => {
       if (item.templateId) {
         // This is a new component from the palette
-        return { name: 'DroppableArea', isNewComponent: true, templateId: item.templateId, type: item.type };
+        onDrop(item.templateId, item.type);
+        return { 
+          name: 'DroppableArea', 
+          isNewComponent: true, 
+          templateId: item.templateId, 
+          type: item.type 
+        };
       }
       // This is an existing component being reordered
-      onDrop(item.id, item.index);
+      onDrop(item.id, item.type, item.index);
       return { name: 'DroppableArea' };
     },
     collect: (monitor) => ({
@@ -42,8 +50,10 @@ export const DroppableArea: React.FC<DroppableAreaProps> = ({
           ? 'bg-primary/10 border-2 border-dashed border-primary shadow-lg' 
           : canDrop 
               ? 'bg-secondary/5 border-2 border-dashed border-secondary' 
-              : ''
-      } min-h-[200px] p-4 rounded-md transition-all duration-200`}
+              : hasChildren 
+                ? '' 
+                : 'border border-dashed border-muted-foreground'
+      } ${allowAnywhereDropping ? 'min-h-[200px]' : ''} p-4 rounded-md transition-all duration-200`}
     >
       {!hasChildren && (
         <div className="flex flex-col items-center justify-center h-40 text-muted-foreground">

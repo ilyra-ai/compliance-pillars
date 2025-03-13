@@ -8,7 +8,7 @@ import { ComponentPalette } from './ComponentPalette';
 import { EditableTable, Column, TableData } from './EditableTable';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Save, Undo, Trash } from 'lucide-react';
+import { PlusCircle, Save, Undo, Trash, X } from 'lucide-react';
 import update from 'immutability-helper';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -23,6 +23,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Textarea } from '@/components/ui/textarea';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { BarChart, LineChart, PieChart } from 'recharts';
 
 interface Component {
   id: string;
@@ -77,6 +79,7 @@ export const CustomizableLayout: React.FC = () => {
   const [showLayoutsDialog, setShowLayoutsDialog] = useState(false);
   const [componentBeingEdited, setComponentBeingEdited] = useState<Component | null>(null);
   const [customTextContent, setCustomTextContent] = useState('');
+  const [isDraggingActive, setIsDraggingActive] = useState(false);
 
   useEffect(() => {
     // Try to load any previously saved layouts from localStorage
@@ -108,9 +111,14 @@ export const CustomizableLayout: React.FC = () => {
     [components]
   );
 
-  const handleDrop = (id: string, index: number) => {
-    // Handle component reordering
-    moveComponent(index, components.length);
+  const handleDrop = (id: string, type: string, index?: number) => {
+    if (index !== undefined) {
+      // Handle component reordering
+      moveComponent(index, components.length);
+    } else {
+      // Handle new component drop
+      handleNewComponentDrop(id, type);
+    }
   };
 
   const handleNewComponentDrop = (templateId: string, type: string) => {
@@ -168,6 +176,67 @@ export const CustomizableLayout: React.FC = () => {
         content: {
           alertType: alertType,
           message: `Este é um alerta do tipo ${alertType}. Você pode editar esta mensagem.`,
+        },
+      };
+    } else if (type === 'list') {
+      newComponent = {
+        id: newId,
+        title: 'Lista de Itens',
+        type: 'list',
+        content: {
+          items: [
+            { id: 'item-1', text: 'Item 1' },
+            { id: 'item-2', text: 'Item 2' },
+            { id: 'item-3', text: 'Item 3' },
+          ],
+        },
+      };
+    } else if (type === 'calendar') {
+      newComponent = {
+        id: newId,
+        title: 'Calendário',
+        type: 'calendar',
+        content: {
+          events: [
+            { id: 'event-1', title: 'Reunião', date: '2023-06-15' },
+            { id: 'event-2', title: 'Treinamento', date: '2023-06-20' },
+          ],
+        },
+      };
+    } else if (type === 'users') {
+      newComponent = {
+        id: newId,
+        title: 'Usuários',
+        type: 'users',
+        content: {
+          users: [
+            { id: 'user-1', name: 'João Silva', role: 'Admin' },
+            { id: 'user-2', name: 'Maria Santos', role: 'Editor' },
+            { id: 'user-3', name: 'Pedro Costa', role: 'Viewer' },
+          ],
+        },
+      };
+    } else if (type === 'iframe') {
+      newComponent = {
+        id: newId,
+        title: 'Conteúdo Incorporado',
+        type: 'iframe',
+        content: {
+          url: 'https://example.com/embed',
+          height: 400,
+        },
+      };
+    } else if (type === 'kanban') {
+      newComponent = {
+        id: newId,
+        title: 'Quadro Kanban',
+        type: 'kanban',
+        content: {
+          columns: [
+            { id: 'col-1', title: 'Pendente', cards: ['Tarefa 1', 'Tarefa 2'] },
+            { id: 'col-2', title: 'Em Progresso', cards: ['Tarefa 3'] },
+            { id: 'col-3', title: 'Concluído', cards: ['Tarefa 4'] },
+          ],
         },
       };
     } else {
@@ -374,6 +443,14 @@ export const CustomizableLayout: React.FC = () => {
     }
   };
 
+  const handleDragStartFromPalette = () => {
+    setIsDraggingActive(true);
+  };
+
+  const handleDragEndFromPalette = () => {
+    setIsDraggingActive(false);
+  };
+
   const renderComponentContent = (component: Component) => {
     switch (component.type) {
       case 'table':
@@ -426,6 +503,86 @@ export const CustomizableLayout: React.FC = () => {
             {component.content.message || 'Mensagem de alerta'}
           </div>
         );
+      case 'list':
+        return (
+          <div className="p-4 bg-card rounded-md">
+            <ul className="list-disc pl-5 space-y-2">
+              {component.content.items?.map((item: any) => (
+                <li key={item.id}>{item.text}</li>
+              )) || <li>Nenhum item disponível</li>}
+            </ul>
+          </div>
+        );
+      case 'calendar':
+        return (
+          <div className="p-4 bg-card rounded-md">
+            <div className="text-lg font-medium mb-3">Calendário</div>
+            <div className="border p-3 rounded-md bg-muted/20">
+              <div className="grid grid-cols-7 gap-1 text-center text-sm">
+                <div>Dom</div>
+                <div>Seg</div>
+                <div>Ter</div>
+                <div>Qua</div>
+                <div>Qui</div>
+                <div>Sex</div>
+                <div>Sáb</div>
+              </div>
+              <div className="mt-2 text-center text-muted-foreground">
+                (Visualização do calendário - implementação completa exibirá o calendário real)
+              </div>
+            </div>
+          </div>
+        );
+      case 'users':
+        return (
+          <div className="p-4 bg-card rounded-md">
+            <div className="text-lg font-medium mb-3">Usuários</div>
+            <div className="space-y-2">
+              {component.content.users?.map((user: any) => (
+                <div key={user.id} className="flex items-center justify-between p-2 border rounded-md">
+                  <div>{user.name}</div>
+                  <div className="text-sm text-muted-foreground">{user.role}</div>
+                </div>
+              )) || <div className="text-muted-foreground">Nenhum usuário disponível</div>}
+            </div>
+          </div>
+        );
+      case 'iframe':
+        return (
+          <div className="p-4 bg-card rounded-md">
+            <div className="text-lg font-medium mb-3">Conteúdo Incorporado</div>
+            <div className="border p-4 rounded-md bg-muted/20 h-32 flex items-center justify-center">
+              <div className="text-center text-muted-foreground">
+                URL: {component.content.url || 'Nenhuma URL definida'}
+                <div className="mt-2 text-sm">
+                  (Visualização - o conteúdo será exibido aqui)
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      case 'kanban':
+        return (
+          <div className="p-4 bg-card rounded-md">
+            <div className="text-lg font-medium mb-3">Quadro Kanban</div>
+            <div className="flex space-x-3 overflow-x-auto pb-2">
+              {component.content.columns?.map((column: any) => (
+                <div key={column.id} className="min-w-[180px] border rounded-md p-2 bg-muted/10">
+                  <div className="font-medium mb-2">{column.title}</div>
+                  <div className="space-y-2">
+                    {column.cards?.map((card: string, idx: number) => (
+                      <div key={idx} className="p-2 bg-card rounded-md shadow-sm border text-sm">
+                        {card}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )) || (
+                <div className="text-muted-foreground">Kanban não configurado</div>
+              )}
+            </div>
+          </div>
+        );
       default:
         return (
           <div className="p-4 bg-muted/30 rounded-md text-center">
@@ -442,9 +599,9 @@ export const CustomizableLayout: React.FC = () => {
     <DndProvider backend={HTML5Backend}>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="md:col-span-3">
-          <div className="mb-4 flex justify-between items-center">
+          <div className="mb-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
             <h2 className="text-2xl font-bold">Editor de Layout</h2>
-            <div className="flex space-x-2">
+            <div className="flex flex-wrap gap-2">
               <Button
                 variant="outline"
                 onClick={() => setShowLayoutsDialog(true)}
@@ -462,11 +619,26 @@ export const CustomizableLayout: React.FC = () => {
             </div>
           </div>
 
+          {isDraggingActive && (
+            <Alert className="mb-4 bg-primary/5 border-primary/30">
+              <AlertTitle className="flex items-center">
+                <div className="bg-primary/20 p-1.5 rounded-full mr-2">
+                  <PlusCircle className="h-4 w-4 text-primary" />
+                </div>
+                Solte o componente em qualquer lugar desta área
+              </AlertTitle>
+              <AlertDescription>
+                Você pode posicionar este componente em qualquer lugar nesta área de edição. Após soltar, você poderá reorganizá-lo conforme necessário.
+              </AlertDescription>
+            </Alert>
+          )}
+
           <Card>
             <CardContent className="p-6">
               <DroppableArea
                 onDrop={handleDrop}
                 className="min-h-[500px] border border-dashed border-gray-300 rounded-md p-4"
+                allowAnywhereDropping={true}
               >
                 {components.map((component, index) => (
                   <DraggableComponent
@@ -500,7 +672,11 @@ export const CustomizableLayout: React.FC = () => {
         </div>
 
         <div className="md:col-span-1">
-          <ComponentPalette onComponentDropped={handleNewComponentDrop} />
+          <ComponentPalette 
+            onComponentDropped={handleNewComponentDrop} 
+            onDragStart={handleDragStartFromPalette}
+            onDragEnd={handleDragEndFromPalette}
+          />
         </div>
       </div>
 

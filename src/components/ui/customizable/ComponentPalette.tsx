@@ -107,49 +107,51 @@ const DraggableTemplate: React.FC<DraggableTemplateProps> = ({
 
 export const ComponentPalette: React.FC<{
   onComponentDropped?: (templateId: string, type: string) => void;
-}> = ({ onComponentDropped }) => {
+  onDragStart?: () => void;
+  onDragEnd?: () => void;
+}> = ({ onComponentDropped, onDragStart, onDragEnd }) => {
   const templates: ComponentTemplate[] = [
     // Charts
     { 
       id: 'chart-bar', 
       name: 'Bar Chart', 
       icon: <BarChart size={18} />, 
-      type: 'chart',
+      type: 'chart-bar',
       description: 'Exibir dados em barras' 
     },
     { 
       id: 'chart-line', 
       name: 'Line Chart', 
       icon: <LineChart size={18} />, 
-      type: 'chart',
+      type: 'chart-line',
       description: 'Mostrar tendências ao longo do tempo' 
     },
     { 
       id: 'chart-pie', 
       name: 'Pie Chart', 
       icon: <PieChart size={18} />, 
-      type: 'chart',
+      type: 'chart-pie',
       description: 'Visualizar proporções e percentuais' 
     },
     { 
       id: 'chart-gauge', 
       name: 'Gauge Chart', 
       icon: <Gauge size={18} />, 
-      type: 'chart',
+      type: 'chart-gauge',
       description: 'Indicador de medição como velocímetro' 
     },
     { 
       id: 'chart-radar', 
       name: 'Radar Chart', 
       icon: <Radar size={18} />, 
-      type: 'chart',
+      type: 'chart-radar',
       description: 'Comparar múltiplas variáveis' 
     },
     { 
       id: 'chart-trending', 
       name: 'Trending Chart', 
       icon: <TrendingUp size={18} />, 
-      type: 'chart',
+      type: 'chart-trending',
       description: 'Análise de tendências' 
     },
     // Data Display
@@ -366,11 +368,17 @@ export const ComponentPalette: React.FC<{
     },
   ];
 
-  const handleDragStart = () => {
-    // Add additional logic if needed when drag starts
+  const handleComponentDragStart = () => {
+    if (onDragStart) {
+      onDragStart();
+    }
   };
 
-  const handleDragEnd = () => {
+  const handleComponentDragEnd = () => {
+    if (onDragEnd) {
+      onDragEnd();
+    }
+    
     // Notify parent that a component was dropped
     if (onComponentDropped) {
       // This will be called when the drop happens
@@ -390,8 +398,8 @@ export const ComponentPalette: React.FC<{
             <DraggableTemplate 
               key={template.id} 
               template={template} 
-              onDragStart={handleDragStart}
-              onDragEnd={handleDragEnd}
+              onDragStart={handleComponentDragStart}
+              onDragEnd={handleComponentDragEnd}
             />
           ))}
         </div>

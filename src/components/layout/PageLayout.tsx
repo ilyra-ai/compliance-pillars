@@ -7,13 +7,17 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import FloatingThemeButton from '@/components/ui/FloatingThemeButton';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Menu } from 'lucide-react';
+import { Palette, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { toast } from 'sonner';
 
 // New import for drag-and-drop functionality
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { CustomizableLayout } from '@/components/ui/customizable/CustomizableLayout';
+import { DroppableArea } from '@/components/ui/customizable/DroppableArea';
+import { ComponentPalette } from '@/components/ui/customizable/ComponentPalette';
 
 interface PageLayoutProps {
   children: ReactNode;
@@ -37,9 +41,31 @@ const PageLayout: React.FC<PageLayoutProps> = ({
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(20);
+  const [editMode, setEditMode] = useState(customizable || false);
+  const [showPalette, setShowPalette] = useState(false);
+
+  useEffect(() => {
+    setEditMode(customizable);
+  }, [customizable]);
 
   const handlePanelResize = (sizes: number[]) => {
     setSidebarWidth(sizes[0]);
+  };
+
+  const toggleEditMode = () => {
+    setEditMode(prev => !prev);
+    if (!editMode) {
+      toast.info("Modo de edição ativado. Arraste componentes para personalizar o layout.");
+      setShowPalette(true);
+    } else {
+      setShowPalette(false);
+    }
+  };
+
+  const handleDrop = (templateId: string, type: string) => {
+    console.log(`Dropped component: ${templateId} of type ${type}`);
+    // Implementation for handling drops would go here
+    toast.success(`Componente adicionado: ${type}`);
   };
 
   // Wrap the content with DndProvider for drag and drop functionality if customizable
@@ -54,18 +80,53 @@ const PageLayout: React.FC<PageLayoutProps> = ({
                 {description && <p className="text-muted-foreground">{description}</p>}
               </div>
             )}
-            {actions && <div className="flex flex-wrap gap-2 self-start mt-2 md:mt-0">{actions}</div>}
+            <div className="flex flex-wrap gap-2 self-start mt-2 md:mt-0">
+              <Button 
+                onClick={toggleEditMode} 
+                variant={editMode ? "default" : "outline"}
+                className="relative overflow-hidden group mr-2"
+                size="sm"
+              >
+                {editMode ? (
+                  <>
+                    <X className="mr-2 h-4 w-4" />
+                    Sair do Modo Edição
+                  </>
+                ) : (
+                  <>
+                    <Palette className="mr-2 h-4 w-4" />
+                    <span>Personalizar UI</span>
+                    <span className="absolute right-0 top-0 h-full w-2 bg-primary/20 animate-pulse hidden group-hover:block"></span>
+                  </>
+                )}
+              </Button>
+              {actions}
+            </div>
           </div>
         )}
-        {children}
+        
+        {editMode ? (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="md:col-span-3">
+              <DroppableArea onDrop={handleDrop} className="min-h-[200px]" allowAnywhereDropping={true}>
+                {children}
+              </DroppableArea>
+            </div>
+            <div className="md:col-span-1">
+              <ComponentPalette onComponentDropped={handleDrop} />
+            </div>
+          </div>
+        ) : (
+          children
+        )}
       </>
     );
 
-    return customizable ? (
+    return (
       <DndProvider backend={HTML5Backend}>
         {content}
       </DndProvider>
-    ) : content;
+    );
   };
 
   return (
@@ -78,7 +139,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
               <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon" className="fixed top-4 left-4 z-50 lg:hidden">
-                    <Menu />
+                    <Palette />
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="left" className="p-0" onCloseAutoFocus={() => setSidebarOpen(false)}>
