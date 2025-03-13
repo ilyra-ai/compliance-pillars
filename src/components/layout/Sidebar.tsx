@@ -92,11 +92,17 @@ const Sidebar = () => {
         </SidebarCategory>
         
         <SidebarCategory title="Pilares de Compliance">
-          <SidebarLink to="/pillars" icon={<LayoutList size={18} />} text="Pilares" />
-          <SidebarLink to="/pillars/risk" icon={<AlertTriangle size={18} />} text="Gestão de Riscos" />
-          <SidebarLink to="/pillars/audit" icon={<CheckCircle size={18} />} text="Auditoria" />
-          <SidebarLink to="/pillars/governance" icon={<Shield size={18} />} text="Governança" />
-          <SidebarLink to="/pillars/ethics" icon={<BookOpen size={18} />} text="Ética" />
+          <SidebarLink to="/pillars/leadership" icon={<Shield size={18} />} text="1. Comprometimento da Alta Administração" />
+          <SidebarLink to="/pillars/risk" icon={<AlertTriangle size={18} />} text="2. Gestão de Riscos Corporativo" />
+          <SidebarLink to="/pillars/policies" icon={<FileText size={18} />} text="3. Políticas e Procedimentos" />
+          <SidebarLink to="/pillars/controls" icon={<CheckCircle size={18} />} text="4. Controles Internos" />
+          <SidebarLink to="/pillars/training" icon={<BookOpen size={18} />} text="5. Treinamento e Comunicação" />
+          <SidebarLink to="/pillars/complaints" icon={<MessageSquare size={18} />} text="6. Canal de Denúncias" />
+          <SidebarLink to="/pillars/investigations" icon={<Activity size={18} />} text="7. Investigações Internas" />
+          <SidebarLink to="/pillars/due-diligence" icon={<File size={18} />} text="8. Due Diligence" />
+          <SidebarLink to="/pillars/audits" icon={<LayoutList size={18} />} text="9. Gestão das Auditorias" />
+          <SidebarLink to="/pillars/monitoring" icon={<BarChart3 size={18} />} text="10. Monitoramento dos Riscos" />
+          <SidebarLink to="/pillars/lgpd" icon={<Shield size={18} />} text="11. LGPD" />
         </SidebarCategory>
         
         <SidebarCategory title="Ferramentas">

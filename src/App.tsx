@@ -48,6 +48,10 @@ const App = () => {
   // Apply the Imprima font to the body when the app loads
   useEffect(() => {
     document.body.classList.add('font-imprima');
+    
+    // Apply font-family directly to ensure it works
+    document.documentElement.style.setProperty('--font-family', 'Imprima, sans-serif');
+    document.body.style.fontFamily = 'Imprima, sans-serif';
   }, []);
   
   return (
@@ -76,7 +80,9 @@ const App = () => {
                   <Pillars />
                 </ProtectedRoute>
               } />
-              <Route path="/pillars/new" element={
+              
+              {/* Rotas dos Pilares de Compliance */}
+              <Route path="/pillars/leadership" element={
                 <ProtectedRoute>
                   <PillarManagement />
                 </ProtectedRoute>
@@ -86,17 +92,47 @@ const App = () => {
                   <RiskManagement />
                 </ProtectedRoute>
               } />
-              <Route path="/pillars/audit" element={
+              <Route path="/pillars/policies" element={
                 <ProtectedRoute>
                   <PillarManagement />
                 </ProtectedRoute>
               } />
-              <Route path="/pillars/governance" element={
+              <Route path="/pillars/controls" element={
                 <ProtectedRoute>
                   <PillarManagement />
                 </ProtectedRoute>
               } />
-              <Route path="/pillars/ethics" element={
+              <Route path="/pillars/training" element={
+                <ProtectedRoute>
+                  <PillarManagement />
+                </ProtectedRoute>
+              } />
+              <Route path="/pillars/complaints" element={
+                <ProtectedRoute>
+                  <PillarManagement />
+                </ProtectedRoute>
+              } />
+              <Route path="/pillars/investigations" element={
+                <ProtectedRoute>
+                  <PillarManagement />
+                </ProtectedRoute>
+              } />
+              <Route path="/pillars/due-diligence" element={
+                <ProtectedRoute>
+                  <PillarManagement />
+                </ProtectedRoute>
+              } />
+              <Route path="/pillars/audits" element={
+                <ProtectedRoute>
+                  <PillarManagement />
+                </ProtectedRoute>
+              } />
+              <Route path="/pillars/monitoring" element={
+                <ProtectedRoute>
+                  <PillarManagement />
+                </ProtectedRoute>
+              } />
+              <Route path="/pillars/lgpd" element={
                 <ProtectedRoute>
                   <PillarManagement />
                 </ProtectedRoute>
@@ -106,12 +142,13 @@ const App = () => {
                   <PillarManagement />
                 </ProtectedRoute>
               } />
+              
               <Route path="/settings" element={
                 <ProtectedRoute requiredRoles={['admin', 'gestor']}>
                   <Settings />
                 </ProtectedRoute>
               } />
-              <Route path="/settings/ui" element={
+              <Route path="/settings/theme" element={
                 <ProtectedRoute>
                   <UIThemeConfigurator />
                 </ProtectedRoute>
@@ -133,56 +170,46 @@ const App = () => {
                   <Settings />
                 </ProtectedRoute>
               } />
-              <Route path="/settings/hostgator" element={
-                <ProtectedRoute requiredRoles={['admin']}>
-                  <Settings />
-                </ProtectedRoute>
-              } />
+              
+              {/* Tool Routes */}
               <Route path="/reports" element={
                 <ProtectedRoute>
                   <Index />
                 </ProtectedRoute>
               } />
-              <Route path="/users" element={
-                <ProtectedRoute requiredRoles={['admin', 'gestor']}>
-                  <UserManagement />
-                </ProtectedRoute>
-              } />
-              
-              {/* Rotas para funcionalidades solicitadas */}
               <Route path="/reports/builder" element={
                 <ProtectedRoute>
                   <ReportBuilder />
                 </ProtectedRoute>
               } />
-              
               <Route path="/documents/editor" element={
                 <ProtectedRoute>
                   <DocumentEditor />
                 </ProtectedRoute>
               } />
-              
               <Route path="/documents/advanced" element={
                 <ProtectedRoute>
                   <AdvancedDocumentsPage />
                 </ProtectedRoute>
               } />
-              
               <Route path="/charts" element={
                 <ProtectedRoute>
                   <ChartManagement />
                 </ProtectedRoute>
               } />
-              
               <Route path="/analytics" element={
                 <ProtectedRoute>
                   <AnalyticsPage />
                 </ProtectedRoute>
               } />
-              
               <Route path="/chatbot" element={
                 <ProtectedRoute>
                   <ChatbotAssistantPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/users" element={
+                <ProtectedRoute requiredRoles={['admin', 'gestor']}>
+                  <UserManagement />
                 </ProtectedRoute>
               } />
 
@@ -198,20 +225,19 @@ const App = () => {
                 </ProtectedRoute>
               } />
 
-              {/* Novas rotas para banco de dados e configurações Docker */}
+              {/* Admin routes */}
               <Route path="/database" element={
                 <ProtectedRoute requiredRoles={['admin']}>
                   <DatabaseManager />
                 </ProtectedRoute>
               } />
-              
               <Route path="/docker" element={
                 <ProtectedRoute requiredRoles={['admin']}>
                   <DockerConfigurator />
                 </ProtectedRoute>
               } />
 
-              {/* Rota de fallback */}
+              {/* Fallback route */}
               <Route path="*" element={<NotFound />} />
             </Routes>
             

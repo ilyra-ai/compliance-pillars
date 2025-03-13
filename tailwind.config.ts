@@ -218,6 +218,9 @@ export default {
 				'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
 				'gradient-compliance': 'linear-gradient(135deg, #f6f8fd 0%, #eef1fc 100%)',
 			},
+			screens: {
+				'xs': '480px',
+			}
 		}
 	},
 	plugins: [require("tailwindcss-animate")],

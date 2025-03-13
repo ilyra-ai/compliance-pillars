@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Folder, Settings, Layers, AlertTriangle, CheckCircle2, BarChart3, FileText } from 'lucide-react';
+import { PlusCircle, Shield, AlertTriangle, FileText, CheckCircle2, BookOpen, MessageSquare, Activity, File, LayoutList, BarChart3 } from 'lucide-react';
 import PillarCard from '@/components/ui/PillarCard';
 import { toast } from "sonner";
 import Navbar from '@/components/layout/Navbar';
@@ -13,79 +13,79 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 const pillars = [
   {
     id: 'leadership',
-    title: 'Alta Administração',
+    title: '1. Comprometimento da Alta Administração',
     description: 'Comprometimento, declarações e relatórios para diretoria',
-    icon: <Settings className="h-5 w-5" />,
+    icon: <Shield className="h-5 w-5" />,
     color: 'from-blue-500 to-blue-700',
   },
   {
     id: 'risk',
-    title: 'Gestão de Riscos',
+    title: '2. Gestão de Riscos Corporativo',
     description: 'Matriz de riscos, avaliação e controles',
     icon: <AlertTriangle className="h-5 w-5" />,
     color: 'from-orange-500 to-orange-700',
   },
   {
     id: 'policies',
-    title: 'Políticas',
+    title: '3. Políticas e Procedimentos',
     description: 'Gerenciamento de políticas e códigos de conduta',
     icon: <FileText className="h-5 w-5" />,
     color: 'from-indigo-500 to-indigo-700',
   },
   {
     id: 'controls',
-    title: 'Controles Internos',
+    title: '4. Controles Internos',
     description: 'Testes, monitoramento e planos de ação',
     icon: <CheckCircle2 className="h-5 w-5" />,
     color: 'from-green-500 to-green-700',
   },
   {
     id: 'training',
-    title: 'Treinamento',
+    title: '5. Treinamento e Comunicação',
     description: 'Programas de capacitação e e-learning',
-    icon: <Layers className="h-5 w-5" />,
+    icon: <BookOpen className="h-5 w-5" />,
     color: 'from-purple-500 to-purple-700',
   },
   {
     id: 'complaints',
-    title: 'Canal de Denúncias',
+    title: '6. Canal de Denúncias',
     description: 'Formulários anônimos e protocolos',
-    icon: <Folder className="h-5 w-5" />,
+    icon: <MessageSquare className="h-5 w-5" />,
     color: 'from-red-500 to-red-700',
   },
   {
     id: 'investigations',
-    title: 'Investigações',
+    title: '7. Investigações Internas',
     description: 'Gestão de investigações e evidências',
-    icon: <Folder className="h-5 w-5" />,
+    icon: <Activity className="h-5 w-5" />,
     color: 'from-amber-500 to-amber-700',
   },
   {
     id: 'due-diligence',
-    title: 'Due Diligence',
+    title: '8. Due Diligence',
     description: 'Avaliação de terceiros e parceiros',
-    icon: <Folder className="h-5 w-5" />,
+    icon: <File className="h-5 w-5" />,
     color: 'from-cyan-500 to-cyan-700',
   },
   {
     id: 'audits',
-    title: 'Auditorias',
+    title: '9. Gestão das Auditorias',
     description: 'Gestão de auditorias internas e externas',
-    icon: <Folder className="h-5 w-5" />,
+    icon: <LayoutList className="h-5 w-5" />,
     color: 'from-teal-500 to-teal-700',
   },
   {
     id: 'monitoring',
-    title: 'Monitoramento',
+    title: '10. Monitoramento dos Riscos',
     description: 'Acompanhamento contínuo de riscos e ocorrências',
     icon: <BarChart3 className="h-5 w-5" />,
     color: 'from-sky-500 to-sky-700',
   },
   {
     id: 'lgpd',
-    title: 'LGPD',
+    title: '11. LGPD',
     description: 'Gestão de proteção de dados pessoais',
-    icon: <Folder className="h-5 w-5" />,
+    icon: <Shield className="h-5 w-5" />,
     color: 'from-pink-500 to-pink-700',
   },
 ];
@@ -123,12 +123,12 @@ const Pillars: React.FC = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background font-imprima">
         <Navbar />
         <Sidebar />
-        <main className="pb-16 pt-24 md:ml-64 px-4 md:px-8">
-          <div className="mb-6 flex justify-between items-center">
-            <h1 className="text-3xl font-bold">Pilares de Compliance</h1>
+        <main className="pb-16 pt-20 md:pt-24 md:ml-64 px-4 md:px-8 transition-all duration-300 ease-in-out">
+          <div className="mb-6 flex flex-col md:flex-row justify-between gap-4 items-start md:items-center">
+            <h1 className="text-2xl md:text-3xl font-bold">Pilares de Compliance</h1>
             <Button onClick={handleAddPillar}>
               <PlusCircle className="mr-2 h-4 w-4" />
               Adicionar Pilar
@@ -196,7 +196,7 @@ const Pillars: React.FC = () => {
             </Card>
           )}
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {pillars.map((pillar, index) => (
               <PillarCard
                 key={pillar.id}
