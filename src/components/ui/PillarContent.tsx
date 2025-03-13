@@ -19,6 +19,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import WYSIWYGEditor from '@/components/editor/WYSIWYGEditor';
 import ReportBuilder from '@/components/reports/ReportBuilder';
+import { toast } from 'sonner';
 
 const pillarNames: Record<string, string> = {
   'leadership': 'Alta Administração',
@@ -56,9 +57,33 @@ const PillarContent: React.FC<PillarContentProps> = ({ children }) => {
   const { pillarId } = useParams<{ pillarId: string }>();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState('overview');
+  const [showNewItemForm, setShowNewItemForm] = useState(false);
+  const [newItem, setNewItem] = useState({
+    title: '',
+    description: '',
+    dueDate: ''
+  });
   
   const pillarName = pillarId ? pillarNames[pillarId] || 'Pilar Desconhecido' : '';
   const pillarDescription = pillarId ? pillarDescriptions[pillarId] || 'Sem descrição disponível.' : '';
+  
+  const handleAddItem = () => {
+    setShowNewItemForm(true);
+  };
+  
+  const handleSubmitItem = () => {
+    toast.success(`Item "${newItem.title}" adicionado com sucesso!`);
+    setShowNewItemForm(false);
+    setNewItem({
+      title: '',
+      description: '',
+      dueDate: ''
+    });
+  };
+  
+  const handleCancelItem = () => {
+    setShowNewItemForm(false);
+  };
   
   return (
     <div className="container mx-auto px-4 py-8 md:px-6">
@@ -66,6 +91,10 @@ const PillarContent: React.FC<PillarContentProps> = ({ children }) => {
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink href="/">Início</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/pillars">Pilares</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
@@ -85,11 +114,55 @@ const PillarContent: React.FC<PillarContentProps> = ({ children }) => {
         <div>
           <h2 className="text-xl font-semibold">Gestão do Pilar</h2>
         </div>
-        <Button>
+        <Button onClick={handleAddItem}>
           <Plus className="mr-2 h-4 w-4" />
           Novo Item
         </Button>
       </div>
+      
+      {showNewItemForm && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Adicionar Novo Item</CardTitle>
+            <CardDescription>Preencha os dados do novo item para este pilar</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="item-title">Título</Label>
+              <Input 
+                id="item-title"
+                value={newItem.title}
+                onChange={(e) => setNewItem({...newItem, title: e.target.value})}
+                placeholder="Título do item"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="item-description">Descrição</Label>
+              <textarea 
+                id="item-description"
+                className="w-full px-3 py-2 border rounded-md"
+                value={newItem.description}
+                onChange={(e) => setNewItem({...newItem, description: e.target.value})}
+                placeholder="Descrição detalhada"
+                rows={3}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="item-due-date">Data de Vencimento</Label>
+              <Input 
+                id="item-due-date"
+                type="date"
+                value={newItem.dueDate}
+                onChange={(e) => setNewItem({...newItem, dueDate: e.target.value})}
+              />
+            </div>
+            <div className="flex justify-end space-x-2 mt-4">
+              <Button variant="outline" onClick={handleCancelItem}>Cancelar</Button>
+              <Button onClick={handleSubmitItem}>Salvar Item</Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="mb-8">
         <TabsList className="mb-6">
@@ -211,7 +284,45 @@ const PillarContent: React.FC<PillarContentProps> = ({ children }) => {
               <CardDescription>Políticas, procedimentos e evidências relacionadas</CardDescription>
             </CardHeader>
             <CardContent>
-              <p>Lista de documentos relacionados a este pilar...</p>
+              <p className="mb-4">Lista de documentos relacionados a este pilar:</p>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between p-3 border rounded-md hover:bg-muted">
+                  <div className="flex items-center">
+                    <FileText size={20} className="mr-2 text-blue-500" />
+                    <span>Política de Compliance v2.1.docx</span>
+                  </div>
+                  <div className="flex space-x-2">
+                    <Button variant="outline" size="sm">Visualizar</Button>
+                    <Button variant="outline" size="sm">Editar</Button>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between p-3 border rounded-md hover:bg-muted">
+                  <div className="flex items-center">
+                    <FileText size={20} className="mr-2 text-blue-500" />
+                    <span>Procedimento Operacional PO-001.docx</span>
+                  </div>
+                  <div className="flex space-x-2">
+                    <Button variant="outline" size="sm">Visualizar</Button>
+                    <Button variant="outline" size="sm">Editar</Button>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between p-3 border rounded-md hover:bg-muted">
+                  <div className="flex items-center">
+                    <FileText size={20} className="mr-2 text-green-500" />
+                    <span>Relatório de Atividades Q1 2023.xlsx</span>
+                  </div>
+                  <div className="flex space-x-2">
+                    <Button variant="outline" size="sm">Visualizar</Button>
+                    <Button variant="outline" size="sm">Editar</Button>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-4">
+                <Button variant="outline">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Adicionar Documento
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -223,7 +334,54 @@ const PillarContent: React.FC<PillarContentProps> = ({ children }) => {
               <CardDescription>Pendências, atividades e prazos</CardDescription>
             </CardHeader>
             <CardContent>
-              <p>Lista de tarefas relacionadas a este pilar...</p>
+              <p className="mb-4">Lista de tarefas relacionadas a este pilar:</p>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between p-3 border rounded-md hover:bg-muted">
+                  <div className="flex items-center">
+                    <Clock size={20} className="mr-2 text-red-500" />
+                    <div>
+                      <p className="font-medium">Revisão da Política de Compliance</p>
+                      <p className="text-sm text-muted-foreground">Vencimento em 5 dias</p>
+                    </div>
+                  </div>
+                  <div className="flex space-x-2">
+                    <Button variant="outline" size="sm">Concluir</Button>
+                    <Button variant="outline" size="sm">Detalhes</Button>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between p-3 border rounded-md hover:bg-muted">
+                  <div className="flex items-center">
+                    <Clock size={20} className="mr-2 text-amber-500" />
+                    <div>
+                      <p className="font-medium">Treinamento da Equipe</p>
+                      <p className="text-sm text-muted-foreground">Vencimento em 15 dias</p>
+                    </div>
+                  </div>
+                  <div className="flex space-x-2">
+                    <Button variant="outline" size="sm">Concluir</Button>
+                    <Button variant="outline" size="sm">Detalhes</Button>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between p-3 border rounded-md hover:bg-muted">
+                  <div className="flex items-center">
+                    <CheckSquare size={20} className="mr-2 text-green-500" />
+                    <div>
+                      <p className="font-medium">Coleta de Evidências</p>
+                      <p className="text-sm text-muted-foreground">Concluída em 10/05/2023</p>
+                    </div>
+                  </div>
+                  <div className="flex space-x-2">
+                    <Button variant="outline" size="sm">Reabrir</Button>
+                    <Button variant="outline" size="sm">Detalhes</Button>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-4">
+                <Button variant="outline">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Adicionar Tarefa
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

@@ -66,6 +66,26 @@ const App = () => (
                 <Settings />
               </ProtectedRoute>
             } />
+            <Route path="/settings/ui" element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            } />
+            <Route path="/settings/backup" element={
+              <ProtectedRoute requiredRoles={['admin']}>
+                <Settings />
+              </ProtectedRoute>
+            } />
+            <Route path="/settings/migration" element={
+              <ProtectedRoute requiredRoles={['admin']}>
+                <Settings />
+              </ProtectedRoute>
+            } />
+            <Route path="/settings/hostgator" element={
+              <ProtectedRoute requiredRoles={['admin']}>
+                <Settings />
+              </ProtectedRoute>
+            } />
             <Route path="/reports" element={
               <ProtectedRoute>
                 <Index />
