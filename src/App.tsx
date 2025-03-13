@@ -69,9 +69,9 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <BrowserRouter>
-          <TooltipProvider>
+          <SidebarProvider>
             <DndProvider backend={HTML5Backend}>
-              <SidebarProvider>
+              <TooltipProvider>
                 <ThemeConfiguratorDialog
                   open={themeDialogOpen}
                   onOpenChange={setThemeDialogOpen}
@@ -252,9 +252,9 @@ const App = () => {
                 <Toaster />
                 <Sonner />
                 <FloatingThemeButton onClick={() => setThemeDialogOpen(true)} />
-              </SidebarProvider>
+              </TooltipProvider>
             </DndProvider>
-          </TooltipProvider>
+          </SidebarProvider>
         </BrowserRouter>
       </AuthProvider>
     </QueryClientProvider>

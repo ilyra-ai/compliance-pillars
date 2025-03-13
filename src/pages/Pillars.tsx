@@ -1,217 +1,237 @@
 
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useLocation, useNavigate } from 'react-router-dom';
+import PageLayout from '@/components/layout/PageLayout';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Shield, AlertTriangle, FileText, CheckCircle2, BookOpen, MessageSquare, Activity, File, LayoutList, BarChart3 } from 'lucide-react';
-import PillarCard from '@/components/ui/PillarCard';
-import { toast } from "sonner";
-import Navbar from '@/components/layout/Navbar';
-import Sidebar from '@/components/layout/Sidebar';
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { PillarCard } from '@/components/ui/PillarCard';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  Shield,
+  FileText,
+  BookOpen,
+  MessageSquare,
+  Search,
+  BarChart4,
+  CheckSquare,
+  AlertTriangle,
+  FileCheck,
+  Eye,
+  Lock,
+  Palette
+} from 'lucide-react';
+import { PageCustomizer } from '@/components/ui/customizable/PageCustomizer';
+import { CustomizableLayout } from '@/components/ui/customizable/CustomizableLayout';
 
-const pillars = [
-  {
-    id: 'leadership',
-    title: '1. Comprometimento da Alta Administração',
-    description: 'Comprometimento, declarações e relatórios para diretoria',
-    icon: <Shield className="h-5 w-5" />,
-    color: 'from-blue-500 to-blue-700',
-  },
-  {
-    id: 'risk',
-    title: '2. Gestão de Riscos Corporativo',
-    description: 'Matriz de riscos, avaliação e controles',
-    icon: <AlertTriangle className="h-5 w-5" />,
-    color: 'from-orange-500 to-orange-700',
-  },
-  {
-    id: 'policies',
-    title: '3. Políticas e Procedimentos',
-    description: 'Gerenciamento de políticas e códigos de conduta',
-    icon: <FileText className="h-5 w-5" />,
-    color: 'from-indigo-500 to-indigo-700',
-  },
-  {
-    id: 'controls',
-    title: '4. Controles Internos',
-    description: 'Testes, monitoramento e planos de ação',
-    icon: <CheckCircle2 className="h-5 w-5" />,
-    color: 'from-green-500 to-green-700',
-  },
-  {
-    id: 'training',
-    title: '5. Treinamento e Comunicação',
-    description: 'Programas de capacitação e e-learning',
-    icon: <BookOpen className="h-5 w-5" />,
-    color: 'from-purple-500 to-purple-700',
-  },
-  {
-    id: 'complaints',
-    title: '6. Canal de Denúncias',
-    description: 'Formulários anônimos e protocolos',
-    icon: <MessageSquare className="h-5 w-5" />,
-    color: 'from-red-500 to-red-700',
-  },
-  {
-    id: 'investigations',
-    title: '7. Investigações Internas',
-    description: 'Gestão de investigações e evidências',
-    icon: <Activity className="h-5 w-5" />,
-    color: 'from-amber-500 to-amber-700',
-  },
-  {
-    id: 'due-diligence',
-    title: '8. Due Diligence',
-    description: 'Avaliação de terceiros e parceiros',
-    icon: <File className="h-5 w-5" />,
-    color: 'from-cyan-500 to-cyan-700',
-  },
-  {
-    id: 'audits',
-    title: '9. Gestão das Auditorias',
-    description: 'Gestão de auditorias internas e externas',
-    icon: <LayoutList className="h-5 w-5" />,
-    color: 'from-teal-500 to-teal-700',
-  },
-  {
-    id: 'monitoring',
-    title: '10. Monitoramento dos Riscos',
-    description: 'Acompanhamento contínuo de riscos e ocorrências',
-    icon: <BarChart3 className="h-5 w-5" />,
-    color: 'from-sky-500 to-sky-700',
-  },
-  {
-    id: 'lgpd',
-    title: '11. LGPD',
-    description: 'Gestão de proteção de dados pessoais',
-    icon: <Shield className="h-5 w-5" />,
-    color: 'from-pink-500 to-pink-700',
-  },
-];
-
-const Pillars: React.FC = () => {
+const Pillars = () => {
+  const location = useLocation();
   const navigate = useNavigate();
-  const [showNewPillarForm, setShowNewPillarForm] = useState(false);
-  const [newPillar, setNewPillar] = useState({
-    id: '',
-    title: '',
-    description: '',
-    color: 'from-gray-500 to-gray-700'
-  });
+  const [editMode, setEditMode] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>('all');
   
-  const handleAddPillar = () => {
-    setShowNewPillarForm(true);
-  };
-  
-  const handleSubmitPillar = () => {
-    // Em uma aplicação real, aqui você salvaria no banco de dados
-    toast.success(`Pilar "${newPillar.title}" adicionado com sucesso!`);
-    setShowNewPillarForm(false);
-    // Reset form
-    setNewPillar({
-      id: '',
-      title: '',
-      description: '',
-      color: 'from-gray-500 to-gray-700'
-    });
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    // If switching to editor tab, enable edit mode
+    if (value === 'editor') {
+      setEditMode(true);
+    } else if (editMode && value !== 'editor') {
+      // If leaving editor tab and edit mode is on, ask for confirmation
+      const confirmed = window.confirm("Sair do modo de edição? Alterações não salvas serão perdidas.");
+      if (confirmed) {
+        setEditMode(false);
+      } else {
+        // If user cancels, stay on editor tab
+        setActiveTab('editor');
+        return;
+      }
+    }
   };
 
-  const handleCancelPillar = () => {
-    setShowNewPillarForm(false);
+  const navigateToPillar = (path: string) => {
+    navigate(`/pillars/${path}`);
   };
+
+  const pillars = [
+    {
+      id: 'leadership',
+      name: 'Liderança',
+      description: 'Compromisso e exemplaridade da Alta Direção',
+      icon: <Shield className="h-8 w-8" />,
+      color: 'bg-indigo-500'
+    },
+    {
+      id: 'risk',
+      name: 'Riscos',
+      description: 'Identificação e mitigação de riscos de compliance',
+      icon: <AlertTriangle className="h-8 w-8" />,
+      color: 'bg-amber-500'
+    },
+    {
+      id: 'policies',
+      name: 'Políticas',
+      description: 'Políticas e procedimentos de compliance',
+      icon: <FileText className="h-8 w-8" />,
+      color: 'bg-blue-500'
+    },
+    {
+      id: 'controls',
+      name: 'Controles',
+      description: 'Monitoramento e controles internos',
+      icon: <CheckSquare className="h-8 w-8" />,
+      color: 'bg-green-500'
+    },
+    {
+      id: 'training',
+      name: 'Treinamentos',
+      description: 'Comunicação e capacitação',
+      icon: <BookOpen className="h-8 w-8" />,
+      color: 'bg-orange-500'
+    },
+    {
+      id: 'complaints',
+      name: 'Canal de Denúncias',
+      description: 'Canal de comunicação e denúncias',
+      icon: <MessageSquare className="h-8 w-8" />,
+      color: 'bg-red-500'
+    },
+    {
+      id: 'investigations',
+      name: 'Investigações',
+      description: 'Processo de investigação interna',
+      icon: <Search className="h-8 w-8" />,
+      color: 'bg-purple-500'
+    },
+    {
+      id: 'due-diligence',
+      name: 'Due Diligence',
+      description: 'Avaliação de terceiros e parceiros',
+      icon: <FileCheck className="h-8 w-8" />,
+      color: 'bg-teal-500'
+    },
+    {
+      id: 'audits',
+      name: 'Auditorias',
+      description: 'Auditorias e verificações',
+      icon: <Eye className="h-8 w-8" />,
+      color: 'bg-cyan-500'
+    },
+    {
+      id: 'monitoring',
+      name: 'Monitoramento',
+      description: 'Monitoramento contínuo do programa',
+      icon: <BarChart4 className="h-8 w-8" />,
+      color: 'bg-emerald-500'
+    },
+    {
+      id: 'lgpd',
+      name: 'LGPD',
+      description: 'Lei Geral de Proteção de Dados',
+      icon: <Lock className="h-8 w-8" />,
+      color: 'bg-violet-500'
+    }
+  ];
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen bg-background font-imprima">
-        <Navbar />
-        <Sidebar />
-        <main className="pb-16 pt-20 md:pt-24 md:ml-64 px-4 md:px-8 transition-all duration-300 ease-in-out">
-          <div className="mb-6 flex flex-col md:flex-row justify-between gap-4 items-start md:items-center">
-            <h1 className="text-2xl md:text-3xl font-bold">Pilares de Compliance</h1>
-            <Button onClick={handleAddPillar}>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Adicionar Pilar
-            </Button>
-          </div>
-          
-          {showNewPillarForm && (
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>Adicionar Novo Pilar</CardTitle>
-                <CardDescription>Preencha os dados do novo pilar de compliance</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">ID do Pilar</label>
-                  <input 
-                    type="text" 
-                    className="w-full px-3 py-2 border rounded-md"
-                    value={newPillar.id}
-                    onChange={(e) => setNewPillar({...newPillar, id: e.target.value})}
-                    placeholder="Ex: risk-management"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Título</label>
-                  <input 
-                    type="text" 
-                    className="w-full px-3 py-2 border rounded-md"
-                    value={newPillar.title}
-                    onChange={(e) => setNewPillar({...newPillar, title: e.target.value})}
-                    placeholder="Ex: Gestão de Riscos"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Descrição</label>
-                  <textarea 
-                    className="w-full px-3 py-2 border rounded-md"
-                    value={newPillar.description}
-                    onChange={(e) => setNewPillar({...newPillar, description: e.target.value})}
-                    placeholder="Descreva o pilar de compliance"
-                    rows={3}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Cor</label>
-                  <select 
-                    className="w-full px-3 py-2 border rounded-md"
-                    value={newPillar.color}
-                    onChange={(e) => setNewPillar({...newPillar, color: e.target.value})}
-                  >
-                    <option value="from-blue-500 to-blue-700">Azul</option>
-                    <option value="from-red-500 to-red-700">Vermelho</option>
-                    <option value="from-green-500 to-green-700">Verde</option>
-                    <option value="from-purple-500 to-purple-700">Roxo</option>
-                    <option value="from-orange-500 to-orange-700">Laranja</option>
-                    <option value="from-teal-500 to-teal-700">Teal</option>
-                    <option value="from-gray-500 to-gray-700">Cinza</option>
-                  </select>
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-end space-x-2">
-                <Button variant="outline" onClick={handleCancelPillar}>Cancelar</Button>
-                <Button onClick={handleSubmitPillar}>Salvar Pilar</Button>
-              </CardFooter>
-            </Card>
+    <PageLayout 
+      title="Pilares do Programa de Compliance" 
+      description="Gerencie os pilares fundamentais do seu programa"
+      actions={
+        <Button 
+          onClick={() => {
+            setEditMode(!editMode);
+            setActiveTab(editMode ? 'all' : 'editor');
+          }}
+          variant={editMode ? "default" : "outline"}
+          className="relative overflow-hidden group"
+          size="sm"
+        >
+          {editMode ? (
+            <>
+              <Eye className="mr-2 h-4 w-4" />
+              Modo Visualização
+            </>
+          ) : (
+            <>
+              <Palette className="mr-2 h-4 w-4" />
+              <span>Personalizar UI</span>
+              <span className="absolute right-0 top-0 h-full w-2 bg-primary/20 animate-pulse hidden group-hover:block"></span>
+            </>
           )}
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {pillars.map((pillar, index) => (
+        </Button>
+      }
+      customizable={editMode}
+    >
+      <Tabs 
+        value={editMode ? "editor" : activeTab} 
+        onValueChange={handleTabChange}
+      >
+        <TabsList className="mb-6">
+          <TabsTrigger value="all">Todos os Pilares</TabsTrigger>
+          <TabsTrigger value="editor" className="relative">
+            Editor de Layout
+            {!editMode && (
+              <span className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-pulse"></span>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="principais">Principais</TabsTrigger>
+          <TabsTrigger value="regulatorios">Regulatórios</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="all">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {pillars.map((pillar) => (
               <PillarCard
                 key={pillar.id}
-                icon={pillar.icon}
-                title={pillar.title}
+                title={pillar.name}
                 description={pillar.description}
-                href={`/pillars/${pillar.id}`}
+                icon={pillar.icon}
                 colorClass={pillar.color}
-                delay={index * 100}
+                onClick={() => navigateToPillar(pillar.id)}
               />
             ))}
           </div>
-        </main>
-      </div>
-    </SidebarProvider>
+        </TabsContent>
+        
+        <TabsContent value="editor">
+          <PageCustomizer
+            pagePath={location.pathname}
+            editMode={true}
+            onEditModeChange={setEditMode}
+          >
+            <CustomizableLayout />
+          </PageCustomizer>
+        </TabsContent>
+        
+        <TabsContent value="principais">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {pillars.slice(0, 6).map((pillar) => (
+              <PillarCard
+                key={pillar.id}
+                title={pillar.name}
+                description={pillar.description}
+                icon={pillar.icon}
+                colorClass={pillar.color}
+                onClick={() => navigateToPillar(pillar.id)}
+              />
+            ))}
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="regulatorios">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {pillars.slice(6).map((pillar) => (
+              <PillarCard
+                key={pillar.id}
+                title={pillar.name}
+                description={pillar.description}
+                icon={pillar.icon}
+                colorClass={pillar.color}
+                onClick={() => navigateToPillar(pillar.id)}
+              />
+            ))}
+          </div>
+        </TabsContent>
+      </Tabs>
+    </PageLayout>
   );
 };
 

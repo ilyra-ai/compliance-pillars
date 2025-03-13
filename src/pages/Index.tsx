@@ -69,7 +69,7 @@ const Index: React.FC = () => {
       >
         {editMode ? (
           <>
-            <Settings className="mr-2 h-4 w-4" />
+            <Eye className="mr-2 h-4 w-4" />
             Modo Visualização
           </>
         ) : (
