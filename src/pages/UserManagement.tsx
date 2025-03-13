@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import Navbar from '@/components/layout/Navbar';
@@ -137,7 +136,7 @@ const UserManagement: React.FC = () => {
     setNewUser({
       name: user.name,
       email: user.email,
-      password: '',
+      password: '', // Empty password when editing
       role: user.role,
       department: user.department || '',
       active: user.active,
@@ -151,7 +150,15 @@ const UserManagement: React.FC = () => {
       // Update existing user
       const updatedUsers = users.map(user => 
         user.id === selectedUser.id 
-          ? { ...user, ...newUser, password: newUser.password || user.password } 
+          ? { 
+              ...user, 
+              name: newUser.name,
+              email: newUser.email,
+              role: newUser.role,
+              department: newUser.department,
+              active: newUser.active,
+              notes: newUser.notes
+            } 
           : user
       );
       setUsers(updatedUsers);
@@ -159,7 +166,15 @@ const UserManagement: React.FC = () => {
     } else {
       // Add new user
       const newId = users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
-      setUsers([...users, { id: newId, ...newUser }]);
+      setUsers([...users, { 
+        id: newId, 
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role,
+        department: newUser.department,
+        active: newUser.active,
+        notes: newUser.notes
+      }]);
       toast.success('Usuário adicionado com sucesso!');
     }
     setUserDialogOpen(false);
@@ -427,7 +442,6 @@ const UserManagement: React.FC = () => {
           </Tabs>
         </main>
         
-        {/* User Form Dialog */}
         <Dialog open={userDialogOpen} onOpenChange={setUserDialogOpen}>
           <DialogContent className="max-w-md">
             <DialogHeader>
@@ -512,7 +526,6 @@ const UserManagement: React.FC = () => {
           </DialogContent>
         </Dialog>
         
-        {/* Delete Confirmation Dialog */}
         <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <DialogContent>
             <DialogHeader>
@@ -528,7 +541,6 @@ const UserManagement: React.FC = () => {
           </DialogContent>
         </Dialog>
         
-        {/* Permissions Dialog */}
         <Dialog open={permissionsDialogOpen} onOpenChange={setPermissionsDialogOpen}>
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
@@ -629,7 +641,6 @@ const UserManagement: React.FC = () => {
           </DialogContent>
         </Dialog>
         
-        {/* Role Form Dialog */}
         <Dialog open={roleDialogOpen} onOpenChange={setRoleDialogOpen}>
           <DialogContent className="max-w-md">
             <DialogHeader>
@@ -664,7 +675,6 @@ const UserManagement: React.FC = () => {
           </DialogContent>
         </Dialog>
         
-        {/* Floating Theme Button */}
         <FloatingThemeButton onClick={handleOpenUITheme} />
       </div>
     </SidebarProvider>
