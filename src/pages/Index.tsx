@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
 import Sidebar from '@/components/layout/Sidebar';
@@ -10,12 +10,15 @@ import ReportBuilder from '@/components/reports/ReportBuilder';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SidebarProvider } from '@/components/ui/sidebar';
-import { Settings, Palette, FileText } from 'lucide-react';
+import { Settings, Palette, FileText, Plus, PanelLeftOpen } from 'lucide-react';
 import { toast } from 'sonner';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import ThemeConfigurator from '@/components/settings/ThemeConfigurator';
 
 const Index: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [themeDialogOpen, setThemeDialogOpen] = useState(false);
 
   useEffect(() => {
     // Scroll to top when navigating
@@ -27,11 +30,20 @@ const Index: React.FC = () => {
   };
 
   const handleOpenUITheme = () => {
-    navigate('/settings/ui');
+    setThemeDialogOpen(true);
   };
 
   const handleOpenDocumentEditor = () => {
     navigate('/documents/editor');
+  };
+
+  const handleSaveTheme = (config: any) => {
+    toast.success('Tema personalizado salvo com sucesso!');
+    setThemeDialogOpen(false);
+  };
+
+  const handleAddPillar = () => {
+    navigate('/pillars/new');
   };
 
   return (
@@ -96,6 +108,19 @@ const Index: React.FC = () => {
             </button>
           </div>
         </main>
+
+        {/* Theme Customization Dialog */}
+        <Dialog open={themeDialogOpen} onOpenChange={setThemeDialogOpen}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Personalizar UI</DialogTitle>
+              <DialogDescription>
+                Personalize as cores, fontes e elementos da interface
+              </DialogDescription>
+            </DialogHeader>
+            <ThemeConfigurator onSave={handleSaveTheme} />
+          </DialogContent>
+        </Dialog>
       </div>
     </SidebarProvider>
   );

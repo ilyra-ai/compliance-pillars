@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import {
@@ -21,6 +21,7 @@ import {
   CloudUpload,
   Server,
   ContainerIcon,
+  Plus,
 } from 'lucide-react';
 
 interface PillarLink {
@@ -99,6 +100,21 @@ const pillars: PillarLink[] = [
   },
 ];
 
+const toolsItems = [
+  {
+    name: 'Construtor de Relatórios',
+    icon: <FileText size={18} />,
+    href: '/reports/builder',
+    description: 'Construtor de Relatórios',
+  },
+  {
+    name: 'Gestão de Gráficos',
+    icon: <BarChart3 size={18} />,
+    href: '/charts',
+    description: 'Gestão de Gráficos',
+  },
+];
+
 const settingsItems = [
   {
     name: 'Configurações Gerais',
@@ -152,17 +168,22 @@ const settingsItems = [
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
+  const [expanded, setExpanded] = useState({
+    pillars: true,
+    tools: true,
+    system: true
+  });
 
   return (
-    <aside className="fixed bottom-0 left-0 top-16 z-30 hidden w-64 border-r border-border bg-background/90 backdrop-blur-sm transition-all duration-300 md:block">
+    <aside className="fixed bottom-0 left-0 top-16 z-30 w-64 border-r border-border bg-background/90 backdrop-blur-sm transition-all duration-300">
       <div className="flex h-full flex-col p-4">
-        <div className="mb-4 px-3">
+        <div className="mb-4 px-3 flex justify-between items-center">
           <h2 className="text-xs font-medium uppercase text-muted-foreground">
             Pilares de Compliance
           </h2>
         </div>
 
-        <nav className="space-y-1 overflow-y-auto">
+        <div className="space-y-1">
           <Link
             to="/"
             className={cn(
@@ -186,22 +207,36 @@ const Sidebar: React.FC = () => {
             <ShieldCheck size={18} />
             <span>Todos os Pilares</span>
           </Link>
+          
+          <Link
+            to="/pillars/new"
+            className={cn(
+              'sidebar-item',
+              location.pathname === '/pillars/new' && 'sidebar-item-active'
+            )}
+            title="Adicionar Novo Pilar"
+          >
+            <Plus size={18} />
+            <span>Adicionar Pilar</span>
+          </Link>
 
-          {pillars.map((pillar) => (
-            <Link
-              key={pillar.href}
-              to={pillar.href}
-              className={cn(
-                'sidebar-item',
-                location.pathname === pillar.href && 'sidebar-item-active'
-              )}
-              title={pillar.description}
-            >
-              {pillar.icon}
-              <span>{pillar.name}</span>
-            </Link>
-          ))}
-        </nav>
+          <div className="max-h-[calc(100vh-350px)]">
+            {pillars.map((pillar) => (
+              <Link
+                key={pillar.href}
+                to={pillar.href}
+                className={cn(
+                  'sidebar-item',
+                  location.pathname === pillar.href && 'sidebar-item-active'
+                )}
+                title={pillar.description}
+              >
+                {pillar.icon}
+                <span>{pillar.name}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
 
         <div className="mt-6 px-3">
           <h2 className="text-xs font-medium uppercase text-muted-foreground">
@@ -209,31 +244,22 @@ const Sidebar: React.FC = () => {
           </h2>
         </div>
 
-        <nav className="space-y-1">
-          <Link
-            to="/reports/builder"
-            className={cn(
-              'sidebar-item',
-              location.pathname === '/reports/builder' && 'sidebar-item-active'
-            )}
-            title="Construtor de Relatórios"
-          >
-            <FileText size={18} />
-            <span>Construtor de Relatórios</span>
-          </Link>
-
-          <Link
-            to="/charts"
-            className={cn(
-              'sidebar-item',
-              location.pathname === '/charts' && 'sidebar-item-active'
-            )}
-            title="Gestão de Gráficos"
-          >
-            <BarChart3 size={18} />
-            <span>Gestão de Gráficos</span>
-          </Link>
-        </nav>
+        <div className="space-y-1">
+          {toolsItems.map((item) => (
+            <Link
+              key={item.href}
+              to={item.href}
+              className={cn(
+                'sidebar-item',
+                location.pathname === item.href && 'sidebar-item-active'
+              )}
+              title={item.description}
+            >
+              {item.icon}
+              <span>{item.name}</span>
+            </Link>
+          ))}
+        </div>
 
         <div className="mt-auto px-3 pt-6">
           <h2 className="text-xs font-medium uppercase text-muted-foreground">
@@ -241,7 +267,7 @@ const Sidebar: React.FC = () => {
           </h2>
         </div>
 
-        <nav className="space-y-1">
+        <div className="space-y-1">
           {settingsItems.map((item) => (
             <Link
               key={item.href}
@@ -256,7 +282,7 @@ const Sidebar: React.FC = () => {
               <span>{item.name}</span>
             </Link>
           ))}
-        </nav>
+        </div>
       </div>
     </aside>
   );

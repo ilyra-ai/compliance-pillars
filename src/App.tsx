@@ -19,6 +19,7 @@ import Settings from "./pages/Settings";
 import ChartManagement from "./pages/ChartManagement";
 import DatabaseManager from "./pages/DatabaseManager";
 import DockerConfigurator from "./pages/DockerConfigurator";
+import { UIThemeConfigurator } from "./pages/UIThemeConfigurator";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -49,6 +50,11 @@ const App = () => (
             <Route path="/pillars" element={
               <ProtectedRoute>
                 <Pillars />
+              </ProtectedRoute>
+            } />
+            <Route path="/pillars/new" element={
+              <ProtectedRoute>
+                <PillarManagement />
               </ProtectedRoute>
             } />
             <Route path="/pillars/risk" element={
@@ -126,6 +132,13 @@ const App = () => (
             <Route path="/docker" element={
               <ProtectedRoute requiredRoles={['admin']}>
                 <DockerConfigurator />
+              </ProtectedRoute>
+            } />
+
+            {/* Rota para o UI Theme Configurator */}
+            <Route path="/ui/customize" element={
+              <ProtectedRoute>
+                <UIThemeConfigurator />
               </ProtectedRoute>
             } />
 
