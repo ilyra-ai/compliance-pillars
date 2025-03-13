@@ -56,7 +56,7 @@ export const useThemeDialog = (): ThemeDialogContextType => {
 
   // Provide fallback values if used outside of context
   if (context === undefined) {
-    console.warn('useThemeDialog was used outside of ThemeDialogProvider');
+    // Instead of warning, just provide defaults
     return {
       themeDialogOpen: false,
       setThemeDialogOpen: () => {},

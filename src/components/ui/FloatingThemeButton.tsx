@@ -18,7 +18,9 @@ const FloatingThemeButton: React.FC<FloatingThemeButtonProps> = ({ onClick }) =>
     return null;
   }
   
-  const handleButtonClick = () => {
+  const handleButtonClick = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent any default behavior
+    
     if (onClick) {
       onClick();
     } else {

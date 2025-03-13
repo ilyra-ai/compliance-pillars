@@ -25,6 +25,11 @@ export const DroppableArea: React.FC<DroppableAreaProps> = ({
   const [dropPosition, setDropPosition] = useState({ x: 0, y: 0 });
 
   const handleDrop = useCallback((item: any, monitor: any) => {
+    if (!item) {
+      console.warn('Drop detected but no item was provided');
+      return;
+    }
+    
     console.log('Drop detected:', item);
     
     // Get the drop position for absolute positioning
@@ -75,12 +80,15 @@ export const DroppableArea: React.FC<DroppableAreaProps> = ({
         type: item.type,
         position: dropPosition
       };
+    } else if (item.id && item.type) {
+      // This is an existing component being reordered
+      console.log('Reordering existing component:', item.id, item.type, item.index);
+      onDrop(item.id, item.type, item.index);
+      return { name: 'DroppableArea', position: dropPosition };
+    } else {
+      console.warn('Unknown drop item format:', item);
+      return undefined;
     }
-    
-    // This is an existing component being reordered
-    console.log('Reordering existing component:', item.id, item.type, item.index);
-    onDrop(item.id, item.type, item.index);
-    return { name: 'DroppableArea', position: dropPosition };
   }, [onDrop, dropPosition]);
 
   const [{ isOver, canDrop }, drop] = useDrop({

@@ -10,14 +10,15 @@ interface ColorSwatchProps {
 }
 
 export const ColorSwatch: React.FC<ColorSwatchProps> = ({ 
-  color, 
+  color = '#000000', 
   onChange, 
   label 
 }) => {
-  const [inputValue, setInputValue] = useState(color);
+  const [inputValue, setInputValue] = useState<string>(color || '#000000');
   
   useEffect(() => {
-    setInputValue(color);
+    // Ensure we have a valid color value
+    setInputValue(color || '#000000');
   }, [color]);
 
   const handleColorChange = (value: string) => {
@@ -36,15 +37,27 @@ export const ColorSwatch: React.FC<ColorSwatchProps> = ({
       }
     } catch (error) {
       console.error('Error changing color:', error);
+      // In case of error, reset to the current color
+      setInputValue(color || '#000000');
     }
   };
 
   // Handle direct color picker change
   const handlePickerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newColor = event.target.value;
-    setInputValue(newColor);
-    onChange(newColor);
+    try {
+      const newColor = event.target.value;
+      setInputValue(newColor);
+      onChange(newColor);
+    } catch (error) {
+      console.error('Error from color picker:', error);
+      setInputValue(color || '#000000');
+    }
   };
+
+  // Ensure we're always displaying a valid color
+  const displayColor = inputValue.match(/^#([0-9A-F]{3}){1,2}$/i) 
+    ? inputValue 
+    : color || '#000000';
 
   return (
     <div className="flex flex-col space-y-1.5">
@@ -52,11 +65,11 @@ export const ColorSwatch: React.FC<ColorSwatchProps> = ({
       <div className="flex items-center gap-2">
         <div 
           className="h-8 w-8 rounded-md border shadow-sm" 
-          style={{ backgroundColor: color }}
+          style={{ backgroundColor: displayColor }}
         />
         <Input 
           type="color" 
-          value={color} 
+          value={displayColor} 
           onChange={handlePickerChange} 
           className="w-16 h-8 p-0" 
         />
