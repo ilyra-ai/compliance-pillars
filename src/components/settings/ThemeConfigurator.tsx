@@ -29,9 +29,15 @@ import { themeService, ThemeConfig } from '@/services/theme-service';
 
 interface ThemeConfiguratorProps {
   onSave?: (config: ThemeConfig) => void;
+  onChange?: (config: ThemeConfig) => void;
+  initialValues?: ThemeConfig;
 }
 
-const ThemeConfigurator: React.FC<ThemeConfiguratorProps> = ({ onSave }) => {
+const ThemeConfigurator: React.FC<ThemeConfiguratorProps> = ({ 
+  onSave,
+  onChange,
+  initialValues
+}) => {
   const [activeTab, setActiveTab] = useState('colors');
   const [primaryColor, setPrimaryColor] = useState('#6366f1');
   const [secondaryColor, setSecondaryColor] = useState('#10b981');
@@ -44,15 +50,36 @@ const ThemeConfigurator: React.FC<ThemeConfiguratorProps> = ({ onSave }) => {
   const [showLeftSidebar, setShowLeftSidebar] = useState(false);
 
   useEffect(() => {
-    const currentTheme = themeService.getTheme();
-    setPrimaryColor(currentTheme.colors.primary);
-    setSecondaryColor(currentTheme.colors.secondary);
-    setAccentColor(currentTheme.colors.accent);
-    setBackgroundColor(currentTheme.colors.background);
-    setTextColor(currentTheme.colors.text);
-    setFontFamily(currentTheme.fonts.family);
-    setLogoUrl(currentTheme.assets.logo);
-  }, []);
+    const themeToLoad = initialValues || themeService.getTheme();
+    setPrimaryColor(themeToLoad.colors.primary);
+    setSecondaryColor(themeToLoad.colors.secondary);
+    setAccentColor(themeToLoad.colors.accent);
+    setBackgroundColor(themeToLoad.colors.background);
+    setTextColor(themeToLoad.colors.text);
+    setFontFamily(themeToLoad.fonts.family);
+    setLogoUrl(themeToLoad.assets.logo);
+  }, [initialValues]);
+
+  useEffect(() => {
+    if (onChange) {
+      const updatedTheme: ThemeConfig = {
+        colors: {
+          primary: primaryColor,
+          secondary: secondaryColor,
+          accent: accentColor,
+          background: backgroundColor,
+          text: textColor
+        },
+        fonts: {
+          family: fontFamily
+        },
+        assets: {
+          logo: logoUrl
+        }
+      };
+      onChange(updatedTheme);
+    }
+  }, [primaryColor, secondaryColor, accentColor, backgroundColor, textColor, fontFamily, logoUrl, onChange]);
 
   const handleSaveTheme = () => {
     setIsLoading(true);

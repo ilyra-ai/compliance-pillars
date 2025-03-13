@@ -26,9 +26,9 @@ export const useThemeDialog = () => {
   }, []);
   
   const handleGoToThemeEditor = useCallback(() => {
-    // Aqui vamos remover a navegação direta para evitar o erro
-    // A navegação pode ser feita através de botões ou links nos componentes
-    toast.info('Clique no botão "Personalizar UI" para abrir o editor completo');
+    // Navigate to theme editor page via window.location to avoid Router context issues
+    window.location.href = '/ui/customize';
+    toast.info('Redirecionando para o editor de temas...');
   }, []);
   
   return {

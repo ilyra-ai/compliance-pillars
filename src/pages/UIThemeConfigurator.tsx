@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import ThemeConfigurator from '@/components/settings/ThemeConfigurator';
 import PageLayout from '@/components/layout/PageLayout';
@@ -12,7 +11,6 @@ import {
   Undo,
   Copy,
   Eye,
-  Settings,
   Check
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';

@@ -1,404 +1,298 @@
-
 import React, { useState } from 'react';
-import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from 'recharts';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Slider } from '@/components/ui/slider';
-import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { ChevronDown, ChevronUp, Plus, Trash2, Settings, Save } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
+import { LineChart, BarChart, PieChart, AreaChart, ComposedChart, Line, Bar, Pie, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
+import { ChevronDown, ChevronUp, Save, Download, Upload, Plus, Trash2, Settings, Palette, RefreshCcw, Eye, Check, Copy } from 'lucide-react';
 import { toast } from 'sonner';
 
-// Dados de exemplo
-const sampleData = [
-  { name: 'Jan', valor: 400, quantidade: 240 },
-  { name: 'Fev', valor: 300, quantidade: 139 },
-  { name: 'Mar', valor: 200, quantidade: 980 },
-  { name: 'Abr', valor: 278, quantidade: 390 },
-  { name: 'Mai', valor: 189, quantidade: 480 },
-  { name: 'Jun', valor: 239, quantidade: 380 },
-  { name: 'Jul', valor: 349, quantidade: 430 },
+// Sample data for the charts
+const data = [
+  { name: 'Jan', value1: 400, value2: 240, value3: 200 },
+  { name: 'Feb', value1: 300, value2: 139, value3: 300 },
+  { name: 'Mar', value1: 200, value2: 980, value3: 400 },
+  { name: 'Apr', value1: 278, value2: 390, value3: 200 },
+  { name: 'May', value1: 189, value2: 480, value3: 300 },
+  { name: 'Jun', value1: 239, value2: 380, value3: 250 },
+  { name: 'Jul', value1: 349, value2: 430, value3: 350 },
 ];
 
-const chartColors = [
-  '#6366F1', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', 
-  '#EC4899', '#06B6D4', '#14B8A6', '#F97316', '#3B82F6'
-];
-
-interface ChartSeries {
-  id: string;
-  dataKey: string;
-  color: string;
-  type: 'line' | 'bar' | 'area' | 'pie';
-}
-
-interface ChartConfigState {
-  title: string;
-  type: 'line' | 'bar' | 'area' | 'pie';
-  data: any[];
-  series: ChartSeries[];
-  showGrid: boolean;
-  showLegend: boolean;
-  stacked: boolean;
-  xAxisKey: string;
-  height: number;
-}
-
-export interface CustomChartBuilderProps {
+interface CustomChartBuilderProps {
+  initialType?: 'line' | 'bar' | 'pie' | 'area' | 'composed';
   initialData?: any[];
-  onSave?: (config: ChartConfigState) => void;
-  pillarId?: string;
 }
 
-const CustomChartBuilder: React.FC<CustomChartBuilderProps> = ({ 
-  initialData = sampleData,
-  onSave,
-  pillarId 
-}) => {
-  const [chartConfig, setChartConfig] = useState<ChartConfigState>({
-    title: 'Meu Gráfico Personalizado',
-    type: 'bar',
-    data: initialData,
-    series: [
-      { 
-        id: '1', 
-        dataKey: 'valor', 
-        color: chartColors[0],
-        type: 'bar' 
-      },
-    ],
-    showGrid: true,
-    showLegend: true,
-    stacked: false,
-    xAxisKey: 'name',
-    height: 400
-  });
-  
-  const [expanded, setExpanded] = useState(true);
-  const [dataKeysOptions, setDataKeysOptions] = useState<string[]>(() => {
-    // Extrair todas as chaves possíveis dos dados, exceto o eixo X
-    if (initialData && initialData.length > 0) {
-      return Object.keys(initialData[0]).filter(key => key !== chartConfig.xAxisKey);
-    }
-    return ['valor', 'quantidade'];
-  });
+const CustomChartBuilder: React.FC<CustomChartBuilderProps> = ({ initialType = 'line', initialData = data }) => {
+  const [chartType, setChartType] = useState<string>(initialType);
+  const [chartData, setChartData] = useState<any[]>(initialData);
+  const [xAxisKey, setXAxisKey] = useState<string>('name');
+  const [yAxisKeys, setYAxisKeys] = useState<string[]>(['value1']);
+  const [colorPalette, setColorPalette] = useState<string[]>([
+    '#8884d8',
+    '#82ca9d',
+    '#ffc658',
+    '#a4de6c',
+    '#d0ed57',
+  ]);
+  const [showGrid, setShowGrid] = useState<boolean>(true);
+  const [showLegend, setShowLegend] = useState<boolean>(true);
+  const [isStacked, setIsStacked] = useState<boolean>(false);
+  const [opacity, setOpacity] = useState<number>(0.7);
 
-  const toggleExpanded = () => setExpanded(!expanded);
-
-  const handleTypeChange = (type: 'line' | 'bar' | 'area' | 'pie') => {
-    setChartConfig(prev => ({
-      ...prev,
-      type,
-      series: prev.series.map(s => ({ ...s, type }))
-    }));
+  const handleAddYAxisKey = () => {
+    setYAxisKeys([...yAxisKeys, `value${yAxisKeys.length + 1}`]);
   };
 
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setChartConfig(prev => ({
-      ...prev,
-      title: e.target.value
-    }));
+  const handleRemoveYAxisKey = (index: number) => {
+    const newYAxisKeys = [...yAxisKeys];
+    newYAxisKeys.splice(index, 1);
+    setYAxisKeys(newYAxisKeys);
   };
 
-  const handleAddSeries = () => {
-    const newSeries = {
-      id: Date.now().toString(),
-      dataKey: dataKeysOptions[0] || 'valor',
-      color: chartColors[chartConfig.series.length % chartColors.length],
-      type: chartConfig.type
-    };
-    
-    setChartConfig(prev => ({
-      ...prev,
-      series: [...prev.series, newSeries]
-    }));
-  };
-
-  const handleRemoveSeries = (id: string) => {
-    setChartConfig(prev => ({
-      ...prev,
-      series: prev.series.filter(s => s.id !== id)
-    }));
-  };
-
-  const handleSeriesChange = (id: string, field: keyof ChartSeries, value: any) => {
-    setChartConfig(prev => ({
-      ...prev,
-      series: prev.series.map(s => 
-        s.id === id ? { ...s, [field]: value } : s
-      )
-    }));
-  };
-
-  const handleSaveChart = () => {
-    if (onSave) {
-      onSave(chartConfig);
-      toast.success('Gráfico salvo com sucesso!');
-    } else {
-      console.log('Chart config saved:', chartConfig);
-      toast.success('Gráfico configurado! (modo demonstração)');
-    }
+  const handleColorChange = (index: number, color: string) => {
+    const newColorPalette = [...colorPalette];
+    newColorPalette[index] = color;
+    setColorPalette(newColorPalette);
   };
 
   const renderChart = () => {
-    switch (chartConfig.type) {
+    switch (chartType) {
       case 'line':
-        return (
-          <LineChart 
-            data={chartConfig.data}
-            stackId={chartConfig.stacked ? 'a' : undefined}
-          >
-            {chartConfig.showGrid && <CartesianGrid strokeDasharray="3 3" />}
-            <XAxis dataKey={chartConfig.xAxisKey} />
-            <YAxis />
-            <Tooltip />
-            {chartConfig.showLegend && <Legend />}
-            {chartConfig.series.map(series => (
-              <Line 
-                key={series.id}
-                type="monotone"
-                dataKey={series.dataKey}
-                stroke={series.color}
-                activeDot={{ r: 8 }}
-              />
-            ))}
-          </LineChart>
-        );
+        return <LineChartComponent data={chartData} xAxisKey={xAxisKey} yAxisKeys={yAxisKeys} colorPalette={colorPalette} showGrid={showGrid} showLegend={showLegend} />;
       case 'bar':
-        return (
-          <BarChart 
-            data={chartConfig.data}
-          >
-            {chartConfig.showGrid && <CartesianGrid strokeDasharray="3 3" />}
-            <XAxis dataKey={chartConfig.xAxisKey} />
-            <YAxis />
-            <Tooltip />
-            {chartConfig.showLegend && <Legend />}
-            {chartConfig.series.map(series => (
-              <Bar 
-                key={series.id}
-                dataKey={series.dataKey}
-                fill={series.color}
-                stackId={chartConfig.stacked ? 'a' : undefined}
-              />
-            ))}
-          </BarChart>
-        );
-      case 'area':
-        return (
-          <AreaChart 
-            data={chartConfig.data}
-          >
-            {chartConfig.showGrid && <CartesianGrid strokeDasharray="3 3" />}
-            <XAxis dataKey={chartConfig.xAxisKey} />
-            <YAxis />
-            <Tooltip />
-            {chartConfig.showLegend && <Legend />}
-            {chartConfig.series.map(series => (
-              <Area 
-                key={series.id}
-                type="monotone"
-                dataKey={series.dataKey}
-                fill={series.color}
-                stroke={series.color}
-                stackId={chartConfig.stacked ? 'a' : undefined}
-              />
-            ))}
-          </AreaChart>
-        );
+        return <BarChartComponent data={chartData} xAxisKey={xAxisKey} yAxisKeys={yAxisKeys} colorPalette={colorPalette} showGrid={showGrid} showLegend={showLegend} />;
       case 'pie':
-        return (
-          <PieChart>
-            {chartConfig.series.map((series, index) => (
-              <Pie 
-                key={series.id}
-                data={chartConfig.data} 
-                dataKey={series.dataKey}
-                nameKey={chartConfig.xAxisKey}
-                cx="50%" 
-                cy="50%" 
-                outerRadius={80 + (index * 10)} 
-                fill={series.color}
-                label
-              />
-            ))}
-            <Tooltip />
-            {chartConfig.showLegend && <Legend />}
-          </PieChart>
-        );
+        return <PieChartComponent data={chartData} yAxisKeys={yAxisKeys} colorPalette={colorPalette} showLegend={showLegend} />;
+      case 'area':
+        return <AreaChartComponent data={chartData} xAxisKey={xAxisKey} yAxisKeys={yAxisKeys} colorPalette={colorPalette} showGrid={showGrid} showLegend={showLegend} opacity={opacity} />;
+      case 'composed':
+        return <ComposedChartComponent data={chartData} xAxisKey={xAxisKey} yAxisKeys={yAxisKeys} colorPalette={colorPalette} showGrid={showGrid} showLegend={showLegend} />;
+      case 'stacked':
+        return <StackedBarChartComponent data={chartData} />;
       default:
-        return null;
+        return <div>Selecione um tipo de gráfico</div>;
     }
   };
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between py-4">
-          <CardTitle>{chartConfig.title || 'Gráfico Sem Título'}</CardTitle>
-          <Button variant="ghost" size="icon" onClick={toggleExpanded}>
-            {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <div className="h-[400px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              {renderChart()}
-            </ResponsiveContainer>
+    <Card>
+      <CardHeader>
+        <CardTitle>Construtor de Gráfico Personalizado</CardTitle>
+        <CardDescription>Crie e personalize gráficos interativos</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="chart-type">Tipo de Gráfico</Label>
+            <Select value={chartType} onValueChange={setChartType}>
+              <SelectTrigger id="chart-type">
+                <SelectValue placeholder="Selecione o tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="line">Linha</SelectItem>
+                <SelectItem value="bar">Barra</SelectItem>
+                <SelectItem value="pie">Pizza</SelectItem>
+                <SelectItem value="area">Área</SelectItem>
+                <SelectItem value="composed">Composto</SelectItem>
+                <SelectItem value="stacked">Barras Empilhadas</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          
-          {expanded && (
-            <div className="mt-6 space-y-6 border-t pt-4">
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Configurações Básicas</h3>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="chart-title">Título do Gráfico</Label>
-                    <Input 
-                      id="chart-title"
-                      value={chartConfig.title} 
-                      onChange={handleTitleChange} 
-                      placeholder="Título do Gráfico"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="chart-type">Tipo de Gráfico</Label>
-                    <Select 
-                      value={chartConfig.type}
-                      onValueChange={(value) => handleTypeChange(value as any)}
-                    >
-                      <SelectTrigger id="chart-type">
-                        <SelectValue placeholder="Selecione o tipo" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="bar">Barras</SelectItem>
-                        <SelectItem value="line">Linha</SelectItem>
-                        <SelectItem value="area">Área</SelectItem>
-                        <SelectItem value="pie">Pizza</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                  <div className="flex items-center space-x-2">
-                    <Switch 
-                      id="show-grid"
-                      checked={chartConfig.showGrid}
-                      onCheckedChange={(checked) => setChartConfig(prev => ({...prev, showGrid: checked}))}
-                    />
-                    <Label htmlFor="show-grid">Mostrar Grade</Label>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <Switch 
-                      id="show-legend"
-                      checked={chartConfig.showLegend}
-                      onCheckedChange={(checked) => setChartConfig(prev => ({...prev, showLegend: checked}))}
-                    />
-                    <Label htmlFor="show-legend">Mostrar Legenda</Label>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <Switch 
-                      id="stacked"
-                      checked={chartConfig.stacked}
-                      onCheckedChange={(checked) => setChartConfig(prev => ({...prev, stacked: checked}))}
-                    />
-                    <Label htmlFor="stacked">Empilhado</Label>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="chart-height">Altura do Gráfico: {chartConfig.height}px</Label>
-                  <Slider
-                    id="chart-height"
-                    min={200}
-                    max={600}
-                    step={10}
-                    value={[chartConfig.height]}
-                    onValueChange={(values) => setChartConfig(prev => ({...prev, height: values[0]}))}
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-medium">Séries de Dados</h3>
-                  <Button variant="outline" size="sm" onClick={handleAddSeries}>
-                    <Plus size={16} className="mr-1" /> Adicionar Série
-                  </Button>
-                </div>
-                
-                <div className="space-y-4">
-                  {chartConfig.series.map((series, index) => (
-                    <div key={series.id} className="flex items-center gap-2 border p-3 rounded-md">
-                      <div className="w-4 h-4 rounded-full" style={{ backgroundColor: series.color }} />
-                      
-                      <Select
-                        value={series.dataKey}
-                        onValueChange={(value) => handleSeriesChange(series.id, 'dataKey', value)}
-                      >
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder="Selecione o campo" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {dataKeysOptions.map(key => (
-                            <SelectItem key={key} value={key}>{key}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      
-                      <Input
-                        type="color"
-                        value={series.color}
-                        onChange={(e) => handleSeriesChange(series.id, 'color', e.target.value)}
-                        className="w-16 p-1 h-9"
-                      />
-                      
-                      {chartConfig.series.length > 1 && (
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => handleRemoveSeries(series.id)}
-                        >
-                          <Trash2 size={16} />
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="pt-4 flex justify-end">
-                <Button onClick={handleSaveChart}>
-                  <Save size={16} className="mr-2" /> Salvar Gráfico
+          <div>
+            <Label htmlFor="x-axis-key">Chave do Eixo X</Label>
+            <Input id="x-axis-key" value={xAxisKey} onChange={(e) => setXAxisKey(e.target.value)} />
+          </div>
+        </div>
+
+        <div>
+          <Label>Chaves do Eixo Y</Label>
+          {yAxisKeys.map((key, index) => (
+            <div key={index} className="flex items-center space-x-2 mb-2">
+              <Input value={key} onChange={(e) => {
+                const newYAxisKeys = [...yAxisKeys];
+                newYAxisKeys[index] = e.target.value;
+                setYAxisKeys(newYAxisKeys);
+              }} />
+              <Input
+                type="color"
+                value={colorPalette[index] || '#8884d8'}
+                onChange={(e) => handleColorChange(index, e.target.value)}
+              />
+              {yAxisKeys.length > 1 && (
+                <Button variant="ghost" size="icon" onClick={() => handleRemoveYAxisKey(index)}>
+                  <Trash2 className="h-4 w-4" />
                 </Button>
-              </div>
+              )}
             </div>
+          ))}
+          <Button variant="outline" size="sm" onClick={handleAddYAxisKey}>
+            <Plus className="mr-2 h-4 w-4" />
+            Adicionar Chave
+          </Button>
+        </div>
+
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            <Switch id="show-grid" checked={showGrid} onCheckedChange={setShowGrid} />
+            <Label htmlFor="show-grid">Mostrar Grid</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Switch id="show-legend" checked={showLegend} onCheckedChange={setShowLegend} />
+            <Label htmlFor="show-legend">Mostrar Legenda</Label>
+          </div>
+          {chartType === 'area' && (
+            <>
+              <Label>Opacidade</Label>
+              <Slider
+                defaultValue={[opacity * 100]}
+                max={100}
+                step={1}
+                onValueChange={(value) => setOpacity(value[0] / 100)}
+              />
+            </>
           )}
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+
+        <div className="border rounded-md p-4">
+          {renderChart()}
+        </div>
+      </CardContent>
+      <CardFooter>
+        <Button>
+          <Save className="mr-2 h-4 w-4" />
+          Salvar Gráfico
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+};
+
+const LineChartComponent = ({ data, xAxisKey, yAxisKeys, colorPalette, showGrid, showLegend }: { data: any[], xAxisKey: string, yAxisKeys: string[], colorPalette: string[], showGrid: boolean, showLegend: boolean }) => {
+  return (
+    <ResponsiveContainer width="100%" height={300}>
+      <LineChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey={xAxisKey} />
+        <YAxis />
+        <Tooltip />
+        {showLegend && <Legend />}
+        {showGrid && <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />}
+        {yAxisKeys.map((key, index) => (
+          <Line key={key} type="monotone" dataKey={key} stroke={colorPalette[index] || '#8884d8'} />
+        ))}
+      </LineChart>
+    </ResponsiveContainer>
+  );
+};
+
+const BarChartComponent = ({ data, xAxisKey, yAxisKeys, colorPalette, showGrid, showLegend }: { data: any[], xAxisKey: string, yAxisKeys: string[], colorPalette: string[], showGrid: boolean, showLegend: boolean }) => {
+  return (
+    <ResponsiveContainer width="100%" height={300}>
+      <BarChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey={xAxisKey} />
+        <YAxis />
+        <Tooltip />
+        {showLegend && <Legend />}
+        {showGrid && <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />}
+        {yAxisKeys.map((key, index) => (
+          <Bar key={key} dataKey={key} fill={colorPalette[index] || '#8884d8'} />
+        ))}
+      </BarChart>
+    </ResponsiveContainer>
+  );
+};
+
+const PieChartComponent = ({ data, yAxisKeys, colorPalette, showLegend }: { data: any[], yAxisKeys: string[], colorPalette: string[], showLegend: boolean }) => {
+  return (
+    <ResponsiveContainer width="100%" height={300}>
+      <PieChart>
+        <Tooltip />
+        {showLegend && <Legend />}
+        {yAxisKeys.map((key, index) => (
+          <Pie
+            key={key}
+            data={data}
+            dataKey={key}
+            nameKey="name"
+            cx="50%"
+            cy="50%"
+            outerRadius={80}
+            fill={colorPalette[index] || '#8884d8'}
+            label
+          >
+            {data.map((entry, i) => (
+              <Cell key={`cell-${i}`} fill={colorPalette[i % colorPalette.length] || '#8884d8'} />
+            ))}
+          </Pie>
+        ))}
+      </PieChart>
+    </ResponsiveContainer>
+  );
+};
+
+const AreaChartComponent = ({ data, xAxisKey, yAxisKeys, colorPalette, showGrid, showLegend, opacity }: { data: any[], xAxisKey: string, yAxisKeys: string[], colorPalette: string[], showGrid: boolean, showLegend: boolean, opacity: number }) => {
+  return (
+    <ResponsiveContainer width="100%" height={300}>
+      <AreaChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey={xAxisKey} />
+        <YAxis />
+        <Tooltip />
+        {showLegend && <Legend />}
+        {showGrid && <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />}
+        {yAxisKeys.map((key, index) => (
+          <Area
+            key={key}
+            type="monotone"
+            dataKey={key}
+            stroke={colorPalette[index] || '#8884d8'}
+            fillOpacity={opacity}
+            fill={colorPalette[index] || '#8884d8'}
+          />
+        ))}
+      </AreaChart>
+    </ResponsiveContainer>
+  );
+};
+
+const ComposedChartComponent = ({ data, xAxisKey, yAxisKeys, colorPalette, showGrid, showLegend }: { data: any[], xAxisKey: string, yAxisKeys: string[], colorPalette: string[], showGrid: boolean, showLegend: boolean }) => {
+  return (
+    <ResponsiveContainer width="100%" height={300}>
+      <ComposedChart data={data}>
+        <CartesianGrid stroke="#f5f5f5" />
+        <XAxis dataKey={xAxisKey} />
+        <YAxis />
+        <Tooltip />
+        {showLegend && <Legend />}
+        {showGrid && <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />}
+        {yAxisKeys.map((key, index) => (
+          <Bar key={`bar-${key}`} dataKey={key} barSize={20} fill={colorPalette[index] || '#413ea0'} />
+        ))}
+      </ComposedChart>
+    </ResponsiveContainer>
+  );
+};
+
+const StackedBarChartComponent = ({ data }: { data: any[] }) => {
+  // Fix the stackId prop
+  return (
+    <ResponsiveContainer width="100%" height={300}>
+      <BarChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="name" />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Bar dataKey="value1" fill="#8884d8" stackId="a" />
+        <Bar dataKey="value2" fill="#82ca9d" stackId="a" />
+        <Bar dataKey="value3" fill="#ffc658" stackId="a" />
+      </BarChart>
+    </ResponsiveContainer>
   );
 };
 

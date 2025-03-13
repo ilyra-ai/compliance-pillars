@@ -38,17 +38,14 @@ const App = () => {
   const { 
     themeDialogOpen, 
     setThemeDialogOpen, 
-    handleOpenUITheme, 
     handleSaveTheme 
   } = useThemeDialog();
   
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
+        <BrowserRouter>
+          <TooltipProvider>
             <ThemeConfiguratorDialog
               open={themeDialogOpen}
               onOpenChange={setThemeDialogOpen}
@@ -96,7 +93,6 @@ const App = () => {
                 </ProtectedRoute>
               } />
               
-              {/* Corrigido para apontar para o UIThemeConfigurator que já existe */}
               <Route path="/ui/customize" element={
                 <ProtectedRoute>
                   <UIThemeConfigurator />
@@ -148,7 +144,12 @@ const App = () => {
                 </ProtectedRoute>
               } />
 
-              {/* Nova rota para o dashboard estilo Power BI */}
+              {/* Power BI Dashboard routes with alias for easier access */}
+              <Route path="/power-bi" element={
+                <ProtectedRoute>
+                  <PowerBIDashboardPage />
+                </ProtectedRoute>
+              } />
               <Route path="/dashboard/power-bi" element={
                 <ProtectedRoute>
                   <PowerBIDashboardPage />
@@ -172,10 +173,11 @@ const App = () => {
               <Route path="*" element={<NotFound />} />
             </Routes>
             
-            {/* Floating Theme Button disponível em todas as páginas exceto no próprio configurador */}
-            <FloatingThemeButton onClick={handleOpenUITheme} />
-          </BrowserRouter>
-        </TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <FloatingThemeButton onClick={() => setThemeDialogOpen(true)} />
+          </TooltipProvider>
+        </BrowserRouter>
       </AuthProvider>
     </QueryClientProvider>
   );

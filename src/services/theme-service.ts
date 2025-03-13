@@ -79,6 +79,10 @@ class ThemeService {
     this.themeConfig = config;
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(config));
     this.applyTheme(config);
+    
+    // Dispatch an event that the theme has changed
+    const themeChangedEvent = new CustomEvent('theme-changed', { detail: config });
+    window.dispatchEvent(themeChangedEvent);
   }
 
   public resetTheme(): void {
@@ -87,14 +91,14 @@ class ThemeService {
   }
 
   private applyTheme(config: ThemeConfig): void {
-    // Aplicar cores
+    // Aplicar cores como variáveis CSS
     document.documentElement.style.setProperty('--color-primary', config.colors.primary);
     document.documentElement.style.setProperty('--color-secondary', config.colors.secondary);
     document.documentElement.style.setProperty('--color-accent', config.colors.accent);
     document.documentElement.style.setProperty('--color-background', config.colors.background);
     document.documentElement.style.setProperty('--color-text', config.colors.text);
     
-    // Atualiza as variáveis CSS do Tailwind
+    // Atualizar as variáveis HSL do Tailwind CSS
     const hslPrimary = this.hexToHSL(config.colors.primary);
     const hslSecondary = this.hexToHSL(config.colors.secondary);
     const hslAccent = this.hexToHSL(config.colors.accent);
@@ -103,22 +107,21 @@ class ThemeService {
     document.documentElement.style.setProperty('--secondary', hslSecondary);
     document.documentElement.style.setProperty('--accent', hslAccent);
     
-    // Atualiza a fonte
+    // Aplicar a fonte
     if (config.fonts.family) {
       document.documentElement.style.setProperty('--font-family', `'${config.fonts.family}', sans-serif`);
       document.body.style.fontFamily = `'${config.fonts.family}', sans-serif`;
     }
 
-    // Para debug
-    console.log('Theme applied:', {
+    // Ativamos um evento personalizado para que outros componentes saibam que o tema mudou
+    window.dispatchEvent(new CustomEvent('themechange', { detail: config }));
+    
+    console.log('Theme applied with colors:', {
       primary: hslPrimary,
       secondary: hslSecondary,
       accent: hslAccent,
       font: config.fonts.family
     });
-
-    // Dispara um evento customizado para que outros componentes possam reagir à mudança de tema
-    window.dispatchEvent(new CustomEvent('themechange', { detail: config }));
   }
 
   private hexToHSL(hex: string): string {
@@ -154,14 +157,19 @@ class ThemeService {
     return `${h} ${s}% ${l}%`;
   }
 
-  // Adicione um método para obter uma URL de preview com o tema atual
+  // Método para aplicar o tema imediatamente sem salvar na localStorage
+  public applyThemeTemporarily(config: ThemeConfig): void {
+    this.applyTheme(config);
+  }
+
+  // Método para obter uma URL de preview com o tema atual
   public getPreviewUrl(): string {
     const baseUrl = window.location.origin;
     const themeParam = encodeURIComponent(JSON.stringify(this.themeConfig));
     return `${baseUrl}?preview=${themeParam}`;
   }
 
-  // Adicione um método para copiar o código CSS do tema atual
+  // Método para copiar o código CSS do tema atual
   public getThemeCSS(): string {
     const { colors, fonts } = this.themeConfig;
     return `
