@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,6 +12,9 @@ import Login from "./pages/Login";
 import UserManagement from "./pages/UserManagement";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import PillarManagement from "./pages/PillarManagement";
+import DocumentEditor from "./pages/DocumentEditor";
+import ReportBuilder from "./pages/ReportBuilder";
+import Settings from "./pages/Settings";
 
 const queryClient = new QueryClient();
 
@@ -42,8 +46,8 @@ const App = () => (
               </ProtectedRoute>
             } />
             <Route path="/settings" element={
-              <ProtectedRoute>
-                <Index />
+              <ProtectedRoute requiredRoles={['admin', 'gestor']}>
+                <Settings />
               </ProtectedRoute>
             } />
             <Route path="/reports" element={
@@ -60,13 +64,13 @@ const App = () => (
             {/* Novas rotas */}
             <Route path="/reports/builder" element={
               <ProtectedRoute>
-                <Index />
+                <ReportBuilder />
               </ProtectedRoute>
             } />
             
             <Route path="/documents/editor" element={
               <ProtectedRoute>
-                <Index />
+                <DocumentEditor />
               </ProtectedRoute>
             } />
 
