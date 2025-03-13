@@ -13,8 +13,6 @@ import ThemeButton from '@/components/ui/ThemeButton';
 import { useThemeDialog } from '@/hooks/use-theme-dialog';
 import { CustomizableLayout } from '@/components/ui/customizable/CustomizableLayout';
 import { PageCustomizer } from '@/components/ui/customizable/PageCustomizer';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
 
 const Index: React.FC = () => {
   const location = useLocation();
@@ -96,60 +94,52 @@ const Index: React.FC = () => {
 
   return (
     <PageLayout title="Gestão de Compliance" actions={actions} customizable={editMode}>
-      <DndProvider backend={HTML5Backend}>
-        <Tabs 
-          value={editMode ? "editor" : activeTab} 
-          onValueChange={handleTabChange}
-        >
-          <TabsList className="mb-6">
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="editor" className="relative">
-              Editor de Layout
-              {!editMode && (
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-pulse"></span>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="reports">Relatórios</TabsTrigger>
-            <TabsTrigger value="charts">Gráficos</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="dashboard">
-            <PageCustomizer
-              pagePath={location.pathname}
-              editMode={false}
-              onEditModeChange={setEditMode}
-            >
-              <Dashboard />
-            </PageCustomizer>
-          </TabsContent>
-          
-          <TabsContent value="editor">
-            <PageCustomizer
-              pagePath={location.pathname}
-              editMode={true}
-              onEditModeChange={setEditMode}
-            >
-              <CustomizableLayout />
-            </PageCustomizer>
-          </TabsContent>
-          
-          <TabsContent value="reports">
-            <Card>
-              <CardHeader>
-                <CardTitle>Construtor de Relatórios</CardTitle>
-                <CardDescription>Crie e personalize relatórios para seu programa de compliance</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ReportBuilder />
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="charts">
-            <ChartConfigurator />
-          </TabsContent>
-        </Tabs>
-      </DndProvider>
+      <Tabs 
+        value={editMode ? "editor" : activeTab} 
+        onValueChange={handleTabChange}
+      >
+        <TabsList className="mb-6">
+          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+          <TabsTrigger value="editor" className="relative">
+            Editor de Layout
+            {!editMode && (
+              <span className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-pulse"></span>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="reports">Relatórios</TabsTrigger>
+          <TabsTrigger value="charts">Gráficos</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="dashboard">
+          <Dashboard />
+        </TabsContent>
+        
+        <TabsContent value="editor">
+          <PageCustomizer
+            pagePath={location.pathname}
+            editMode={true}
+            onEditModeChange={setEditMode}
+          >
+            <CustomizableLayout />
+          </PageCustomizer>
+        </TabsContent>
+        
+        <TabsContent value="reports">
+          <Card>
+            <CardHeader>
+              <CardTitle>Construtor de Relatórios</CardTitle>
+              <CardDescription>Crie e personalize relatórios para seu programa de compliance</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ReportBuilder />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="charts">
+          <ChartConfigurator />
+        </TabsContent>
+      </Tabs>
     </PageLayout>
   );
 };
