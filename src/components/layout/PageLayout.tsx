@@ -17,6 +17,7 @@ interface PageLayoutProps {
   description?: string;
   actions?: ReactNode;
   hideFloatingThemeButton?: boolean;
+  contentClassName?: string;
 }
 
 const PageLayout: React.FC<PageLayoutProps> = ({
@@ -25,6 +26,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
   description,
   actions,
   hideFloatingThemeButton = false,
+  contentClassName = '',
 }) => {
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -54,7 +56,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
                 </SheetContent>
               </Sheet>
               
-              <main className="pb-16 pt-20 md:pt-24 px-4 md:px-8 transition-all duration-300 ease-in-out">
+              <main className={`pb-16 pt-20 md:pt-24 px-4 md:px-8 transition-all duration-300 ease-in-out ${contentClassName}`}>
                 {(title || actions) && (
                   <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     {title && (
@@ -85,7 +87,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
               </ResizablePanel>
               <ResizableHandle withHandle className="bg-border" />
               <ResizablePanel defaultSize={80}>
-                <main className="pb-16 pt-24 px-8 transition-all duration-300 ease-in-out">
+                <main className={`pb-16 pt-24 px-8 transition-all duration-300 ease-in-out ${contentClassName}`}>
                   {(title || actions) && (
                     <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                       {title && (

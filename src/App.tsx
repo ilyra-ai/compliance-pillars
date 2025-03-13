@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -29,6 +28,7 @@ import ChatbotAssistantPage from "./pages/ChatbotAssistant";
 import AnalyticsPage from "./pages/Analytics";
 import { useEffect } from "react";
 import { themeService } from "./services/theme-service";
+import DueDiligencePage from "./pages/DueDiligencePage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -46,12 +46,9 @@ const App = () => {
     handleSaveTheme 
   } = useThemeDialog();
   
-  // Apply the Imprima font and theme when the app loads
   useEffect(() => {
-    // Ensure the theme service is initialized
     const theme = themeService.getTheme();
     
-    // Check for URL parameters for theme preview
     const urlParams = new URLSearchParams(window.location.search);
     const previewTheme = urlParams.get('preview');
     
@@ -77,10 +74,8 @@ const App = () => {
             />
             
             <Routes>
-              {/* Rotas públicas */}
               <Route path="/login" element={<Login />} />
               
-              {/* Rotas protegidas */}
               <Route path="/" element={
                 <ProtectedRoute>
                   <Index />
@@ -92,7 +87,6 @@ const App = () => {
                 </ProtectedRoute>
               } />
               
-              {/* Rotas dos Pilares de Compliance */}
               <Route path="/pillars/leadership" element={
                 <ProtectedRoute>
                   <PillarManagement />
@@ -130,7 +124,7 @@ const App = () => {
               } />
               <Route path="/pillars/due-diligence" element={
                 <ProtectedRoute>
-                  <PillarManagement />
+                  <DueDiligencePage />
                 </ProtectedRoute>
               } />
               <Route path="/pillars/audits" element={
@@ -159,6 +153,7 @@ const App = () => {
                   <Settings />
                 </ProtectedRoute>
               } />
+              
               <Route path="/settings/theme" element={
                 <ProtectedRoute>
                   <UIThemeConfigurator />
@@ -182,7 +177,6 @@ const App = () => {
                 </ProtectedRoute>
               } />
               
-              {/* Tool Routes */}
               <Route path="/reports" element={
                 <ProtectedRoute>
                   <Index />
@@ -224,7 +218,6 @@ const App = () => {
                 </ProtectedRoute>
               } />
 
-              {/* Power BI Dashboard routes with alias for easier access */}
               <Route path="/power-bi" element={
                 <ProtectedRoute>
                   <PowerBIDashboardPage />
@@ -236,7 +229,6 @@ const App = () => {
                 </ProtectedRoute>
               } />
 
-              {/* Admin routes */}
               <Route path="/database" element={
                 <ProtectedRoute requiredRoles={['admin']}>
                   <DatabaseManager />
@@ -248,7 +240,6 @@ const App = () => {
                 </ProtectedRoute>
               } />
 
-              {/* Fallback route */}
               <Route path="*" element={<NotFound />} />
             </Routes>
             
