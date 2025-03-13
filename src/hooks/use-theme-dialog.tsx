@@ -21,19 +21,23 @@ export const useThemeDialog = () => {
   
   const handleOpenUITheme = useCallback(() => {
     setThemeDialogOpen(true);
+    console.log('Opening theme dialog');
   }, []);
   
   const handleCloseUITheme = useCallback(() => {
     setThemeDialogOpen(false);
+    console.log('Closing theme dialog');
   }, []);
   
   const handleSaveTheme = useCallback((config: ThemeConfig) => {
     // Save theme configuration using theme service
     try {
+      console.log('Saving theme configuration:', config);
       themeService.saveTheme(config);
       toast.success('Tema personalizado salvo com sucesso!');
       setThemeDialogOpen(false);
     } catch (error) {
+      console.error('Error saving theme:', error);
       toast.error('Erro ao salvar o tema: ' + (error instanceof Error ? error.message : 'Erro desconhecido'));
     }
   }, []);
@@ -41,14 +45,15 @@ export const useThemeDialog = () => {
   const handleGoToThemeEditor = useCallback(() => {
     // Navigate to theme editor page via router
     try {
-      navigate('/ui/customize');
+      console.log('Navigating to theme editor page');
+      navigate('/settings/theme');
       toast.info('Redirecionando para o editor de temas...');
     } catch (error) {
       console.error('Error navigating to theme editor:', error);
       toast.error('Não foi possível navegar para o editor de temas.');
       
       // Fallback to direct navigation if router navigation fails
-      window.location.href = '/ui/customize';
+      window.location.href = '/settings/theme';
     }
   }, [navigate]);
   

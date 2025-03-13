@@ -1,20 +1,16 @@
 
-import React from "react";
-import { createContext, useContext, useState } from "react";
-import { useTheme } from "next-themes";
-import { toast } from "sonner";
+import { toast } from 'sonner';
 
-export interface ThemeColors {
-  primary: string;
-  secondary: string;
-  accent: string;
-  font: string;
-  background: string;
-  text: string;
-}
-
+// Define theme configuration interface
 export interface ThemeConfig {
-  colors: ThemeColors;
+  colors: {
+    primary: string;
+    secondary: string;
+    accent: string;
+    background: string;
+    text: string;
+    font?: string;
+  };
   fonts: {
     family: string;
   };
@@ -23,263 +19,225 @@ export interface ThemeConfig {
   };
 }
 
-interface ThemeContextType {
-  colors: ThemeColors;
-  updateColors: (colors: Partial<ThemeColors>) => void;
-  resetColors: () => void;
-  applyTheme: (themeName: string) => void;
-}
-
-const defaultColors: ThemeColors = {
-  primary: "221.2 83.2% 53.3%",
-  secondary: "215 27.9% 16.9%",
-  accent: "210 40% 96.1%",
-  font: "Inter",
-  background: "#ffffff",
-  text: "#1f2937"
+// Default theme configuration
+const defaultTheme: ThemeConfig = {
+  colors: {
+    primary: '#637fe2',
+    secondary: '#10b981',
+    accent: '#f59e0b',
+    background: '#ffffff',
+    text: '#1f2937',
+  },
+  fonts: {
+    family: 'Imprima',
+  },
+  assets: {
+    logo: '/logo.svg',
+  },
 };
 
-export const predefinedThemes = {
-  default: {
-    primary: "221.2 83.2% 53.3%",
-    secondary: "215 27.9% 16.9%",
-    accent: "210 40% 96.1%",
-    font: "Inter",
-    background: "#ffffff",
-    text: "#1f2937"
-  },
-  forest: {
-    primary: "142 76% 36%",
-    secondary: "180 60% 25%",
-    accent: "120 40% 94%",
-    font: "Poppins",
-    background: "#f8faf6",
-    text: "#2c3e2e"
-  },
-  sunset: {
-    primary: "25 95% 53%",
-    secondary: "4 90% 28%",
-    accent: "50 30% 96%",
-    font: "Lato",
-    background: "#fffaf5",
-    text: "#3d2b20"
-  },
-  ocean: {
-    primary: "198 93% 60%",
-    secondary: "200 98% 24%",
-    accent: "190 40% 96%",
-    font: "Montserrat",
-    background: "#f5fafd",
-    text: "#1a3b4c"
-  },
-  lavender: {
-    primary: "239 84% 67%",
-    secondary: "160 84% 39%",
-    accent: "38 92% 50%",
-    font: "Imprima",
-    background: "#f9f7ff",
-    text: "#2e2a3d"
-  },
-  midnight: {
-    primary: "245 58% 51%",
-    secondary: "230 22% 20%",
-    accent: "230 20% 96%",
-    font: "Nunito",
-    background: "#1a1a24",
-    text: "#e1e1e8"
-  },
-  corporate: {
-    primary: "215 100% 38%",
-    secondary: "215 28% 17%",
-    accent: "10 100% 80%",
-    font: "Lato",
-    background: "#f5f8fc",
-    text: "#1c2333"
-  },
-  modern: {
-    primary: "262 83% 58%",
-    secondary: "250 24% 20%",
-    accent: "270 20% 96%",
-    font: "Montserrat",
-    background: "#f8f7fc",
-    text: "#2a2639"
+class ThemeService {
+  private static instance: ThemeService;
+  private currentTheme: ThemeConfig;
+  private tempTheme: ThemeConfig | null = null;
+
+  private constructor() {
+    this.currentTheme = this.loadTheme();
+    this.applyTheme(this.currentTheme);
   }
-};
 
-export const availableFonts = [
-  "Inter",
-  "Roboto",
-  "Lato",
-  "Poppins",
-  "Montserrat",
-  "Nunito",
-  "Raleway",
-  "Open Sans",
-  "Playfair Display",
-  "Imprima"
-];
-
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
-
-// Separate the React component from the service
-export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [colors, setColors] = useState<ThemeColors>(defaultColors);
-  const { theme } = useTheme();
-
-  const updateColors = (newColors: Partial<ThemeColors>) => {
-    try {
-      setColors((prev) => {
-        const updated = { ...prev, ...newColors };
-        
-        // Apply colors to CSS variables
-        document.documentElement.style.setProperty("--primary", updated.primary);
-        document.documentElement.style.setProperty("--secondary", updated.secondary);
-        document.documentElement.style.setProperty("--accent", updated.accent);
-        
-        // Save to localStorage
-        localStorage.setItem("theme-colors", JSON.stringify(updated));
-        
-        console.info("Theme applied with colors:", updated);
-        return updated;
-      });
-      
-      // Show success toast notification
-      toast.success("Tema atualizado com sucesso");
-    } catch (error) {
-      console.error("Error updating theme:", error);
-      toast.error("Erro ao atualizar o tema");
+  public static getInstance(): ThemeService {
+    if (!ThemeService.instance) {
+      ThemeService.instance = new ThemeService();
     }
-  };
-
-  const resetColors = () => {
-    updateColors(defaultColors);
-  };
-
-  const applyTheme = (themeName: keyof typeof predefinedThemes) => {
-    if (predefinedThemes[themeName]) {
-      updateColors(predefinedThemes[themeName]);
-    }
-  };
-
-  // Create the context provider without JSX
-  return React.createElement(
-    ThemeContext.Provider,
-    { value: { colors, updateColors, resetColors, applyTheme } },
-    children
-  );
-};
-
-export const useThemeService = () => {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error("useThemeService must be used within a ThemeProvider");
+    return ThemeService.instance;
   }
-  return context;
-};
 
-// Create a utility for theme service
-export const themeService = {
-  getTheme(): ThemeConfig {
+  private loadTheme(): ThemeConfig {
     try {
-      const savedTheme = localStorage.getItem("theme-colors");
+      const savedTheme = localStorage.getItem('app-theme');
       if (savedTheme) {
-        const colors = JSON.parse(savedTheme);
-        return { 
-          colors, 
-          fonts: { family: colors.font || "Inter" },
-          assets: { logo: "/placeholder.svg" }
-        };
+        return { ...defaultTheme, ...JSON.parse(savedTheme) };
       }
     } catch (error) {
-      console.error("Error loading theme:", error);
+      console.error('Error loading theme:', error);
     }
-    return { 
-      colors: defaultColors,
-      fonts: { family: defaultColors.font },
-      assets: { logo: "/placeholder.svg" }
-    };
-  },
+    return { ...defaultTheme };
+  }
 
-  saveTheme(config: ThemeConfig): void {
-    try {
-      const { colors } = config;
-      
-      // Apply colors to CSS variables
-      document.documentElement.style.setProperty("--primary", colors.primary);
-      document.documentElement.style.setProperty("--secondary", colors.secondary);
-      document.documentElement.style.setProperty("--accent", colors.accent);
-      document.documentElement.style.setProperty("--font", colors.font);
-      
-      // Save to localStorage
-      localStorage.setItem("theme-colors", JSON.stringify(colors));
-      
-      console.info("Theme saved with colors:", colors);
-    } catch (error) {
-      console.error("Error saving theme:", error);
-      throw new Error("Failed to save theme");
-    }
-  },
+  public getTheme(): ThemeConfig {
+    return this.tempTheme || this.currentTheme;
+  }
 
-  resetTheme(): void {
-    this.saveTheme({ 
-      colors: defaultColors,
-      fonts: { family: defaultColors.font },
-      assets: { logo: "/placeholder.svg" }
-    });
-  },
-  
-  applyThemeTemporarily(config: ThemeConfig): void {
+  public saveTheme(config: ThemeConfig): void {
     try {
-      const { colors } = config;
-      
-      // Apply colors to CSS variables without saving to localStorage
-      document.documentElement.style.setProperty("--primary", colors.primary);
-      document.documentElement.style.setProperty("--secondary", colors.secondary);
-      document.documentElement.style.setProperty("--accent", colors.accent);
-      document.documentElement.style.setProperty("--font", colors.font);
-      
-      console.info("Theme applied temporarily with colors:", colors);
+      this.currentTheme = { ...this.currentTheme, ...config };
+      localStorage.setItem('app-theme', JSON.stringify(this.currentTheme));
+      this.applyTheme(this.currentTheme);
+      this.tempTheme = null;
     } catch (error) {
-      console.error("Error applying temporary theme:", error);
+      console.error('Error saving theme:', error);
+      throw new Error('Failed to save theme configuration.');
     }
-  },
-  
-  getThemeCSS(): string {
-    const colors = this.getTheme().colors;
-    
+  }
+
+  public resetTheme(): void {
+    try {
+      localStorage.removeItem('app-theme');
+      this.currentTheme = { ...defaultTheme };
+      this.applyTheme(this.currentTheme);
+      this.tempTheme = null;
+    } catch (error) {
+      console.error('Error resetting theme:', error);
+      throw new Error('Failed to reset theme configuration.');
+    }
+  }
+
+  public applyThemeTemporarily(config: ThemeConfig): void {
+    this.tempTheme = config;
+    this.applyTheme(config);
+  }
+
+  public getThemeCSS(): string {
+    const theme = this.getTheme();
     return `
 :root {
-  --primary: ${colors.primary};
-  --secondary: ${colors.secondary};
-  --accent: ${colors.accent};
-  --font: ${colors.font || "Inter"};
-  --background: ${colors.background || "#ffffff"};
-  --text: ${colors.text || "#1f2937"};
+  --primary: ${this.hexToHSL(theme.colors.primary)};
+  --primary-foreground: 0 0% 98%;
+  
+  --secondary: ${this.hexToHSL(theme.colors.secondary)};
+  --secondary-foreground: 0 0% 98%;
+  
+  --accent: ${this.hexToHSL(theme.colors.accent)};
+  --accent-foreground: 0 0% 98%;
+  
+  --background: ${this.hexToHSL(theme.colors.background)};
+  --foreground: ${this.hexToHSL(theme.colors.text)};
+  
+  --card: ${this.hexToHSL(theme.colors.background)};
+  --card-foreground: ${this.hexToHSL(theme.colors.text)};
+  
+  --popover: ${this.hexToHSL(theme.colors.background)};
+  --popover-foreground: ${this.hexToHSL(theme.colors.text)};
+  
+  --muted: 0 0% 96.1%;
+  --muted-foreground: 0 0% 45.1%;
+  
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  
+  --border: 0 0% 89.8%;
+  --input: 0 0% 89.8%;
+  --ring: ${this.hexToHSL(theme.colors.primary)};
+  
+  --radius: 0.5rem;
+  
+  --font-family: ${theme.fonts.family || 'Imprima'}, sans-serif;
 }
 
-/* Primary color variants */
-.bg-primary { background-color: hsl(var(--primary)); }
-.text-primary { color: hsl(var(--primary)); }
-.border-primary { border-color: hsl(var(--primary)); }
-
-/* Secondary color variants */
-.bg-secondary { background-color: hsl(var(--secondary)); }
-.text-secondary { color: hsl(var(--secondary)); }
-.border-secondary { border-color: hsl(var(--secondary)); }
-
-/* Accent color variants */
-.bg-accent { background-color: hsl(var(--accent)); }
-.text-accent { color: hsl(var(--accent)); }
-.border-accent { border-color: hsl(var(--accent)); }
-
-/* Background and text colors */
-.custom-bg { background-color: var(--background); }
-.custom-text { color: var(--text); }
-
-/* Font family */
 body {
-  font-family: var(--font), system-ui, sans-serif;
+  font-family: var(--font-family);
 }
 `.trim();
   }
-};
+
+  private applyTheme(config: ThemeConfig): void {
+    try {
+      const root = document.documentElement;
+      
+      // Convert HEX colors to HSL
+      const primaryHSL = this.hexToHSL(config.colors.primary);
+      const secondaryHSL = this.hexToHSL(config.colors.secondary);
+      const accentHSL = this.hexToHSL(config.colors.accent);
+      const backgroundHSL = this.hexToHSL(config.colors.background);
+      const textHSL = this.hexToHSL(config.colors.text);
+      
+      // Set CSS variables
+      root.style.setProperty('--primary', primaryHSL);
+      root.style.setProperty('--secondary', secondaryHSL);
+      root.style.setProperty('--accent', accentHSL);
+      root.style.setProperty('--background', backgroundHSL);
+      root.style.setProperty('--foreground', textHSL);
+      root.style.setProperty('--card', backgroundHSL);
+      root.style.setProperty('--card-foreground', textHSL);
+      root.style.setProperty('--popover', backgroundHSL);
+      root.style.setProperty('--popover-foreground', textHSL);
+      root.style.setProperty('--ring', primaryHSL);
+      
+      // Update font family if provided
+      if (config.fonts && config.fonts.family) {
+        root.style.setProperty('--font-family', `${config.fonts.family}, sans-serif`);
+      }
+      
+      // Detect if we need to use dark mode
+      const isDarkBackground = this.isColorDark(config.colors.background);
+      root.classList.toggle('dark-theme', isDarkBackground);
+      
+      // Handle other aspects like logo
+      if (config.assets && config.assets.logo) {
+        // Set logo - implementation depends on your app structure
+        document.querySelectorAll('.app-logo').forEach((logo: Element) => {
+          if (logo instanceof HTMLImageElement) {
+            logo.src = config.assets.logo;
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error applying theme:', error);
+    }
+  }
+
+  private hexToHSL(hex: string): string {
+    // Remove the # if present
+    hex = hex.replace('#', '');
+    
+    // Parse the hex values
+    const r = parseInt(hex.substring(0, 2), 16) / 255;
+    const g = parseInt(hex.substring(2, 4), 16) / 255;
+    const b = parseInt(hex.substring(4, 6), 16) / 255;
+    
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    
+    let h = 0, s = 0, l = (max + min) / 2;
+    
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      
+      h /= 6;
+    }
+    
+    // Convert to degrees, percentage, percentage
+    h = Math.round(h * 360);
+    s = Math.round(s * 100);
+    l = Math.round(l * 100);
+    
+    return `${h} ${s}% ${l}%`;
+  }
+  
+  private isColorDark(hex: string): boolean {
+    // Remove the # if present
+    hex = hex.replace('#', '');
+    
+    // Parse the RGB values
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    
+    // Calculate perceived brightness (using the formula to determine relative luminance)
+    const brightness = (r * 0.299 + g * 0.587 + b * 0.114) / 255;
+    
+    // Return true if the color is dark (brightness < 0.5)
+    return brightness < 0.5;
+  }
+}
+
+// Export singleton instance
+export const themeService = ThemeService.getInstance();

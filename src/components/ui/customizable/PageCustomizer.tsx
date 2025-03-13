@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -54,14 +53,18 @@ export const PageCustomizer: React.FC<PageCustomizerProps> = ({
   const [showLoadDialog, setShowLoadDialog] = useState(false);
   const [isDraggingActive, setIsDraggingActive] = useState(false);
 
-  // Load components for current page
   useEffect(() => {
     try {
-      const pageKey = `pageComponents-${pagePath}`;
+      const sanitizedPagePath = pagePath.replace(/[^a-zA-Z0-9]/g, '_');
+      const pageKey = `pageComponents_${sanitizedPagePath}`;
+      
       const savedComponents = localStorage.getItem(pageKey);
       
       if (savedComponents) {
-        setComponents(JSON.parse(savedComponents));
+        const parsedComponents = JSON.parse(savedComponents);
+        setComponents(parsedComponents);
+      } else {
+        console.log('No saved components found for this page');
       }
       
       const savedLayoutsStr = localStorage.getItem('savedLayouts');
@@ -70,6 +73,7 @@ export const PageCustomizer: React.FC<PageCustomizerProps> = ({
       }
     } catch (error) {
       console.error('Error loading saved components:', error);
+      toast.error('Erro ao carregar componentes salvos');
     }
   }, [pagePath]);
 
@@ -81,12 +85,14 @@ export const PageCustomizer: React.FC<PageCustomizerProps> = ({
   
   const saveComponentsToLocalStorage = useCallback(() => {
     try {
-      const pageKey = `pageComponents-${pagePath}`;
+      const sanitizedPagePath = pagePath.replace(/[^a-zA-Z0-9]/g, '_');
+      const pageKey = `pageComponents_${sanitizedPagePath}`;
+      
       localStorage.setItem(pageKey, JSON.stringify(components));
-      toast.success("Layout salvo localmente.");
+      toast.success("Layout salvo localmente com sucesso");
     } catch (error) {
       console.error('Error saving components:', error);
-      toast.error("Erro ao salvar o layout.");
+      toast.error("Erro ao salvar o layout localmente");
     }
   }, [components, pagePath]);
 
@@ -99,6 +105,7 @@ export const PageCustomizer: React.FC<PageCustomizerProps> = ({
       newComponents.splice(index, 1);
       newComponents.push(draggedComponent);
       setComponents(newComponents);
+      toast.success(`Componente reordenado`);
     } else {
       const newComponent = {
         id: uuidv4(),
@@ -109,10 +116,10 @@ export const PageCustomizer: React.FC<PageCustomizerProps> = ({
           data: []
         }
       };
+      
       setComponents([...components, newComponent]);
+      toast.success(`Componente ${type} adicionado com sucesso!`);
     }
-    
-    toast.success(`Componente ${type} adicionado!`);
   };
 
   const handleDelete = (id: string) => {
@@ -201,6 +208,10 @@ export const PageCustomizer: React.FC<PageCustomizerProps> = ({
       setComponents(JSON.parse(JSON.stringify(layout.components)));
       setShowLoadDialog(false);
       toast.success(`Layout "${layout.name}" carregado com sucesso!`);
+      
+      setTimeout(() => {
+        saveComponentsToLocalStorage();
+      }, 100);
     }
   };
   
@@ -311,7 +322,6 @@ export const PageCustomizer: React.FC<PageCustomizerProps> = ({
   };
 
   if (!editMode) {
-    // Se não estiver em modo de edição, apenas mostra os componentes existentes
     return (
       <DndProvider backend={HTML5Backend}>
         {components.length > 0 ? (
