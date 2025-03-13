@@ -32,6 +32,7 @@ export const DroppableArea: React.FC<DroppableAreaProps> = ({
   });
 
   const isActive = isOver && canDrop;
+  const hasChildren = React.Children.count(children) > 0;
 
   return (
     <div
@@ -44,7 +45,7 @@ export const DroppableArea: React.FC<DroppableAreaProps> = ({
               : ''
       } min-h-[200px] p-4 rounded-md transition-all duration-200`}
     >
-      {children.length === 0 && (
+      {!hasChildren && (
         <div className="flex flex-col items-center justify-center h-40 text-muted-foreground">
           <PlusCircle className="h-12 w-12 mb-2 text-muted" />
           <p className="text-center">Arraste componentes aqui ou do painel de componentes</p>

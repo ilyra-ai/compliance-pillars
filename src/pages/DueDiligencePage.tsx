@@ -14,6 +14,25 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const DueDiligencePage = () => {
   const [editMode, setEditMode] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>('dashboard');
+  
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    // If switching to editor tab, enable edit mode
+    if (value === 'editor') {
+      setEditMode(true);
+    } else if (editMode && value !== 'editor') {
+      // If leaving editor tab and edit mode is on, ask for confirmation
+      const confirmed = window.confirm("Sair do modo de edição? Alterações não salvas serão perdidas.");
+      if (confirmed) {
+        setEditMode(false);
+      } else {
+        // If user cancels, stay on editor tab
+        setActiveTab('editor');
+        return;
+      }
+    }
+  };
   
   return (
     <PageLayout
@@ -22,7 +41,10 @@ const DueDiligencePage = () => {
       actions={
         <div className="flex gap-2">
           <Button 
-            onClick={() => setEditMode(!editMode)} 
+            onClick={() => {
+              setEditMode(!editMode);
+              setActiveTab(editMode ? 'dashboard' : 'editor');
+            }}
             variant={editMode ? "default" : "outline"}
             className="relative overflow-hidden group"
             size="lg"
@@ -48,10 +70,13 @@ const DueDiligencePage = () => {
       }
       customizable={editMode}
     >
-      <Tabs defaultValue={editMode ? "editor" : "dashboard"} value={editMode ? "editor" : "dashboard"}>
+      <Tabs 
+        value={editMode ? "editor" : activeTab} 
+        onValueChange={handleTabChange}
+      >
         <TabsList className="mb-6">
-          <TabsTrigger value="dashboard" onClick={() => setEditMode(false)}>Dashboard</TabsTrigger>
-          <TabsTrigger value="editor" onClick={() => setEditMode(true)} className="relative">
+          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+          <TabsTrigger value="editor" className="relative">
             Editor de Layout
             {!editMode && (
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-pulse"></span>

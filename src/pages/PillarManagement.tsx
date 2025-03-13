@@ -6,11 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { ChevronLeft, Save, Plus, BarChart3, FileText, MessageSquare, Grip } from 'lucide-react';
+import { ChevronLeft, Save, Plus, BarChart3, FileText, MessageSquare, Grip, Palette, Settings } from 'lucide-react';
 import { toast } from 'sonner';
 import PageLayout from '@/components/layout/PageLayout';
 import PillarContent from '@/components/ui/PillarContent';
 import PillarChartWidget from '@/components/pillar/PillarChartWidget';
+import { CustomizableLayout } from '@/components/ui/customizable/CustomizableLayout';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface Pilar {
   id: string;
@@ -49,6 +51,8 @@ const PillarManagement: React.FC = () => {
   const [isEditingLayout, setIsEditingLayout] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [draggedItem, setDraggedItem] = useState<number | null>(null);
+  const [editMode, setEditMode] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>('info');
 
   // Get pillar name based on ID
   const getPillarName = (id: string) => {
@@ -208,6 +212,24 @@ const PillarManagement: React.FC = () => {
     setLayoutSections(newSections);
   };
   
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    // If switching to editor tab, enable edit mode
+    if (value === 'editor') {
+      setEditMode(true);
+    } else if (editMode && value !== 'editor') {
+      // If leaving editor tab and edit mode is on, ask for confirmation
+      const confirmed = window.confirm("Sair do modo de edição? Alterações não salvas serão perdidas.");
+      if (confirmed) {
+        setEditMode(false);
+      } else {
+        // If user cancels, stay on editor tab
+        setActiveTab('editor');
+        return;
+      }
+    }
+  };
+  
   const renderSection = (section: LayoutSection, index: number) => {
     switch (section.type) {
       case 'content':
@@ -322,16 +344,32 @@ const PillarManagement: React.FC = () => {
         <ChevronLeft className="mr-2 h-4 w-4" />
         Voltar
       </Button>
+      
       {!isNewPilar && (
         <Button 
-          onClick={() => setIsEditingLayout(!isEditingLayout)} 
-          variant={isEditingLayout ? "default" : "outline"} 
+          onClick={() => {
+            setEditMode(!editMode);
+            setActiveTab(editMode ? 'info' : 'editor');
+          }} 
+          variant={editMode ? "default" : "outline"}
+          className="relative overflow-hidden group mr-2"
           size="sm"
-          className="mr-2"
         >
-          {isEditingLayout ? 'Salvar Layout' : 'Editar Layout'}
+          {editMode ? (
+            <>
+              <Settings className="mr-2 h-4 w-4" />
+              Modo Visualização
+            </>
+          ) : (
+            <>
+              <Palette className="mr-2 h-4 w-4" />
+              <span>Personalizar UI</span>
+              <span className="absolute right-0 top-0 h-full w-2 bg-primary/20 animate-pulse hidden group-hover:block"></span>
+            </>
+          )}
         </Button>
       )}
+      
       <Button onClick={handleSubmit} disabled={isLoading} size="sm">
         <Save className="mr-2 h-4 w-4" />
         {isLoading ? 'Salvando...' : 'Salvar Pilar'}
@@ -346,8 +384,243 @@ const PillarManagement: React.FC = () => {
     <PageLayout
       title={isNewPilar ? 'Novo Pilar' : `Editando: ${pilar.nome}`}
       actions={actions}
+      customizable={editMode}
     >
-      <div className="space-y-6">
+      {!isNewPilar ? (
+        <Tabs 
+          value={editMode ? "editor" : activeTab} 
+          onValueChange={handleTabChange}
+          className="mb-6"
+        >
+          <TabsList>
+            <TabsTrigger value="info">Informações</TabsTrigger>
+            <TabsTrigger value="content">Conteúdo</TabsTrigger>
+            <TabsTrigger value="editor" className="relative">
+              Editor de Layout
+              {!editMode && (
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-pulse"></span>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="documents">Documentos</TabsTrigger>
+            <TabsTrigger value="settings">Configurações</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="info">
+            <Card>
+              <CardHeader>
+                <CardTitle>Informações do Pilar</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form className="space-y-4" onSubmit={handleSubmit}>
+                  <div className="space-y-2">
+                    <Label htmlFor="nome">Nome do Pilar</Label>
+                    <Input
+                      id="nome"
+                      name="nome"
+                      value={pilar.nome}
+                      onChange={handleInputChange}
+                      placeholder="Digite o nome do pilar"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="descricao">Descrição</Label>
+                    <Textarea
+                      id="descricao"
+                      name="descricao"
+                      value={pilar.descricao}
+                      onChange={handleInputChange}
+                      placeholder="Descreva o propósito deste pilar"
+                      rows={3}
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="categoria">Categoria</Label>
+                      <select
+                        id="categoria"
+                        name="categoria"
+                        value={pilar.categoria}
+                        onChange={handleInputChange}
+                        className="w-full rounded-md border border-input bg-background px-3 py-2"
+                      >
+                        <option value="Compliance">Compliance</option>
+                        <option value="Governança">Governança</option>
+                        <option value="Auditoria">Auditoria</option>
+                        <option value="Regulatório">Regulatório</option>
+                        <option value="Ética">Ética</option>
+                      </select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="status">Status</Label>
+                      <select
+                        id="status"
+                        name="status"
+                        value={pilar.status}
+                        onChange={handleInputChange}
+                        className="w-full rounded-md border border-input bg-background px-3 py-2"
+                      >
+                        <option value="Ativo">Ativo</option>
+                        <option value="Inativo">Inativo</option>
+                        <option value="Em Revisão">Em Revisão</option>
+                        <option value="Rascunho">Rascunho</option>
+                      </select>
+                    </div>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="content">
+            <div className="space-y-6">
+              {isEditingLayout && (
+                <Card className="p-4 bg-muted/30">
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-lg font-medium">Editar Layout da Página</h2>
+                    <div className="flex flex-wrap gap-2">
+                      <Button size="sm" variant="outline" onClick={() => handleAddSection('content')}>
+                        <Plus className="mr-2 h-4 w-4" />
+                        Conteúdo
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => handleAddSection('chart')}>
+                        <BarChart3 className="mr-2 h-4 w-4" />
+                        Gráfico
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => handleAddSection('document')}>
+                        <FileText className="mr-2 h-4 w-4" />
+                        Documento
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => handleAddSection('chatbot')}>
+                        <MessageSquare className="mr-2 h-4 w-4" />
+                        Chatbot
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => handleAddSection('text')}>
+                        <FileText className="mr-2 h-4 w-4" />
+                        Texto
+                      </Button>
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Adicione, remova ou reorganize elementos nesta página. Arraste os elementos para reordenar.
+                  </p>
+                </Card>
+              )}
+              
+              <div className="space-y-6">
+                {layoutSections.map((section, index) => (
+                  <div 
+                    key={section.id} 
+                    className="relative"
+                    draggable={isEditingLayout}
+                    onDragStart={() => isEditingLayout && handleDragStart(index)}
+                    onDragOver={(e) => isEditingLayout && handleDragOver(e, index)}
+                    onDragEnd={handleDragEnd}
+                    style={{ opacity: draggedItem === index ? 0.5 : 1 }}
+                  >
+                    {isEditingLayout && (
+                      <div className="absolute -top-3 -right-3 z-10 flex space-x-1">
+                        <Button size="icon" variant="outline" className="h-6 w-6 bg-card" 
+                          onClick={() => handleMoveSection(index, 'up')}
+                          disabled={index === 0}>
+                          ↑
+                        </Button>
+                        <Button size="icon" variant="outline" className="h-6 w-6 bg-card"
+                          onClick={() => handleMoveSection(index, 'down')}
+                          disabled={index === layoutSections.length - 1}>
+                          ↓
+                        </Button>
+                        <Button size="icon" variant="destructive" className="h-6 w-6 bg-card"
+                          onClick={() => setLayoutSections(prev => prev.filter((_, i) => i !== index))}>
+                          ×
+                        </Button>
+                        <div className="h-6 w-6 flex items-center justify-center bg-muted text-muted-foreground rounded cursor-move">
+                          <Grip size={12} />
+                        </div>
+                      </div>
+                    )}
+                    {renderSection(section, index)}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="editor">
+            <CustomizableLayout />
+          </TabsContent>
+          
+          <TabsContent value="documents">
+            <div className="grid gap-6">
+              <div className="border rounded-lg p-6 bg-card text-card-foreground shadow-sm">
+                <h3 className="text-lg font-semibold mb-4">Documentos do Pilar</h3>
+                <p className="text-muted-foreground mb-6">
+                  Gerencie os documentos relacionados a este pilar
+                </p>
+                <div className="text-center p-12 border border-dashed rounded-md">
+                  <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
+                  <h3 className="text-lg font-medium mb-2">Nenhum documento</h3>
+                  <p className="text-muted-foreground mb-4">Carregue documentos para este pilar</p>
+                  <Button>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Adicionar Documento
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="settings">
+            <div className="grid gap-6">
+              <div className="border rounded-lg p-6 bg-card text-card-foreground shadow-sm">
+                <h3 className="text-lg font-semibold mb-4">Configurações do Pilar</h3>
+                <p className="text-muted-foreground mb-6">
+                  Configurações avançadas para este pilar
+                </p>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="permissoes">Permissões</Label>
+                    <select
+                      id="permissoes"
+                      className="w-full rounded-md border border-input bg-background px-3 py-2"
+                    >
+                      <option value="todos">Todos os usuários</option>
+                      <option value="admin">Apenas administradores</option>
+                      <option value="compliance">Equipe de compliance</option>
+                      <option value="personalizado">Personalizado</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="notificacoes">Notificações</Label>
+                    <select
+                      id="notificacoes"
+                      className="w-full rounded-md border border-input bg-background px-3 py-2"
+                    >
+                      <option value="todas">Ativas para todas as ações</option>
+                      <option value="importantes">Apenas importantes</option>
+                      <option value="nenhuma">Desativadas</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="visibilidade">Visibilidade</Label>
+                    <select
+                      id="visibilidade"
+                      className="w-full rounded-md border border-input bg-background px-3 py-2"
+                    >
+                      <option value="publico">Público</option>
+                      <option value="restrito">Restrito</option>
+                      <option value="oculto">Oculto</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
+      ) : (
         <Card>
           <CardHeader>
             <CardTitle>{isNewPilar ? 'Informações do Novo Pilar' : 'Informações do Pilar'}</CardTitle>
@@ -415,81 +688,7 @@ const PillarManagement: React.FC = () => {
             </form>
           </CardContent>
         </Card>
-        
-        {!isNewPilar && (
-          <>
-            {isEditingLayout && (
-              <Card className="p-4 bg-muted/30">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-lg font-medium">Editar Layout da Página</h2>
-                  <div className="flex flex-wrap gap-2">
-                    <Button size="sm" variant="outline" onClick={() => handleAddSection('content')}>
-                      <Plus className="mr-2 h-4 w-4" />
-                      Conteúdo
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => handleAddSection('chart')}>
-                      <BarChart3 className="mr-2 h-4 w-4" />
-                      Gráfico
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => handleAddSection('document')}>
-                      <FileText className="mr-2 h-4 w-4" />
-                      Documento
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => handleAddSection('chatbot')}>
-                      <MessageSquare className="mr-2 h-4 w-4" />
-                      Chatbot
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => handleAddSection('text')}>
-                      <FileText className="mr-2 h-4 w-4" />
-                      Texto
-                    </Button>
-                  </div>
-                </div>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Adicione, remova ou reorganize elementos nesta página. Arraste os elementos para reordenar.
-                </p>
-              </Card>
-            )}
-            
-            <div className="space-y-6">
-              {layoutSections.map((section, index) => (
-                <div 
-                  key={section.id} 
-                  className="relative"
-                  draggable={isEditingLayout}
-                  onDragStart={() => isEditingLayout && handleDragStart(index)}
-                  onDragOver={(e) => isEditingLayout && handleDragOver(e, index)}
-                  onDragEnd={handleDragEnd}
-                  style={{ opacity: draggedItem === index ? 0.5 : 1 }}
-                >
-                  {isEditingLayout && (
-                    <div className="absolute -top-3 -right-3 z-10 flex space-x-1">
-                      <Button size="icon" variant="outline" className="h-6 w-6 bg-card" 
-                        onClick={() => handleMoveSection(index, 'up')}
-                        disabled={index === 0}>
-                        ↑
-                      </Button>
-                      <Button size="icon" variant="outline" className="h-6 w-6 bg-card"
-                        onClick={() => handleMoveSection(index, 'down')}
-                        disabled={index === layoutSections.length - 1}>
-                        ↓
-                      </Button>
-                      <Button size="icon" variant="destructive" className="h-6 w-6 bg-card"
-                        onClick={() => setLayoutSections(prev => prev.filter((_, i) => i !== index))}>
-                        ×
-                      </Button>
-                      <div className="h-6 w-6 flex items-center justify-center bg-muted text-muted-foreground rounded cursor-move">
-                        <Grip size={12} />
-                      </div>
-                    </div>
-                  )}
-                  {renderSection(section, index)}
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-      </div>
+      )}
     </PageLayout>
   );
 };

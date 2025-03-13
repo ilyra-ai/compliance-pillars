@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DroppableArea } from './DroppableArea';
@@ -8,7 +8,7 @@ import { ComponentPalette } from './ComponentPalette';
 import { EditableTable, Column, TableData } from './EditableTable';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Save, Undo } from 'lucide-react';
+import { PlusCircle, Save, Undo, Trash } from 'lucide-react';
 import update from 'immutability-helper';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -22,6 +22,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
+import { Textarea } from '@/components/ui/textarea';
 
 interface Component {
   id: string;
@@ -74,6 +75,23 @@ export const CustomizableLayout: React.FC = () => {
   const [layoutName, setLayoutName] = useState('');
   const [savedLayouts, setSavedLayouts] = useState<LayoutConfig[]>([]);
   const [showLayoutsDialog, setShowLayoutsDialog] = useState(false);
+  const [componentBeingEdited, setComponentBeingEdited] = useState<Component | null>(null);
+  const [customTextContent, setCustomTextContent] = useState('');
+
+  useEffect(() => {
+    // Try to load any previously saved layouts from localStorage
+    try {
+      const savedLayoutsString = localStorage.getItem('savedLayouts');
+      if (savedLayoutsString) {
+        const parsedLayouts = JSON.parse(savedLayoutsString);
+        if (Array.isArray(parsedLayouts)) {
+          setSavedLayouts(parsedLayouts);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load saved layouts:", error);
+    }
+  }, []);
 
   const moveComponent = useCallback(
     (dragIndex: number, hoverIndex: number) => {
@@ -96,6 +114,8 @@ export const CustomizableLayout: React.FC = () => {
   };
 
   const handleNewComponentDrop = (templateId: string, type: string) => {
+    console.log(`New component drop: ${templateId} of type ${type}`);
+    
     const newId = uuidv4();
     let newComponent: Component;
     
@@ -113,16 +133,53 @@ export const CustomizableLayout: React.FC = () => {
           maxRows: 5,
         },
       };
+    } else if (type === 'text' || type === 'rich-text') {
+      newComponent = {
+        id: newId,
+        title: 'Bloco de Texto',
+        type: type,
+        content: {
+          text: 'Edite este texto para adicionar seu conteúdo personalizado.',
+        },
+      };
+    } else if (type === 'chart' || type.startsWith('chart-')) {
+      const chartType = type.replace('chart-', '');
+      newComponent = {
+        id: newId,
+        title: `Gráfico - ${chartType}`,
+        type: 'chart',
+        content: {
+          chartType: chartType || 'bar',
+          data: [
+            { name: 'Jan', value: 40 },
+            { name: 'Fev', value: 30 },
+            { name: 'Mar', value: 45 },
+            { name: 'Abr', value: 50 },
+            { name: 'Mai', value: 35 },
+          ],
+        },
+      };
+    } else if (type.startsWith('alert-')) {
+      const alertType = type.replace('alert-', '');
+      newComponent = {
+        id: newId,
+        title: `Alerta - ${alertType}`,
+        type: 'alert',
+        content: {
+          alertType: alertType,
+          message: `Este é um alerta do tipo ${alertType}. Você pode editar esta mensagem.`,
+        },
+      };
     } else {
       newComponent = {
         id: newId,
-        title: `Novo Componente (${type})`,
+        title: `Componente (${type})`,
         type,
         content: {},
       };
     }
     
-    setComponents([...components, newComponent]);
+    setComponents(prevComponents => [...prevComponents, newComponent]);
     toast.success(`Novo componente "${newComponent.title}" adicionado`);
   };
 
@@ -155,6 +212,31 @@ export const CustomizableLayout: React.FC = () => {
           maxRows: 5,
         },
       };
+    } else if (newComponentType === 'text') {
+      newComponent = {
+        id: newId,
+        title: newComponentTitle,
+        type: 'text',
+        content: {
+          text: 'Edite este texto para adicionar seu conteúdo personalizado.',
+        },
+      };
+    } else if (newComponentType === 'chart') {
+      newComponent = {
+        id: newId,
+        title: newComponentTitle,
+        type: 'chart',
+        content: {
+          chartType: 'bar',
+          data: [
+            { name: 'Jan', value: 40 },
+            { name: 'Fev', value: 30 },
+            { name: 'Mar', value: 45 },
+            { name: 'Abr', value: 50 },
+            { name: 'Mai', value: 35 },
+          ],
+        },
+      };
     } else {
       newComponent = {
         id: newId,
@@ -164,13 +246,22 @@ export const CustomizableLayout: React.FC = () => {
       };
     }
     
-    setComponents([...components, newComponent]);
+    setComponents(prevComponents => [...prevComponents, newComponent]);
     setShowComponentDialog(false);
     toast.success(`Novo componente "${newComponentTitle}" adicionado`);
   };
 
   const handleEditComponent = (id: string) => {
-    setEditComponentId(id);
+    const component = components.find(comp => comp.id === id);
+    if (component) {
+      setComponentBeingEdited(component);
+      
+      if (component.type === 'text' || component.type === 'rich-text') {
+        setCustomTextContent(component.content.text || '');
+      }
+      
+      setEditComponentId(id);
+    }
   };
 
   const handleUpdateComponent = (id: string, data: any) => {
@@ -187,6 +278,20 @@ export const CustomizableLayout: React.FC = () => {
           : comp
       )
     );
+    
+    // If we're currently editing this component, close the edit dialog
+    if (editComponentId === id) {
+      setEditComponentId(null);
+      setComponentBeingEdited(null);
+    }
+    
+    toast.success('Componente atualizado com sucesso');
+  };
+
+  const handleSaveTextComponent = () => {
+    if (editComponentId && componentBeingEdited) {
+      handleUpdateComponent(editComponentId, { text: customTextContent });
+    }
   };
 
   const handleDeleteComponent = (id: string) => {
@@ -199,7 +304,7 @@ export const CustomizableLayout: React.FC = () => {
     if (!componentToDuplicate) return;
     
     const newComponent = {
-      ...componentToDuplicate,
+      ...JSON.parse(JSON.stringify(componentToDuplicate)), // Deep clone
       id: uuidv4(),
       title: `${componentToDuplicate.title} (Cópia)`,
     };
@@ -217,19 +322,120 @@ export const CustomizableLayout: React.FC = () => {
     const newLayout: LayoutConfig = {
       id: uuidv4(),
       name: layoutName,
-      components: [...components],
+      components: JSON.parse(JSON.stringify(components)), // Deep clone
     };
     
-    setSavedLayouts([...savedLayouts, newLayout]);
+    const updatedLayouts = [...savedLayouts, newLayout];
+    setSavedLayouts(updatedLayouts);
+    
+    // Save to localStorage for persistence
+    try {
+      localStorage.setItem('savedLayouts', JSON.stringify(updatedLayouts));
+    } catch (error) {
+      console.error("Failed to save layouts to localStorage:", error);
+    }
+    
     setShowSaveDialog(false);
     setLayoutName('');
     toast.success(`Layout "${layoutName}" salvo com sucesso`);
   };
 
   const loadLayout = (layout: LayoutConfig) => {
-    setComponents(layout.components);
-    setShowLayoutsDialog(false);
-    toast.success(`Layout "${layout.name}" carregado com sucesso`);
+    // Confirm before loading if there are existing components
+    if (components.length > 0) {
+      if (window.confirm(`Carregar o layout "${layout.name}" substituirá o layout atual. Continuar?`)) {
+        setComponents(JSON.parse(JSON.stringify(layout.components))); // Deep clone
+        setShowLayoutsDialog(false);
+        toast.success(`Layout "${layout.name}" carregado com sucesso`);
+      }
+    } else {
+      setComponents(JSON.parse(JSON.stringify(layout.components))); // Deep clone
+      setShowLayoutsDialog(false);
+      toast.success(`Layout "${layout.name}" carregado com sucesso`);
+    }
+  };
+  
+  const deleteLayout = (layoutId: string) => {
+    const layoutToDelete = savedLayouts.find(layout => layout.id === layoutId);
+    if (!layoutToDelete) return;
+    
+    if (window.confirm(`Excluir o layout "${layoutToDelete.name}"? Esta ação não pode ser desfeita.`)) {
+      const updatedLayouts = savedLayouts.filter(layout => layout.id !== layoutId);
+      setSavedLayouts(updatedLayouts);
+      
+      // Update localStorage
+      try {
+        localStorage.setItem('savedLayouts', JSON.stringify(updatedLayouts));
+      } catch (error) {
+        console.error("Failed to update localStorage after deleting layout:", error);
+      }
+      
+      toast.success(`Layout "${layoutToDelete.name}" excluído`);
+    }
+  };
+
+  const renderComponentContent = (component: Component) => {
+    switch (component.type) {
+      case 'table':
+        return (
+          <EditableTable
+            title={component.title}
+            initialColumns={component.content.columns || []}
+            initialData={component.content.data || []}
+            maxRows={component.content.maxRows || 5}
+            onColumnsChange={(columns) =>
+              handleUpdateComponent(component.id, { columns })
+            }
+            onDataChange={(data) =>
+              handleUpdateComponent(component.id, { data })
+            }
+          />
+        );
+      case 'text':
+      case 'rich-text':
+        return (
+          <div className="p-4 bg-card rounded-md">
+            <p>{component.content.text || 'Texto não definido'}</p>
+          </div>
+        );
+      case 'chart':
+        return (
+          <div className="p-4 bg-muted/30 rounded-md text-center h-64 flex items-center justify-center">
+            <div className="text-center">
+              <div className="mb-2 text-lg font-medium">{component.title}</div>
+              <div className="text-muted-foreground">
+                Gráfico tipo: {component.content.chartType || 'barra'}
+              </div>
+              <div className="mt-4 text-sm">
+                (Esta é uma visualização do componente de gráfico. Implementação real exibirá dados.)
+              </div>
+            </div>
+          </div>
+        );
+      case 'alert':
+        const alertClass = component.content.alertType === 'info' 
+          ? 'bg-blue-100 text-blue-800 border-blue-200' 
+          : component.content.alertType === 'warning'
+          ? 'bg-yellow-100 text-yellow-800 border-yellow-200'
+          : component.content.alertType === 'success'
+          ? 'bg-green-100 text-green-800 border-green-200'
+          : 'bg-red-100 text-red-800 border-red-200';
+        
+        return (
+          <div className={`p-4 rounded-md border ${alertClass}`}>
+            {component.content.message || 'Mensagem de alerta'}
+          </div>
+        );
+      default:
+        return (
+          <div className="p-4 bg-muted/30 rounded-md text-center">
+            <p>Componente tipo: {component.type}</p>
+            <p className="text-sm text-muted-foreground">
+              (Esta é uma visualização do componente. Implementação real terá mais funcionalidades.)
+            </p>
+          </div>
+        );
+    }
   };
 
   return (
@@ -262,7 +468,20 @@ export const CustomizableLayout: React.FC = () => {
                 onDrop={handleDrop}
                 className="min-h-[500px] border border-dashed border-gray-300 rounded-md p-4"
               >
-                {components.length === 0 ? (
+                {components.map((component, index) => (
+                  <DraggableComponent
+                    key={component.id}
+                    id={component.id}
+                    index={index}
+                    title={component.title}
+                    onEdit={() => handleEditComponent(component.id)}
+                    onDelete={() => handleDeleteComponent(component.id)}
+                    onDuplicate={() => handleDuplicateComponent(component.id)}
+                  >
+                    {renderComponentContent(component)}
+                  </DraggableComponent>
+                ))}
+                {components.length === 0 && (
                   <div className="flex flex-col items-center justify-center h-40 text-muted-foreground">
                     <p>Arraste componentes aqui para começar</p>
                     <Button
@@ -274,41 +493,6 @@ export const CustomizableLayout: React.FC = () => {
                       Adicionar Componente
                     </Button>
                   </div>
-                ) : (
-                  components.map((component, index) => (
-                    <DraggableComponent
-                      key={component.id}
-                      id={component.id}
-                      index={index}
-                      title={component.title}
-                      onEdit={() => handleEditComponent(component.id)}
-                      onDelete={() => handleDeleteComponent(component.id)}
-                      onDuplicate={() => handleDuplicateComponent(component.id)}
-                    >
-                      {component.type === 'table' && (
-                        <EditableTable
-                          title={component.title}
-                          initialColumns={component.content.columns}
-                          initialData={component.content.data}
-                          maxRows={component.content.maxRows || 5}
-                          onColumnsChange={(columns) =>
-                            handleUpdateComponent(component.id, { columns })
-                          }
-                          onDataChange={(data) =>
-                            handleUpdateComponent(component.id, { data })
-                          }
-                        />
-                      )}
-                      {component.type !== 'table' && (
-                        <div className="p-4 bg-muted/30 rounded-md text-center">
-                          <p>Componente tipo: {component.type}</p>
-                          <p className="text-sm text-muted-foreground">
-                            (Conteúdo de demonstração para {component.type})
-                          </p>
-                        </div>
-                      )}
-                    </DraggableComponent>
-                  ))
                 )}
               </DroppableArea>
             </CardContent>
@@ -316,7 +500,7 @@ export const CustomizableLayout: React.FC = () => {
         </div>
 
         <div className="md:col-span-1">
-          <ComponentPalette />
+          <ComponentPalette onComponentDropped={handleNewComponentDrop} />
         </div>
       </div>
 
@@ -357,6 +541,12 @@ export const CustomizableLayout: React.FC = () => {
                 <option value="text">Texto</option>
                 <option value="card">Card</option>
                 <option value="list">Lista</option>
+                <option value="alert">Alerta</option>
+                <option value="metrics">Métricas</option>
+                <option value="users">Usuários</option>
+                <option value="timeline">Linha do Tempo</option>
+                <option value="kanban">Kanban</option>
+                <option value="calendar">Calendário</option>
               </select>
             </div>
           </div>
@@ -368,6 +558,36 @@ export const CustomizableLayout: React.FC = () => {
               Cancelar
             </Button>
             <Button onClick={createNewComponent}>Adicionar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Text Component Dialog */}
+      <Dialog 
+        open={editComponentId !== null && componentBeingEdited && (componentBeingEdited.type === 'text' || componentBeingEdited.type === 'rich-text')} 
+        onOpenChange={(open) => !open && setEditComponentId(null)}
+      >
+        <DialogContent className="sm:max-w-[625px]">
+          <DialogHeader>
+            <DialogTitle>Editar Texto</DialogTitle>
+            <DialogDescription>
+              Edite o conteúdo do texto para este componente.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <Textarea
+              value={customTextContent}
+              onChange={(e) => setCustomTextContent(e.target.value)}
+              rows={10}
+              className="w-full"
+              placeholder="Digite seu texto aqui..."
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditComponentId(null)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleSaveTextComponent}>Salvar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -422,13 +642,29 @@ export const CustomizableLayout: React.FC = () => {
                 {savedLayouts.map((layout) => (
                   <div
                     key={layout.id}
-                    className="flex justify-between items-center p-3 border rounded-md hover:bg-muted/30 cursor-pointer"
-                    onClick={() => loadLayout(layout)}
+                    className="flex justify-between items-center p-3 border rounded-md hover:bg-muted/30"
                   >
                     <span>{layout.name}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {layout.components.length} componentes
-                    </span>
+                    <div>
+                      <span className="text-xs text-muted-foreground mr-3">
+                        {layout.components.length} componentes
+                      </span>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="mr-2"
+                        onClick={() => loadLayout(layout)}
+                      >
+                        Carregar
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => deleteLayout(layout.id)}
+                      >
+                        <Trash className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
