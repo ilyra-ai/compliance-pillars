@@ -105,8 +105,8 @@ const PillarManagement = () => {
         </TabsList>
         
         <TabsContent value="overview">
-          {/* Fixed: Removed pillarSlug prop as it's not expected by the component */}
-          <PillarContent />
+          {/* Pass the pillarId prop to PillarContent */}
+          <PillarContent pillarId={pillarSlug} />
         </TabsContent>
         
         <TabsContent value="editor">

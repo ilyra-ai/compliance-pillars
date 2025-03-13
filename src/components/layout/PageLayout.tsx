@@ -51,55 +51,53 @@ const PageLayout: React.FC<PageLayoutProps> = ({
   };
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      <div className="min-h-screen bg-background font-imprima w-full">
-        <TooltipProvider>
-          <Navbar />
-          {isMobile ? (
-            <>
-              <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="fixed top-4 left-4 z-50 lg:hidden">
-                    <Palette />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="left" className="p-0" onCloseAutoFocus={() => setSidebarOpen(false)}>
-                  <div className="h-full overflow-y-auto">
-                    <Sidebar onItemClick={() => setSidebarOpen(false)} />
-                  </div>
-                </SheetContent>
-              </Sheet>
-              
-              <main className={`pb-16 pt-20 md:pt-24 px-4 md:px-8 transition-all duration-300 ease-in-out ${contentClassName}`}>
+    <div className="min-h-screen bg-background font-imprima w-full">
+      <TooltipProvider>
+        <Navbar />
+        {isMobile ? (
+          <>
+            <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="fixed top-4 left-4 z-50 lg:hidden">
+                  <Palette />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="p-0" onCloseAutoFocus={() => setSidebarOpen(false)}>
+                <div className="h-full overflow-y-auto">
+                  <Sidebar onItemClick={() => setSidebarOpen(false)} />
+                </div>
+              </SheetContent>
+            </Sheet>
+            
+            <main className={`pb-16 pt-20 md:pt-24 px-4 md:px-8 transition-all duration-300 ease-in-out ${contentClassName}`}>
+              {renderContent()}
+            </main>
+          </>
+        ) : (
+          <ResizablePanelGroup 
+            direction="horizontal" 
+            className="h-full min-h-screen"
+            onLayout={handlePanelResize}
+          >
+            <ResizablePanel 
+              defaultSize={20} 
+              minSize={15} 
+              maxSize={40} 
+              className="hidden md:block"
+            >
+              <Sidebar />
+            </ResizablePanel>
+            <ResizableHandle withHandle className="bg-border" />
+            <ResizablePanel defaultSize={80}>
+              <main className={`pb-16 pt-24 px-8 transition-all duration-300 ease-in-out ${contentClassName}`}>
                 {renderContent()}
               </main>
-            </>
-          ) : (
-            <ResizablePanelGroup 
-              direction="horizontal" 
-              className="h-full min-h-screen"
-              onLayout={handlePanelResize}
-            >
-              <ResizablePanel 
-                defaultSize={20} 
-                minSize={15} 
-                maxSize={40} 
-                className="hidden md:block"
-              >
-                <Sidebar />
-              </ResizablePanel>
-              <ResizableHandle withHandle className="bg-border" />
-              <ResizablePanel defaultSize={80}>
-                <main className={`pb-16 pt-24 px-8 transition-all duration-300 ease-in-out ${contentClassName}`}>
-                  {renderContent()}
-                </main>
-              </ResizablePanel>
-            </ResizablePanelGroup>
-          )}
-          {!hideFloatingThemeButton && <FloatingThemeButton onClick={() => {}} />}
-        </TooltipProvider>
-      </div>
-    </DndProvider>
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        )}
+        {!hideFloatingThemeButton && <FloatingThemeButton onClick={() => {}} />}
+      </TooltipProvider>
+    </div>
   );
 
   function renderContent() {
@@ -132,13 +130,15 @@ const PageLayout: React.FC<PageLayoutProps> = ({
         )}
         
         {customizable && editMode ? (
-          <PageCustomizer 
-            pagePath={currentPath}
-            editMode={editMode}
-            onEditModeChange={setEditMode}
-          >
-            {children}
-          </PageCustomizer>
+          <DndProvider backend={HTML5Backend}>
+            <PageCustomizer 
+              pagePath={currentPath}
+              editMode={editMode}
+              onEditModeChange={setEditMode}
+            >
+              {children}
+            </PageCustomizer>
+          </DndProvider>
         ) : (
           children
         )}
