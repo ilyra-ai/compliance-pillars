@@ -203,6 +203,31 @@ export const CustomizableLayout: React.FC = () => {
           ],
         },
       };
+    } else if (type === 'section') {
+      newComponent = {
+        id: newId,
+        title: 'Seção',
+        type: 'section',
+        content: {
+          title: 'Nova Seção',
+          description: 'Esta é uma nova seção para organizar seu conteúdo.',
+          children: []
+        },
+      };
+    } else if (type === 'grid') {
+      newComponent = {
+        id: newId,
+        title: 'Layout de Grade',
+        type: 'grid',
+        content: {
+          columns: 2,
+          gap: 4,
+          items: [
+            { id: 'grid-item-1', content: 'Item 1' },
+            { id: 'grid-item-2', content: 'Item 2' }
+          ]
+        },
+      };
     } else if (type === 'users') {
       newComponent = {
         id: newId,
@@ -473,6 +498,38 @@ export const CustomizableLayout: React.FC = () => {
         return (
           <div className="p-4 bg-card rounded-md">
             <p>{component.content.text || 'Texto não definido'}</p>
+          </div>
+        );
+      case 'section':
+        return (
+          <div className="p-4 bg-card rounded-md border-l-4 border-primary">
+            <h3 className="text-xl font-medium mb-2">{component.content.title || 'Nova Seção'}</h3>
+            <p className="text-muted-foreground text-sm mb-4">{component.content.description || 'Descrição da seção'}</p>
+            <div className="border border-dashed border-muted-foreground p-4 rounded-md bg-muted/5 min-h-[100px] flex items-center justify-center">
+              <p className="text-muted-foreground text-sm">Arraste componentes para dentro desta seção</p>
+            </div>
+          </div>
+        );
+      case 'grid':
+        return (
+          <div className="p-4 bg-card rounded-md">
+            <h3 className="text-lg font-medium mb-3">{component.title}</h3>
+            <div className={`grid grid-cols-${component.content.columns || 2} gap-${component.content.gap || 4}`}>
+              {component.content.items?.map((item: any, index: number) => (
+                <div key={item.id || index} className="border rounded-md p-3 bg-muted/10 min-h-[80px] flex items-center justify-center">
+                  <p className="text-muted-foreground">{item.content || `Item ${index+1}`}</p>
+                </div>
+              )) || (
+                <>
+                  <div className="border rounded-md p-3 bg-muted/10 min-h-[80px] flex items-center justify-center">
+                    <p className="text-muted-foreground">Coluna 1</p>
+                  </div>
+                  <div className="border rounded-md p-3 bg-muted/10 min-h-[80px] flex items-center justify-center">
+                    <p className="text-muted-foreground">Coluna 2</p>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         );
       case 'chart':

@@ -57,7 +57,7 @@ const MOCK_USERS = [
     password: 'gestor123',
     role: 'gestor',
     permissions: {
-      pillars: ['risk', 'compliance', 'performance'],
+      pillars: ['risk', 'compliance', 'performance', 'due-diligence'],
       features: ['charts', 'reports', 'documents'],
     },
   },
@@ -68,7 +68,7 @@ const MOCK_USERS = [
     password: 'analista123',
     role: 'analista',
     permissions: {
-      pillars: ['risk'],
+      pillars: ['risk', 'due-diligence'],
       features: ['view_charts', 'view_reports'],
     },
   },
@@ -80,37 +80,46 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     // Verificar se existe um usuário no localStorage
-    const storedUser = localStorage.getItem('user');
-    
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    try {
+      const storedUser = localStorage.getItem('user');
+      
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
+    } catch (error) {
+      console.error('Error loading user from localStorage:', error);
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   }, []);
 
   const login = (email: string, password: string) => {
-    // Simula uma chamada API para autenticação
-    const foundUser = MOCK_USERS.find(
-      (u) => u.email === email && u.password === password
-    );
+    try {
+      // Simula uma chamada API para autenticação
+      const foundUser = MOCK_USERS.find(
+        (u) => u.email === email && u.password === password
+      );
 
-    if (foundUser) {
-      const { password, ...userWithoutPassword } = foundUser;
-      
-      // Simula a geração de um token JWT
-      const mockToken = `mock_jwt_token_${Date.now()}`;
-      
-      // Salva no localStorage
-      localStorage.setItem('user', JSON.stringify(userWithoutPassword));
-      localStorage.setItem('token', mockToken);
-      
-      // Atualiza estado
-      setUser(userWithoutPassword);
-      
-      toast.success('Login realizado com sucesso!');
-    } else {
-      toast.error('Credenciais inválidas. Tente novamente.');
+      if (foundUser) {
+        const { password, ...userWithoutPassword } = foundUser;
+        
+        // Simula a geração de um token JWT
+        const mockToken = `mock_jwt_token_${Date.now()}`;
+        
+        // Salva no localStorage
+        localStorage.setItem('user', JSON.stringify(userWithoutPassword));
+        localStorage.setItem('token', mockToken);
+        
+        // Atualiza estado
+        setUser(userWithoutPassword);
+        
+        toast.success('Login realizado com sucesso!');
+      } else {
+        toast.error('Credenciais inválidas. Tente novamente.');
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      toast.error('Ocorreu um erro ao realizar o login.');
     }
   };
 
@@ -120,60 +129,75 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     
     toast.info('Iniciando autenticação com Google...');
     
-    // Simula um delay de resposta
-    setTimeout(() => {
-      const mockGoogleUser = {
-        id: 'google-123',
-        name: 'Usuário Google',
-        email: 'usuario@gmail.com',
-        role: 'analista',
-        permissions: {
-          pillars: ['risk'],
-          features: ['view_charts', 'view_reports'],
-        },
-      };
-      
-      // Simula a geração de um token JWT
-      const mockToken = `google_oauth_token_${Date.now()}`;
-      
-      // Salva no localStorage
-      localStorage.setItem('user', JSON.stringify(mockGoogleUser));
-      localStorage.setItem('token', mockToken);
-      
-      // Atualiza estado
-      setUser(mockGoogleUser);
-      
-      toast.success('Login com Google realizado com sucesso!');
-    }, 1500);
+    try {
+      // Simula um delay de resposta
+      setTimeout(() => {
+        const mockGoogleUser = {
+          id: 'google-123',
+          name: 'Usuário Google',
+          email: 'usuario@gmail.com',
+          role: 'analista',
+          permissions: {
+            pillars: ['risk', 'due-diligence'],
+            features: ['view_charts', 'view_reports'],
+          },
+        };
+        
+        // Simula a geração de um token JWT
+        const mockToken = `google_oauth_token_${Date.now()}`;
+        
+        // Salva no localStorage
+        localStorage.setItem('user', JSON.stringify(mockGoogleUser));
+        localStorage.setItem('token', mockToken);
+        
+        // Atualiza estado
+        setUser(mockGoogleUser);
+        
+        toast.success('Login com Google realizado com sucesso!');
+      }, 1500);
+    } catch (error) {
+      console.error('Error during Google login:', error);
+      toast.error('Ocorreu um erro ao realizar o login com Google.');
+    }
   };
 
   const updateUserPermissions = (userId: string, pillars: string[], features: string[]) => {
     if (!user) return;
     
-    const updatedUser = {
-      ...user,
-      permissions: {
-        pillars,
-        features,
-      }
-    };
-    
-    // Atualiza no localStorage e no estado
-    localStorage.setItem('user', JSON.stringify(updatedUser));
-    setUser(updatedUser);
-    
-    toast.success('Permissões do usuário atualizadas com sucesso!');
+    try {
+      const updatedUser = {
+        ...user,
+        permissions: {
+          pillars,
+          features,
+        }
+      };
+      
+      // Atualiza no localStorage e no estado
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+      
+      toast.success('Permissões do usuário atualizadas com sucesso!');
+    } catch (error) {
+      console.error('Error updating user permissions:', error);
+      toast.error('Ocorreu um erro ao atualizar as permissões do usuário.');
+    }
   };
 
   const logout = () => {
-    // Remove do localStorage
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    
-    // Limpa estado
-    setUser(null);
-    
-    toast.info('Sessão encerrada');
+    try {
+      // Remove do localStorage
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      
+      // Limpa estado
+      setUser(null);
+      
+      toast.info('Sessão encerrada');
+    } catch (error) {
+      console.error('Error during logout:', error);
+      toast.error('Ocorreu um erro ao encerrar a sessão.');
+    }
   };
 
   return (

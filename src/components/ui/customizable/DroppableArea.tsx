@@ -48,7 +48,21 @@ export const DroppableArea: React.FC<DroppableAreaProps> = ({
         console.log('Dropping new component from palette:', item.templateId, item.type);
         onDrop(item.templateId, item.type);
         setHasDropped(true);
-        toast.success(`Componente ${item.type} adicionado com sucesso`);
+        
+        // Adjust toast message based on component type
+        let componentName = item.type;
+        switch (item.type) {
+          case 'section':
+            componentName = 'Seção';
+            break;
+          case 'grid':
+            componentName = 'Layout de Grade';
+            break;
+          default:
+            componentName = item.type.charAt(0).toUpperCase() + item.type.slice(1);
+        }
+        
+        toast.success(`Componente ${componentName} adicionado com sucesso`);
         return { 
           name: 'DroppableArea', 
           isNewComponent: true, 

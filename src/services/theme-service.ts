@@ -91,12 +91,17 @@ class ThemeService {
   public saveTheme(config: ThemeConfig): void {
     console.log('Saving theme:', config);
     this.themeConfig = config;
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(config));
-    this.applyTheme(config);
-    
-    // Dispatch an event that the theme has changed
-    const themeChangedEvent = new CustomEvent('theme-changed', { detail: config });
-    window.dispatchEvent(themeChangedEvent);
+    try {
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(config));
+      this.applyTheme(config);
+      
+      // Dispatch an event that the theme has changed
+      const themeChangedEvent = new CustomEvent('theme-changed', { detail: config });
+      window.dispatchEvent(themeChangedEvent);
+    } catch (error) {
+      console.error('Error saving theme to localStorage:', error);
+      toast.error('Não foi possível salvar o tema. Verifique o espaço disponível no seu navegador.');
+    }
   }
 
   public resetTheme(): void {
@@ -105,70 +110,79 @@ class ThemeService {
   }
 
   private applyTheme(config: ThemeConfig): void {
-    // Apply colors as CSS variables
-    document.documentElement.style.setProperty('--color-primary', config.colors.primary);
-    document.documentElement.style.setProperty('--color-secondary', config.colors.secondary);
-    document.documentElement.style.setProperty('--color-accent', config.colors.accent);
-    document.documentElement.style.setProperty('--color-background', config.colors.background);
-    document.documentElement.style.setProperty('--color-text', config.colors.text);
-    
-    // Update Tailwind CSS HSL variables
-    const hslPrimary = this.hexToHSL(config.colors.primary);
-    const hslSecondary = this.hexToHSL(config.colors.secondary);
-    const hslAccent = this.hexToHSL(config.colors.accent);
-    
-    document.documentElement.style.setProperty('--primary', hslPrimary);
-    document.documentElement.style.setProperty('--secondary', hslSecondary);
-    document.documentElement.style.setProperty('--accent', hslAccent);
-    
-    // Apply the font
-    if (config.fonts.family) {
-      document.documentElement.style.setProperty('--font-family', `'${config.fonts.family}', sans-serif`);
-      document.body.style.fontFamily = `'${config.fonts.family}', sans-serif`;
-    }
+    try {
+      // Apply colors as CSS variables
+      document.documentElement.style.setProperty('--color-primary', config.colors.primary);
+      document.documentElement.style.setProperty('--color-secondary', config.colors.secondary);
+      document.documentElement.style.setProperty('--color-accent', config.colors.accent);
+      document.documentElement.style.setProperty('--color-background', config.colors.background);
+      document.documentElement.style.setProperty('--color-text', config.colors.text);
+      
+      // Update Tailwind CSS HSL variables
+      const hslPrimary = this.hexToHSL(config.colors.primary);
+      const hslSecondary = this.hexToHSL(config.colors.secondary);
+      const hslAccent = this.hexToHSL(config.colors.accent);
+      
+      document.documentElement.style.setProperty('--primary', hslPrimary);
+      document.documentElement.style.setProperty('--secondary', hslSecondary);
+      document.documentElement.style.setProperty('--accent', hslAccent);
+      
+      // Apply the font
+      if (config.fonts.family) {
+        document.documentElement.style.setProperty('--font-family', `'${config.fonts.family}', sans-serif`);
+        document.body.style.fontFamily = `'${config.fonts.family}', sans-serif`;
+      }
 
-    // Dispatch a custom event so other components know the theme has changed
-    window.dispatchEvent(new CustomEvent('themechange', { detail: config }));
-    
-    console.log('Theme applied with colors:', {
-      primary: hslPrimary,
-      secondary: hslSecondary,
-      accent: hslAccent,
-      font: config.fonts.family
-    });
+      // Dispatch a custom event so other components know the theme has changed
+      window.dispatchEvent(new CustomEvent('themechange', { detail: config }));
+      
+      console.log('Theme applied with colors:', {
+        primary: hslPrimary,
+        secondary: hslSecondary,
+        accent: hslAccent,
+        font: config.fonts.family
+      });
+    } catch (error) {
+      console.error('Error applying theme:', error);
+    }
   }
 
   private hexToHSL(hex: string): string {
-    // Remove the # if it exists
-    hex = hex.replace(/^#/, '');
-    
-    // Convert hex to rgb
-    let r = parseInt(hex.slice(0, 2), 16) / 255;
-    let g = parseInt(hex.slice(2, 4), 16) / 255;
-    let b = parseInt(hex.slice(4, 6), 16) / 255;
-    
-    // Find the maximum and minimum values to calculate the luminance
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    let h = 0, s = 0, l = (max + min) / 2;
-
-    if (max !== min) {
-      const d = max - min;
-      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    try {
+      // Remove the # if it exists
+      hex = hex.replace(/^#/, '');
       
-      switch (max) {
-        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-        case g: h = (b - r) / d + 2; break;
-        case b: h = (r - g) / d + 4; break;
+      // Convert hex to rgb
+      let r = parseInt(hex.slice(0, 2), 16) / 255;
+      let g = parseInt(hex.slice(2, 4), 16) / 255;
+      let b = parseInt(hex.slice(4, 6), 16) / 255;
+      
+      // Find the maximum and minimum values to calculate the luminance
+      const max = Math.max(r, g, b);
+      const min = Math.min(r, g, b);
+      let h = 0, s = 0, l = (max + min) / 2;
+
+      if (max !== min) {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        
+        switch (max) {
+          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: h = (b - r) / d + 2; break;
+          case b: h = (r - g) / d + 4; break;
+        }
+        
+        h = Math.round(h * 60);
       }
       
-      h = Math.round(h * 60);
+      s = Math.round(s * 100);
+      l = Math.round(l * 100);
+      
+      return `${h} ${s}% ${l}%`;
+    } catch (error) {
+      console.error('Error converting hex to HSL:', error, hex);
+      return '0 0% 0%'; // Fallback to black
     }
-    
-    s = Math.round(s * 100);
-    l = Math.round(l * 100);
-    
-    return `${h} ${s}% ${l}%`;
   }
 
   // Apply theme temporarily without saving to localStorage
