@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Bot, SendHorizontal, Paperclip, Smile, Download, Copy, Save, Edit, Play, Sparkles, FileText, FileSpreadsheet, FilePresentation } from 'lucide-react';
+import { Bot, SendHorizontal, Paperclip, Smile, Download, Copy, Save, Edit, Play, Sparkles, FileText, FileSpreadsheet, Presentation } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Message {
@@ -64,7 +63,6 @@ const AIDocumentAssistant: React.FC<AIDocumentAssistantProps> = ({
     setInputMessage('');
     setIsProcessing(true);
 
-    // Simulação de resposta do assistente (em um app real, seria uma chamada de API para um serviço de AI)
     setTimeout(() => {
       const responseMessages = [
         "Entendi! Posso ajudar você a melhorar esse texto.",
@@ -86,7 +84,6 @@ const AIDocumentAssistant: React.FC<AIDocumentAssistantProps> = ({
       setMessages(prev => [...prev, newAssistantMessage]);
       setIsProcessing(false);
 
-      // Simulação de conteúdo aprimorado
       if (documentContent) {
         const improvedContent = documentContent + "\n\n[Conteúdo aprimorado pelo assistente AI - Esta seria uma versão real melhorada do seu texto em um ambiente de produção]";
         setEnhancedContent(improvedContent);
@@ -111,7 +108,7 @@ const AIDocumentAssistant: React.FC<AIDocumentAssistantProps> = ({
         return <FileSpreadsheet className="h-5 w-5" />;
       case 'powerpoint':
       case 'gslides':
-        return <FilePresentation className="h-5 w-5" />;
+        return <Presentation className="h-5 w-5" />;
       default:
         return <FileText className="h-5 w-5" />;
     }
@@ -372,7 +369,6 @@ const AIDocumentAssistant: React.FC<AIDocumentAssistantProps> = ({
   );
 };
 
-// Label component for internal use
 const Label: React.FC<React.LabelHTMLAttributes<HTMLLabelElement>> = ({ children, ...props }) => {
   return (
     <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" {...props}>

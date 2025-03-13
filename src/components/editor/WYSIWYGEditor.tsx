@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,11 +33,30 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-const WYSIWYGEditor: React.FC = () => {
+interface WYSIWYGEditorProps {
+  initialContent?: string;
+  onChange?: (content: string) => void;
+}
+
+const WYSIWYGEditor: React.FC<WYSIWYGEditorProps> = ({ 
+  initialContent = '', 
+  onChange = () => {} 
+}) => {
   const [activeTab, setActiveTab] = useState('editor');
   const [documentTitle, setDocumentTitle] = useState('Documento sem título');
   const [isLoading, setIsLoading] = useState(false);
   const [aiPrompt, setAiPrompt] = useState('');
+  const [content, setContent] = useState(initialContent);
+
+  useEffect(() => {
+    setContent(initialContent);
+  }, [initialContent]);
+
+  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newContent = e.target.value;
+    setContent(newContent);
+    onChange(newContent);
+  };
 
   const handleSaveDocument = () => {
     setIsLoading(true);
@@ -60,6 +79,9 @@ const WYSIWYGEditor: React.FC = () => {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
+      const enhancedContent = content + "\n\n[Conteúdo aprimorado pela IA: " + aiPrompt + "]";
+      setContent(enhancedContent);
+      onChange(enhancedContent);
       toast.success('Conteúdo gerado pela IA aplicado ao documento!');
       setAiPrompt('');
     }, 1500);
@@ -182,7 +204,12 @@ const WYSIWYGEditor: React.FC = () => {
                 </div>
               </div>
               <div className="min-h-[500px] rounded-b-md p-4">
-                <p className="text-muted-foreground">Digite aqui seu conteúdo ou utilize o assistente de IA para criar um documento...</p>
+                <textarea
+                  value={content}
+                  onChange={handleContentChange}
+                  className="w-full h-full min-h-[480px] bg-transparent border-none focus:outline-none resize-none"
+                  placeholder="Digite aqui seu conteúdo ou utilize o assistente de IA para criar um documento..."
+                />
               </div>
             </div>
           </CardContent>

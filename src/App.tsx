@@ -16,6 +16,8 @@ import DocumentEditor from "./pages/DocumentEditor";
 import ReportBuilder from "./pages/ReportBuilder";
 import Settings from "./pages/Settings";
 import ChartManagement from "./pages/ChartManagement";
+import DatabaseManager from "./pages/DatabaseManager";
+import DockerConfigurator from "./pages/DockerConfigurator";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -85,6 +87,19 @@ const App = () => (
             <Route path="/charts" element={
               <ProtectedRoute>
                 <ChartManagement />
+              </ProtectedRoute>
+            } />
+
+            {/* Novas rotas para banco de dados e configurações Docker */}
+            <Route path="/database" element={
+              <ProtectedRoute requiredRoles={['admin']}>
+                <DatabaseManager />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/docker" element={
+              <ProtectedRoute requiredRoles={['admin']}>
+                <DockerConfigurator />
               </ProtectedRoute>
             } />
 
