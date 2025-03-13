@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -58,6 +57,19 @@ const App = () => (
               </ProtectedRoute>
             } />
             
+            {/* Novas rotas */}
+            <Route path="/reports/builder" element={
+              <ProtectedRoute>
+                <Index />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/documents/editor" element={
+              <ProtectedRoute>
+                <Index />
+              </ProtectedRoute>
+            } />
+
             {/* Rota de fallback */}
             <Route path="*" element={<NotFound />} />
           </Routes>
