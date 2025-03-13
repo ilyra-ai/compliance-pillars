@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
@@ -19,6 +18,9 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import WYSIWYGEditor from '@/components/editor/WYSIWYGEditor';
 import ReportBuilder from '@/components/reports/ReportBuilder';
+import DocumentVersionControl from '@/components/documents/DocumentVersionControl';
+import FileManager from '@/components/files/FileManager';
+import CustomChartBuilder from '@/components/charts/CustomChartBuilder';
 import { toast } from 'sonner';
 
 const pillarNames: Record<string, string> = {
@@ -58,6 +60,8 @@ const PillarContent: React.FC<PillarContentProps> = ({ children }) => {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState('overview');
   const [showNewItemForm, setShowNewItemForm] = useState(false);
+  const [customCharts, setCustomCharts] = useState<any[]>([]);
+  const [showChartBuilder, setShowChartBuilder] = useState(false);
   const [newItem, setNewItem] = useState({
     title: '',
     description: '',
@@ -83,6 +87,16 @@ const PillarContent: React.FC<PillarContentProps> = ({ children }) => {
   
   const handleCancelItem = () => {
     setShowNewItemForm(false);
+  };
+  
+  const handleAddChart = () => {
+    setShowChartBuilder(true);
+  };
+  
+  const handleSaveChart = (chartConfig: any) => {
+    setCustomCharts([...customCharts, chartConfig]);
+    setShowChartBuilder(false);
+    toast.success('Gráfico adicionado com sucesso!');
   };
   
   return (
@@ -169,6 +183,8 @@ const PillarContent: React.FC<PillarContentProps> = ({ children }) => {
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
           <TabsTrigger value="documents">Documentos</TabsTrigger>
           <TabsTrigger value="tasks">Tarefas</TabsTrigger>
+          <TabsTrigger value="files">Arquivos</TabsTrigger>
+          <TabsTrigger value="charts">Gráficos</TabsTrigger>
           <TabsTrigger value="reports">Relatórios</TabsTrigger>
           <TabsTrigger value="editor">Editor</TabsTrigger>
         </TabsList>
@@ -278,53 +294,57 @@ const PillarContent: React.FC<PillarContentProps> = ({ children }) => {
         </TabsContent>
         
         <TabsContent value="documents">
-          <Card>
-            <CardHeader>
-              <CardTitle>Documentos do Pilar</CardTitle>
-              <CardDescription>Políticas, procedimentos e evidências relacionadas</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="mb-4">Lista de documentos relacionados a este pilar:</p>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between p-3 border rounded-md hover:bg-muted">
-                  <div className="flex items-center">
-                    <FileText size={20} className="mr-2 text-blue-500" />
-                    <span>Política de Compliance v2.1.docx</span>
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Documentos do Pilar</CardTitle>
+                <CardDescription>Políticas, procedimentos e evidências relacionadas</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="mb-4">Lista de documentos relacionados a este pilar:</p>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-3 border rounded-md hover:bg-muted">
+                    <div className="flex items-center">
+                      <FileText size={20} className="mr-2 text-blue-500" />
+                      <span>Política de Compliance v2.1.docx</span>
+                    </div>
+                    <div className="flex space-x-2">
+                      <Button variant="outline" size="sm">Visualizar</Button>
+                      <Button variant="outline" size="sm">Editar</Button>
+                    </div>
                   </div>
-                  <div className="flex space-x-2">
-                    <Button variant="outline" size="sm">Visualizar</Button>
-                    <Button variant="outline" size="sm">Editar</Button>
+                  <div className="flex items-center justify-between p-3 border rounded-md hover:bg-muted">
+                    <div className="flex items-center">
+                      <FileText size={20} className="mr-2 text-blue-500" />
+                      <span>Procedimento Operacional PO-001.docx</span>
+                    </div>
+                    <div className="flex space-x-2">
+                      <Button variant="outline" size="sm">Visualizar</Button>
+                      <Button variant="outline" size="sm">Editar</Button>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between p-3 border rounded-md hover:bg-muted">
+                    <div className="flex items-center">
+                      <FileText size={20} className="mr-2 text-green-500" />
+                      <span>Relatório de Atividades Q1 2023.xlsx</span>
+                    </div>
+                    <div className="flex space-x-2">
+                      <Button variant="outline" size="sm">Visualizar</Button>
+                      <Button variant="outline" size="sm">Editar</Button>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center justify-between p-3 border rounded-md hover:bg-muted">
-                  <div className="flex items-center">
-                    <FileText size={20} className="mr-2 text-blue-500" />
-                    <span>Procedimento Operacional PO-001.docx</span>
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button variant="outline" size="sm">Visualizar</Button>
-                    <Button variant="outline" size="sm">Editar</Button>
-                  </div>
+                <div className="mt-4">
+                  <Button variant="outline">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Adicionar Documento
+                  </Button>
                 </div>
-                <div className="flex items-center justify-between p-3 border rounded-md hover:bg-muted">
-                  <div className="flex items-center">
-                    <FileText size={20} className="mr-2 text-green-500" />
-                    <span>Relatório de Atividades Q1 2023.xlsx</span>
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button variant="outline" size="sm">Visualizar</Button>
-                    <Button variant="outline" size="sm">Editar</Button>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-4">
-                <Button variant="outline">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Adicionar Documento
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+            
+            <DocumentVersionControl pillarId={pillarId} />
+          </div>
         </TabsContent>
         
         <TabsContent value="tasks">
@@ -384,6 +404,61 @@ const PillarContent: React.FC<PillarContentProps> = ({ children }) => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+        
+        <TabsContent value="files">
+          <FileManager pillarId={pillarId} />
+        </TabsContent>
+        
+        <TabsContent value="charts">
+          <div className="space-y-6">
+            {showChartBuilder ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Criar Novo Gráfico</CardTitle>
+                  <CardDescription>Configure seu gráfico personalizado</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <CustomChartBuilder onSave={handleSaveChart} />
+                  
+                  <div className="mt-4 flex justify-end">
+                    <Button variant="outline" onClick={() => setShowChartBuilder(false)} className="mr-2">
+                      Cancelar
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="flex justify-end mb-4">
+                <Button onClick={handleAddChart}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Adicionar Gráfico
+                </Button>
+              </div>
+            )}
+            
+            {customCharts.length > 0 ? (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {customCharts.map((chart) => (
+                  <CustomChartBuilder key={chart.id} initialChart={chart} readOnly />
+                ))}
+              </div>
+            ) : (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <BarChart className="h-16 w-16 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-medium mb-2">Nenhum gráfico criado</h3>
+                  <p className="text-muted-foreground text-center max-w-md mb-6">
+                    Adicione gráficos personalizados para visualizar dados importantes relacionados a este pilar.
+                  </p>
+                  <Button onClick={handleAddChart}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Adicionar Gráfico
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </TabsContent>
         
         <TabsContent value="reports">

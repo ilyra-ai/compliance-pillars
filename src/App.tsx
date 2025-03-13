@@ -23,6 +23,7 @@ import { UIThemeConfigurator } from "./pages/UIThemeConfigurator";
 import FloatingThemeButton from "./components/ui/FloatingThemeButton";
 import { useThemeDialog } from "./hooks/use-theme-dialog";
 import ThemeConfiguratorDialog from "./components/settings/ThemeConfiguratorDialog";
+import PowerBIDashboardPage from "./pages/PowerBIDashboard";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -144,6 +145,13 @@ const App = () => {
               <Route path="/charts" element={
                 <ProtectedRoute>
                   <ChartManagement />
+                </ProtectedRoute>
+              } />
+
+              {/* Nova rota para o dashboard estilo Power BI */}
+              <Route path="/dashboard/power-bi" element={
+                <ProtectedRoute>
+                  <PowerBIDashboardPage />
                 </ProtectedRoute>
               } />
 

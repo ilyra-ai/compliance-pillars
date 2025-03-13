@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -26,6 +25,8 @@ import {
   Menu,
   ChevronLeft,
   ChevronRight,
+  Box,
+  LayoutDashboard,
 } from 'lucide-react';
 
 interface PillarLink {
@@ -117,6 +118,12 @@ const toolsItems = [
     href: '/charts',
     description: 'Gestão de Gráficos',
   },
+  {
+    name: 'Dashboard Power BI',
+    icon: <LayoutDashboard size={18} />,
+    href: '/dashboard/power-bi',
+    description: 'Dashboard estilo Power BI',
+  },
 ];
 
 const settingsItems = [
@@ -152,7 +159,7 @@ const settingsItems = [
   },
   {
     name: 'Configuração Docker',
-    icon: <ContainerIcon size={18} />,
+    icon: <Box size={18} />,
     href: '/docker',
     description: 'Configuração de contêineres',
   },
@@ -190,7 +197,6 @@ const Sidebar: React.FC = () => {
 
   return (
     <>
-      {/* Mobile overlay */}
       {mobileOpen && (
         <div 
           className="fixed inset-0 bg-black/50 z-20 md:hidden"
@@ -198,7 +204,6 @@ const Sidebar: React.FC = () => {
         />
       )}
       
-      {/* Mobile menu button */}
       <button 
         className="fixed top-20 left-4 z-30 md:hidden bg-background rounded-full p-2 shadow-md border border-border"
         onClick={toggleMobileSidebar}
@@ -267,7 +272,6 @@ const Sidebar: React.FC = () => {
               {!collapsed && <span>Adicionar Pilar</span>}
             </Link>
 
-            {/* Mostrando todos os pilares com barra de rolagem */}
             <div className="max-h-[40vh] overflow-y-auto pr-1 scrollbar-thin">
               {pillars.map((pillar) => (
                 <Link

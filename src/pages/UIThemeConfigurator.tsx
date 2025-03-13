@@ -3,7 +3,7 @@ import React from 'react';
 import ThemeConfigurator from '@/components/settings/ThemeConfigurator';
 import PageLayout from '@/components/layout/PageLayout';
 import { useThemeDialog } from '@/hooks/use-theme-dialog';
-import { ThemeConfiguratorDialog } from '@/components/settings/ThemeConfiguratorDialog';
+import ThemeConfiguratorDialog from '@/components/settings/ThemeConfiguratorDialog'; // Fixed import
 import { Button } from '@/components/ui/button';
 import { 
   ChevronLeft,
@@ -13,7 +13,6 @@ import {
   Copy,
   Eye,
   Settings,
-  // Removendo o ícone Template que não existe no lucide-react
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
