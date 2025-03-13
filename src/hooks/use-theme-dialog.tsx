@@ -1,19 +1,20 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
 import { themeService, ThemeConfig } from '@/services/theme-service';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export const useThemeDialog = () => {
   const [themeDialogOpen, setThemeDialogOpen] = useState(false);
+  const location = useLocation();
   
-  // Initialize navigate, but handle the case when we're outside Router context
+  // Initialize navigate with try/catch to handle case when outside Router context
   let navigate;
   try {
     navigate = useNavigate();
   } catch (error) {
-    // If useNavigate throws an error, provide a fallback function
     console.warn('Navigator not available in this context, using fallback');
+    // If useNavigate throws an error, provide a fallback function
     navigate = (path: string) => {
       console.warn('Navigation attempted outside Router context to:', path);
       // Use a more compatible approach for navigation
@@ -23,14 +24,28 @@ export const useThemeDialog = () => {
     };
   }
   
+  // Close dialog when changing routes
+  useEffect(() => {
+    setThemeDialogOpen(false);
+  }, [location.pathname]);
+  
   const handleOpenUITheme = useCallback(() => {
-    setThemeDialogOpen(true);
-    console.log('Opening theme dialog');
+    try {
+      setThemeDialogOpen(true);
+      console.log('Opening theme dialog');
+    } catch (error) {
+      console.error('Error opening theme dialog:', error);
+      toast.error('Erro ao abrir o personalizador de UI');
+    }
   }, []);
   
   const handleCloseUITheme = useCallback(() => {
-    setThemeDialogOpen(false);
-    console.log('Closing theme dialog');
+    try {
+      setThemeDialogOpen(false);
+      console.log('Closing theme dialog');
+    } catch (error) {
+      console.error('Error closing theme dialog:', error);
+    }
   }, []);
   
   const handleSaveTheme = useCallback((config: ThemeConfig) => {

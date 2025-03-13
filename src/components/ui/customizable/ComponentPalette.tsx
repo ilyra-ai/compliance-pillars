@@ -118,14 +118,14 @@ const DraggableComponentItem: React.FC<DraggableComponentItemProps> = ({
   const [{ isDragging }, drag] = useDrag({
     type: 'NEW_COMPONENT',
     item: () => {
-      onDragStart?.();
+      if (onDragStart) onDragStart();
       return { templateId: id, type };
     },
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
     end: (item, monitor) => {
-      onDragEnd?.();
+      if (onDragEnd) onDragEnd();
       const didDrop = monitor.didDrop();
       if (!didDrop) {
         console.log('Component was not dropped in a valid drop target');
@@ -140,6 +140,8 @@ const DraggableComponentItem: React.FC<DraggableComponentItemProps> = ({
         isDragging ? 'opacity-50 bg-primary/5' : 'hover:bg-secondary/10'
       }`}
       style={{ touchAction: 'none' }}
+      data-component-type={type}
+      data-component-id={id}
     >
       <div className="mr-2 text-muted-foreground">{icon}</div>
       <span className="text-sm">{name}</span>

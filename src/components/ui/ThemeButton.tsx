@@ -2,9 +2,10 @@
 import React from 'react';
 import { Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useThemeDialog } from '@/hooks/use-theme-dialog';
 
 interface ThemeButtonProps {
-  onClick: () => void;
+  onClick?: () => void;
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
   size?: "default" | "sm" | "lg" | "icon";
   className?: string;
@@ -16,9 +17,19 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({
   size = "sm",
   className = "" 
 }) => {
+  const { handleOpenUITheme } = useThemeDialog();
+  
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    } else {
+      handleOpenUITheme();
+    }
+  };
+  
   return (
     <Button 
-      onClick={onClick} 
+      onClick={handleClick} 
       variant={variant} 
       size={size}
       className={`relative overflow-hidden group ${className}`}

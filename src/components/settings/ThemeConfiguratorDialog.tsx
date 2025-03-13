@@ -26,9 +26,14 @@ const ThemeConfiguratorDialog: React.FC<ThemeConfiguratorDialogProps> = ({
   // Update the current theme when the dialog opens
   useEffect(() => {
     if (open) {
-      const theme = themeService.getTheme();
-      setCurrentTheme(theme);
-      setIsChanged(false);
+      try {
+        const theme = themeService.getTheme();
+        setCurrentTheme(theme);
+        setIsChanged(false);
+      } catch (error) {
+        console.error('Error loading theme:', error);
+        toast.error('Erro ao carregar o tema atual');
+      }
     }
   }, [open]);
   
@@ -79,7 +84,11 @@ const ThemeConfiguratorDialog: React.FC<ThemeConfiguratorDialogProps> = ({
           initialValues={currentTheme}
         />
         <DialogFooter className="mt-4 flex justify-between">
-          <Button variant="default" onClick={() => handleSave(currentTheme)} disabled={!isChanged}>
+          <Button 
+            variant="default" 
+            onClick={() => handleSave(currentTheme)} 
+            disabled={!isChanged}
+          >
             <Save className="mr-2 h-4 w-4" />
             Salvar Alterações
           </Button>

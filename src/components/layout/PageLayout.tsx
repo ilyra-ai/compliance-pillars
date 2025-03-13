@@ -12,6 +12,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { PageCustomizer } from '@/components/ui/customizable/PageCustomizer';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { useThemeDialog } from '@/hooks/use-theme-dialog';
 
 interface PageLayoutProps {
   children: React.ReactNode;
@@ -37,6 +38,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
   const [sidebarWidth, setSidebarWidth] = useState(20);
   const [editMode, setEditMode] = useState(false);
   const [currentPath, setCurrentPath] = useState('');
+  const { handleOpenUITheme } = useThemeDialog();
 
   useEffect(() => {
     setCurrentPath(window.location.pathname);
@@ -46,9 +48,13 @@ const PageLayout: React.FC<PageLayoutProps> = ({
     setSidebarWidth(sizes[0]);
   };
 
-  const toggleEditMode = () => {
+  const toggleEditMode = useCallback(() => {
     setEditMode(prev => !prev);
-  };
+  }, []);
+  
+  const handleThemeButtonClick = useCallback(() => {
+    handleOpenUITheme();
+  }, [handleOpenUITheme]);
 
   return (
     <div className="min-h-screen bg-background font-imprima w-full">
@@ -95,7 +101,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
             </ResizablePanel>
           </ResizablePanelGroup>
         )}
-        {!hideFloatingThemeButton && <FloatingThemeButton onClick={() => {}} />}
+        {!hideFloatingThemeButton && <FloatingThemeButton onClick={handleThemeButtonClick} />}
       </TooltipProvider>
     </div>
   );
