@@ -68,6 +68,7 @@ const ChartConfigurator: React.FC<ChartConfiguratorProps> = ({ pillarId, onSave 
   const [chartDescription, setChartDescription] = useState('Descrição do gráfico');
   const [dataSource, setDataSource] = useState('static');
   const [showTable, setShowTable] = useState(false);
+  const [dataType, setDataType] = useState('real'); // 'real' ou 'statistic'
   
   const handleSaveChart = () => {
     const chartConfig = {
@@ -75,6 +76,7 @@ const ChartConfigurator: React.FC<ChartConfiguratorProps> = ({ pillarId, onSave 
       title: chartTitle,
       description: chartDescription,
       dataSource,
+      dataType,
       pillarId
     };
     
@@ -175,6 +177,19 @@ const ChartConfigurator: React.FC<ChartConfiguratorProps> = ({ pillarId, onSave 
                     <SelectItem value="treinamentos">Treinamentos</SelectItem>
                     <SelectItem value="auditorias">Auditorias</SelectItem>
                     <SelectItem value="api">API Externa</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="data-type">Tipo de Dados</Label>
+                <Select defaultValue={dataType} onValueChange={setDataType}>
+                  <SelectTrigger id="data-type">
+                    <SelectValue placeholder="Selecione o tipo de dados" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="real">Dados Reais</SelectItem>
+                    <SelectItem value="statistic">Dados Estatísticos</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
