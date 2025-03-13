@@ -9,6 +9,8 @@ interface DroppableAreaProps {
   children: React.ReactNode;
   className?: string;
   allowAnywhereDropping?: boolean;
+  showPlaceholder?: boolean;
+  placeholderText?: string;
 }
 
 export const DroppableArea: React.FC<DroppableAreaProps> = ({
@@ -16,6 +18,8 @@ export const DroppableArea: React.FC<DroppableAreaProps> = ({
   children,
   className = '',
   allowAnywhereDropping = true,
+  showPlaceholder = true,
+  placeholderText = 'Arraste componentes aqui ou do painel de componentes',
 }) => {
   const [hasDropped, setHasDropped] = useState(false);
   const [dropPosition, setDropPosition] = useState({ x: 0, y: 0 });
@@ -132,10 +136,10 @@ export const DroppableArea: React.FC<DroppableAreaProps> = ({
         />
       )}
       
-      {!hasChildren && (
+      {!hasChildren && showPlaceholder && (
         <div className="flex flex-col items-center justify-center h-40 text-muted-foreground">
           <PlusCircle className="h-12 w-12 mb-2 text-muted" />
-          <p className="text-center">Arraste componentes aqui ou do painel de componentes</p>
+          <p className="text-center">{placeholderText}</p>
           <p className="text-xs text-center mt-1">Personalize seu layout arrastando e soltando</p>
         </div>
       )}

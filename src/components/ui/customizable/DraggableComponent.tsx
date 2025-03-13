@@ -20,6 +20,10 @@ interface DraggableComponentProps {
   onEdit: () => void;
   onDelete: () => void;
   onDuplicate: () => void;
+  className?: string;
+  cardClassName?: string;
+  headerClassName?: string;
+  contentClassName?: string;
 }
 
 export const DraggableComponent: React.FC<DraggableComponentProps> = ({
@@ -30,6 +34,10 @@ export const DraggableComponent: React.FC<DraggableComponentProps> = ({
   onEdit,
   onDelete,
   onDuplicate,
+  className = '',
+  cardClassName = '',
+  headerClassName = '',
+  contentClassName = '',
 }) => {
   const [{ isDragging }, drag, preview] = useDrag({
     type: 'COMPONENT',
@@ -43,10 +51,10 @@ export const DraggableComponent: React.FC<DraggableComponentProps> = ({
     <div
       ref={preview}
       style={{ opacity: isDragging ? 0.5 : 1 }}
-      className="mb-4 transition-all duration-200 hover:shadow-md"
+      className={`mb-4 transition-all duration-200 hover:shadow-md ${className}`}
     >
-      <Card className="shadow-sm border border-border/40 overflow-hidden">
-        <CardHeader className="p-3 pb-0 flex flex-row items-center justify-between bg-muted/20">
+      <Card className={`shadow-sm border border-border/40 overflow-hidden ${cardClassName}`}>
+        <CardHeader className={`p-3 pb-0 flex flex-row items-center justify-between bg-muted/20 ${headerClassName}`}>
           <CardTitle className="text-lg font-medium">{title}</CardTitle>
           <div className="flex items-center">
             <Button
@@ -82,7 +90,7 @@ export const DraggableComponent: React.FC<DraggableComponentProps> = ({
             </DropdownMenu>
           </div>
         </CardHeader>
-        <CardContent className="p-4">
+        <CardContent className={`p-4 ${contentClassName}`}>
           {children}
         </CardContent>
       </Card>
