@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ColorSwatch } from "@/components/ui/color-swatch";
 import { themeService, ThemeConfig } from "@/services/theme-service";
 import { useThemeDialog } from '@/hooks/use-theme-dialog';
+import { toast } from 'sonner';
 
 interface ThemeConfiguratorDialogProps {
   open?: boolean;
@@ -34,15 +35,24 @@ const ThemeConfiguratorDialog: React.FC<ThemeConfiguratorDialogProps> = ({
   // Reset theme config when dialog opens
   useEffect(() => {
     if (dialogOpen) {
-      setThemeConfig(themeService.getTheme());
-      setHasChanges(false);
+      try {
+        setThemeConfig(themeService.getTheme());
+        setHasChanges(false);
+      } catch (error) {
+        console.error('Error loading theme:', error);
+        toast.error('Erro ao carregar tema');
+      }
     }
   }, [dialogOpen]);
   
   // Apply theme changes in real-time
   useEffect(() => {
     if (dialogOpen && hasChanges) {
-      themeService.applyThemeTemporarily(themeConfig);
+      try {
+        themeService.applyThemeTemporarily(themeConfig);
+      } catch (error) {
+        console.error('Error applying theme temporarily:', error);
+      }
     }
   }, [themeConfig, dialogOpen, hasChanges]);
   
@@ -72,8 +82,10 @@ const ThemeConfiguratorDialog: React.FC<ThemeConfiguratorDialogProps> = ({
     try {
       saveTheme(themeConfig);
       setHasChanges(false);
+      toast.success('Tema salvo com sucesso');
     } catch (error) {
       console.error('Error saving theme:', error);
+      toast.error('Erro ao salvar tema');
     }
   };
   
@@ -82,8 +94,10 @@ const ThemeConfiguratorDialog: React.FC<ThemeConfiguratorDialogProps> = ({
       themeService.resetTheme();
       setThemeConfig(themeService.getTheme());
       setHasChanges(true);
+      toast.success('Tema restaurado para os valores padrão');
     } catch (error) {
       console.error('Error resetting theme:', error);
+      toast.error('Erro ao restaurar tema');
     }
   };
   

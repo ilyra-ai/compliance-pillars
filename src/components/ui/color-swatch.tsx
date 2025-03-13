@@ -17,7 +17,7 @@ export const ColorSwatch: React.FC<ColorSwatchProps> = ({
   const [inputValue, setInputValue] = useState<string>(color || '#000000');
   
   useEffect(() => {
-    // Ensure we have a valid color value
+    // Ensure we have a valid color value when the prop changes
     setInputValue(color || '#000000');
   }, [color]);
 

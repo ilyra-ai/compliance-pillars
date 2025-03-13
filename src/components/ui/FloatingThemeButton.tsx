@@ -20,6 +20,7 @@ const FloatingThemeButton: React.FC<FloatingThemeButtonProps> = ({ onClick }) =>
   
   const handleButtonClick = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent any default behavior
+    e.stopPropagation(); // Stop event propagation
     
     if (onClick) {
       onClick();

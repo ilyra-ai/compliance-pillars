@@ -19,7 +19,10 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({
 }) => {
   const { handleOpenUITheme } = useThemeDialog();
   
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
     if (onClick) {
       onClick();
     } else {

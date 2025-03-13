@@ -30,63 +30,69 @@ export const DroppableArea: React.FC<DroppableAreaProps> = ({
       return;
     }
     
-    console.log('Drop detected:', item);
-    
-    // Get the drop position for absolute positioning
-    const clientOffset = monitor.getClientOffset();
-    if (clientOffset) {
-      setDropPosition({
-        x: clientOffset.x,
-        y: clientOffset.y,
-      });
-    }
-    
-    if (item.templateId) {
-      // This is a new component from the palette
-      console.log('Dropping new component from palette:', item.templateId, item.type);
-      onDrop(item.templateId, item.type);
-      setHasDropped(true);
+    try {
+      console.log('Drop detected:', item);
       
-      // Adjust toast message based on component type
-      let componentName = item.type;
-      switch (item.type) {
-        case 'section':
-          componentName = 'Seção';
-          break;
-        case 'grid':
-          componentName = 'Layout de Grade';
-          break;
-        case 'text':
-          componentName = 'Texto';
-          break;
-        case 'table':
-          componentName = 'Tabela';
-          break;
-        case 'chart':
-        case 'chart-bar':
-        case 'chart-line':
-        case 'chart-pie':
-          componentName = 'Gráfico';
-          break;
-        default:
-          componentName = item.type.charAt(0).toUpperCase() + item.type.slice(1);
+      // Get the drop position for absolute positioning
+      const clientOffset = monitor.getClientOffset();
+      if (clientOffset) {
+        setDropPosition({
+          x: clientOffset.x,
+          y: clientOffset.y,
+        });
       }
       
-      toast.success(`Componente ${componentName} adicionado com sucesso`);
-      return { 
-        name: 'DroppableArea', 
-        isNewComponent: true, 
-        templateId: item.templateId, 
-        type: item.type,
-        position: dropPosition
-      };
-    } else if (item.id && item.type) {
-      // This is an existing component being reordered
-      console.log('Reordering existing component:', item.id, item.type, item.index);
-      onDrop(item.id, item.type, item.index);
-      return { name: 'DroppableArea', position: dropPosition };
-    } else {
-      console.warn('Unknown drop item format:', item);
+      if (item.templateId) {
+        // This is a new component from the palette
+        console.log('Dropping new component from palette:', item.templateId, item.type);
+        onDrop(item.templateId, item.type);
+        setHasDropped(true);
+        
+        // Adjust toast message based on component type
+        let componentName = item.type;
+        switch (item.type) {
+          case 'section':
+            componentName = 'Seção';
+            break;
+          case 'grid':
+            componentName = 'Layout de Grade';
+            break;
+          case 'text':
+            componentName = 'Texto';
+            break;
+          case 'table':
+            componentName = 'Tabela';
+            break;
+          case 'chart':
+          case 'chart-bar':
+          case 'chart-line':
+          case 'chart-pie':
+            componentName = 'Gráfico';
+            break;
+          default:
+            componentName = item.type.charAt(0).toUpperCase() + item.type.slice(1);
+        }
+        
+        toast.success(`Componente ${componentName} adicionado com sucesso`);
+        return { 
+          name: 'DroppableArea', 
+          isNewComponent: true, 
+          templateId: item.templateId, 
+          type: item.type,
+          position: dropPosition
+        };
+      } else if (item.id && item.type) {
+        // This is an existing component being reordered
+        console.log('Reordering existing component:', item.id, item.type, item.index);
+        onDrop(item.id, item.type, item.index);
+        return { name: 'DroppableArea', position: dropPosition };
+      } else {
+        console.warn('Unknown drop item format:', item);
+        return undefined;
+      }
+    } catch (error) {
+      console.error('Error handling drop:', error);
+      toast.error('Erro ao adicionar componente');
       return undefined;
     }
   }, [onDrop, dropPosition]);
@@ -94,12 +100,16 @@ export const DroppableArea: React.FC<DroppableAreaProps> = ({
   const [{ isOver, canDrop }, drop] = useDrop({
     accept: ['COMPONENT', 'NEW_COMPONENT'],
     hover: (item, monitor) => {
-      const clientOffset = monitor.getClientOffset();
-      if (clientOffset) {
-        setDropPosition({
-          x: clientOffset.x,
-          y: clientOffset.y,
-        });
+      try {
+        const clientOffset = monitor.getClientOffset();
+        if (clientOffset) {
+          setDropPosition({
+            x: clientOffset.x,
+            y: clientOffset.y,
+          });
+        }
+      } catch (error) {
+        console.error('Error in hover handler:', error);
       }
     },
     drop: handleDrop,

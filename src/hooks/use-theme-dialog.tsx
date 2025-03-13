@@ -18,9 +18,13 @@ export const ThemeDialogProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   // Check if we're on a theme configurator page without using Router
   const isThemeConfiguratorPage = useMemo(() => {
-    if (typeof window !== 'undefined') {
-      const path = window.location.pathname;
-      return path === '/ui/customize' || path === '/settings/theme';
+    try {
+      if (typeof window !== 'undefined') {
+        const path = window.location.pathname;
+        return path === '/ui/customize' || path === '/settings/theme';
+      }
+    } catch (error) {
+      console.error('Error checking path:', error);
     }
     return false;
   }, []);
@@ -54,9 +58,8 @@ export const ThemeDialogProvider: React.FC<{ children: React.ReactNode }> = ({ c
 export const useThemeDialog = (): ThemeDialogContextType => {
   const context = useContext(ThemeDialogContext);
 
-  // Provide fallback values if used outside of context
+  // Provide silent fallback values if used outside of context
   if (context === undefined) {
-    // Instead of warning, just provide defaults
     return {
       themeDialogOpen: false,
       setThemeDialogOpen: () => {},
