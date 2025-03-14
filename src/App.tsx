@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -217,6 +216,13 @@ const App = () => {
                       </ProtectedRoute>
                     } />
                     
+                    {/* Configurações routes */}
+                    <Route path="/settings" element={
+                      <ProtectedRoute>
+                        <Settings />
+                      </ProtectedRoute>
+                    } />
+                    
                     <Route path="/settings/general" element={
                       <ProtectedRoute>
                         <Settings />
@@ -225,18 +231,18 @@ const App = () => {
                     
                     <Route path="/settings/theme" element={
                       <ProtectedRoute>
-                        <UIThemeConfigurator />
+                        <Settings />
                       </ProtectedRoute>
                     } />
                     
                     <Route path="/settings/backup" element={
-                      <ProtectedRoute requiredRoles={['admin']}>
+                      <ProtectedRoute>
                         <Settings />
                       </ProtectedRoute>
                     } />
                     
                     <Route path="/settings/migration" element={
-                      <ProtectedRoute requiredRoles={['admin']}>
+                      <ProtectedRoute>
                         <Settings />
                       </ProtectedRoute>
                     } />

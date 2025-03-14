@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
 import Sidebar from '@/components/layout/Sidebar';
@@ -47,15 +48,22 @@ const Settings: React.FC = () => {
     setThemeDialogOpen(false);
   };
 
-  React.useEffect(() => {
-    if (location.pathname === '/settings/theme') setActiveTab('ui');
-    else if (location.pathname === '/settings/backup') setActiveTab('backup');
-    else if (location.pathname === '/settings/migration') setActiveTab('compress');
-    else if (location.pathname === '/settings/hostgator') setActiveTab('compress');
-    else if (location.pathname.includes('/admin/database')) navigate('/admin/database');
-    else if (location.pathname.includes('/admin/docker')) navigate('/admin/docker');
-    else setActiveTab('general');
-  }, [location.pathname, navigate]);
+  useEffect(() => {
+    console.log('Current path:', location.pathname);
+    if (location.pathname === '/settings/theme') {
+      setActiveTab('ui');
+    } else if (location.pathname === '/settings/backup') {
+      setActiveTab('backup');
+    } else if (location.pathname === '/settings/migration') {
+      setActiveTab('compress');
+    } else if (location.pathname === '/settings/general') {
+      setActiveTab('general');
+    } else {
+      // For any other path under /settings/, default to general tab
+      // This handles direct navigation to /settings/ without a specific subpath
+      setActiveTab('general');
+    }
+  }, [location.pathname]);
 
   const handleSaveSettings = () => {
     toast.success('Configurações salvas com sucesso!');

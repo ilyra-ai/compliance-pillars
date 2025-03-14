@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Palette } from 'lucide-react';
 import { useThemeDialog } from '@/hooks/use-theme-dialog';
+import { useNavigate } from 'react-router-dom';
 
 interface FloatingThemeButtonProps {
   onClick?: () => void;
@@ -10,6 +11,7 @@ interface FloatingThemeButtonProps {
 
 const FloatingThemeButton: React.FC<FloatingThemeButtonProps> = ({ onClick }) => {
   const { handleOpenUITheme } = useThemeDialog();
+  const navigate = useNavigate();
   
   const handleButtonClick = () => {
     if (onClick) {
