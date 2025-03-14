@@ -19,8 +19,10 @@ const FloatingThemeButton: React.FC<FloatingThemeButtonProps> = ({ onClick }) =>
   }
   
   const handleButtonClick = (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent any default behavior
-    e.stopPropagation(); // Stop event propagation
+    if (e) {
+      e.preventDefault(); // Prevent any default behavior
+      e.stopPropagation(); // Stop event propagation
+    }
     
     if (onClick) {
       onClick();
@@ -35,6 +37,7 @@ const FloatingThemeButton: React.FC<FloatingThemeButtonProps> = ({ onClick }) =>
       onClick={handleButtonClick}
       size="icon"
       variant="default"
+      type="button"
     >
       <Palette className="h-6 w-6" />
       <span className="sr-only">Personalizar UI</span>

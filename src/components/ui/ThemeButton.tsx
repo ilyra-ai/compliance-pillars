@@ -20,8 +20,10 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({
   const { handleOpenUITheme } = useThemeDialog();
   
   const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     
     if (onClick) {
       onClick();
@@ -36,6 +38,7 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({
       variant={variant} 
       size={size}
       className={`relative overflow-hidden group ${className}`}
+      type="button"
     >
       <Palette className="mr-2 h-4 w-4" />
       <span>Personalizar UI</span>
