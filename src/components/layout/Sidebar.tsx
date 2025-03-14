@@ -117,7 +117,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onItemClick }) => {
           <SidebarLink to="/documents/advanced" icon={<File size={18} />} text="Documentos Avançados" onClick={onItemClick} />
           <SidebarLink to="/charts/view" icon={<PieChart size={18} />} text="Gráficos" onClick={onItemClick} />
           <SidebarLink to="/dashboards/power-bi" icon={<BarChart3 size={18} />} text="Power BI" onClick={onItemClick} />
-          <SidebarLink to="/analytics/data" icon={<Activity size={18} />} text="Analytics" onClick={onItemClick} />
+          <SidebarLink to="/analytics/data" icon={<Activity size={18} />} text="Análise" onClick={onItemClick} />
           <SidebarLink to="/assist/chatbot" icon={<MessageSquare size={18} />} text="Assistente IA" onClick={onItemClick} />
         </SidebarCategory>
         
@@ -131,7 +131,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onItemClick }) => {
         {hasRequiredRole(['admin']) && (
           <SidebarCategory title="Administração">
             <SidebarLink to="/admin/database" icon={<Database size={18} />} text="Banco de Dados" onClick={onItemClick} />
-            <SidebarLink to="/admin/docker" icon={<Container size={18} />} text="Docker" onClick={onItemClick} />
+            <SidebarLink to="/admin/docker" icon={<Container size={18} />} text="Estivador" onClick={onItemClick} />
           </SidebarCategory>
         )}
         
