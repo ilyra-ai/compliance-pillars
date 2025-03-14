@@ -19,11 +19,11 @@ import {
   BarChart3,
   File,
   MessageSquare,
-  Gauge,
+  BookOpen,
   Shield,
   CheckCircle,
   Activity,
-  BookOpen,
+  Gauge,
   LayoutDashboard
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
@@ -76,6 +76,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ onItemClick }) => {
   const { state } = useSidebar();
   const { user } = useAuth();
+  const location = useLocation();
   
   const hasRequiredRole = (requiredRoles: string[]) => {
     if (!user || !user.role) {
@@ -122,14 +123,9 @@ const Sidebar: React.FC<SidebarProps> = ({ onItemClick }) => {
         </SidebarCategory>
         
         {hasRequiredRole(['admin', 'gestor']) && (
-          <SidebarCategory title="Gestão">
+          <SidebarCategory title="Administração">
             <SidebarLink to="/admin/users" icon={<Users size={18} />} text="Usuários" onClick={onItemClick} />
             <SidebarLink to="/admin/kpis" icon={<Gauge size={18} />} text="Indicadores (KPIs)" onClick={onItemClick} />
-          </SidebarCategory>
-        )}
-        
-        {hasRequiredRole(['admin']) && (
-          <SidebarCategory title="Administração">
             <SidebarLink to="/admin/database" icon={<Database size={18} />} text="Banco de Dados" onClick={onItemClick} />
             <SidebarLink to="/admin/docker" icon={<Container size={18} />} text="Estivador" onClick={onItemClick} />
           </SidebarCategory>

@@ -18,17 +18,19 @@ const FloatingThemeButton: React.FC<FloatingThemeButtonProps> = ({ onClick }) =>
   const handleButtonClick = () => {
     if (onClick) {
       onClick();
-    } else {
-      try {
-        handleOpenUITheme();
-        console.log("Theme dialog opened successfully");
-        toast.success("Configurador de tema aberto");
-      } catch (error) {
-        console.error("Error opening theme dialog:", error);
-        toast.error("Erro ao abrir configurador de tema");
-        // Fallback: navigate to theme settings page
-        navigate('/settings/theme');
-      }
+      return;
+    }
+    
+    try {
+      console.log("Attempting to open theme dialog");
+      handleOpenUITheme();
+      toast.success("Configurador de tema aberto");
+    } catch (error) {
+      console.error("Error opening theme dialog:", error);
+      toast.error("Erro ao abrir configurador de tema");
+      
+      // Fallback: navigate to theme settings page
+      navigate('/settings/theme');
     }
   };
   
