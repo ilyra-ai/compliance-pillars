@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -192,6 +193,7 @@ const App = () => {
                       </ProtectedRoute>
                     } />
                     
+                    {/* Admin routes */}
                     <Route path="/admin/users" element={
                       <ProtectedRoute requiredRoles={['admin', 'gestor']}>
                         <UserManagement />
@@ -216,7 +218,7 @@ const App = () => {
                       </ProtectedRoute>
                     } />
                     
-                    {/* Configurações routes */}
+                    {/* Settings routes */}
                     <Route path="/settings" element={
                       <ProtectedRoute>
                         <Settings />
@@ -247,6 +249,7 @@ const App = () => {
                       </ProtectedRoute>
                     } />
 
+                    {/* Redirects for legacy URLs */}
                     <Route path="/power-bi" element={<Navigate to="/dashboards/power-bi" replace />} />
                     <Route path="/database" element={<Navigate to="/admin/database" replace />} />
                     <Route path="/docker" element={<Navigate to="/admin/docker" replace />} />
