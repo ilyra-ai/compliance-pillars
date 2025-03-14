@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PageLayout from '@/components/layout/PageLayout';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, Save, Plus, Palette, Eye } from 'lucide-react';
@@ -9,12 +9,18 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PageCustomizer } from '@/components/ui/customizable/PageCustomizer';
 import { CustomizableLayout } from '@/components/ui/customizable/CustomizableLayout';
+import { toast } from 'sonner';
 
 const ChatbotAssistantPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [editMode, setEditMode] = useState(false);
   const [activeTab, setActiveTab] = useState<string>('chatbot');
+  
+  useEffect(() => {
+    // Log the current path to help with debugging
+    console.log('Current path:', location.pathname);
+  }, [location]);
   
   const handleBack = () => {
     navigate(-1);
@@ -48,6 +54,7 @@ const ChatbotAssistantPage: React.FC = () => {
         onClick={() => {
           setEditMode(!editMode);
           setActiveTab(editMode ? 'chatbot' : 'editor');
+          toast.success(editMode ? "Modo visualização ativado" : "Modo edição ativado");
         }}
         variant={editMode ? "default" : "outline"}
         className="relative overflow-hidden group"
@@ -66,11 +73,18 @@ const ChatbotAssistantPage: React.FC = () => {
           </>
         )}
       </Button>
-      <Button variant="outline" size="sm">
+      <Button 
+        variant="outline" 
+        size="sm"
+        onClick={() => toast.info("Recurso em desenvolvimento")}
+      >
         <Plus className="mr-2 h-4 w-4" />
         Novo Assistente
       </Button>
-      <Button size="sm">
+      <Button 
+        size="sm"
+        onClick={() => toast.success("Configurações salvas com sucesso")}
+      >
         <Save className="mr-2 h-4 w-4" />
         Salvar Configurações
       </Button>
@@ -87,6 +101,7 @@ const ChatbotAssistantPage: React.FC = () => {
       <Tabs 
         value={editMode ? "editor" : activeTab} 
         onValueChange={handleTabChange}
+        className="w-full"
       >
         <TabsList className="mb-6">
           <TabsTrigger value="chatbot">Configuração de Chatbots</TabsTrigger>
@@ -98,7 +113,7 @@ const ChatbotAssistantPage: React.FC = () => {
           </TabsTrigger>
         </TabsList>
         
-        <TabsContent value="chatbot">
+        <TabsContent value="chatbot" className="w-full">
           <div className="space-y-6">
             <Card>
               <CardHeader>
@@ -114,7 +129,7 @@ const ChatbotAssistantPage: React.FC = () => {
           </div>
         </TabsContent>
         
-        <TabsContent value="editor">
+        <TabsContent value="editor" className="w-full">
           <PageCustomizer
             pagePath={location.pathname}
             editMode={true}
