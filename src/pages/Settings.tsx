@@ -29,14 +29,16 @@ import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import ThemeConfigurator from '@/components/settings/ThemeConfigurator';
 import FloatingThemeButton from '@/components/ui/FloatingThemeButton';
+import { useThemeDialog } from '@/hooks/use-theme-dialog';
 
 const Settings: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { handleOpenUITheme } = useThemeDialog();
   const [activeTab, setActiveTab] = useState('general');
   const [themeDialogOpen, setThemeDialogOpen] = useState(false);
   
-  const handleOpenUITheme = () => {
+  const handleOpenThemeDialog = () => {
     setThemeDialogOpen(true);
   };
   
@@ -46,12 +48,12 @@ const Settings: React.FC = () => {
   };
 
   React.useEffect(() => {
-    if (location.pathname === '/settings/ui') setActiveTab('ui');
+    if (location.pathname === '/settings/theme') setActiveTab('ui');
     else if (location.pathname === '/settings/backup') setActiveTab('backup');
-    else if (location.pathname === '/settings/migration') setActiveTab('migration');
+    else if (location.pathname === '/settings/migration') setActiveTab('compress');
     else if (location.pathname === '/settings/hostgator') setActiveTab('compress');
-    else if (location.pathname === '/database') navigate('/database');
-    else if (location.pathname === '/docker') navigate('/docker');
+    else if (location.pathname.includes('/admin/database')) navigate('/admin/database');
+    else if (location.pathname.includes('/admin/docker')) navigate('/admin/docker');
     else setActiveTab('general');
   }, [location.pathname, navigate]);
 
@@ -105,8 +107,7 @@ const Settings: React.FC = () => {
             <TabsList className="mb-6">
               <TabsTrigger value="general">Configurações Gerais</TabsTrigger>
               <TabsTrigger value="backup">Backup do Sistema</TabsTrigger>
-              <TabsTrigger value="migration">Migração de Servidor</TabsTrigger>
-              <TabsTrigger value="compress">Compactar APP e BD</TabsTrigger>
+              <TabsTrigger value="compress">Migração de Servidor</TabsTrigger>
             </TabsList>
             
             <TabsContent value="general">
@@ -229,66 +230,6 @@ const Settings: React.FC = () => {
                     </div>
                   </div>
                 </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="migration">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Migração de Servidor</CardTitle>
-                  <CardDescription>Migre todo o sistema para um novo servidor</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="target-server">Servidor de Destino</Label>
-                      <Input id="target-server" placeholder="Exemplo: 192.168.1.100 ou servidor.exemplo.com" />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="server-username">Usuário SSH</Label>
-                      <Input id="server-username" placeholder="Exemplo: admin" />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="server-password">Senha SSH</Label>
-                      <Input id="server-password" type="password" placeholder="********" />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="server-port">Porta SSH</Label>
-                      <Input id="server-port" defaultValue="22" />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <div className="flex items-center space-x-2">
-                        <Switch id="migrate-database" defaultChecked />
-                        <Label htmlFor="migrate-database">Migrar Banco de Dados</Label>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <div className="flex items-center space-x-2">
-                        <Switch id="migrate-files" defaultChecked />
-                        <Label htmlFor="migrate-files">Migrar Arquivos</Label>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <div className="flex items-center space-x-2">
-                        <Switch id="migrate-configs" defaultChecked />
-                        <Label htmlFor="migrate-configs">Migrar Configurações</Label>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex justify-between">
-                  <Button variant="outline">Testar Conexão</Button>
-                  <Button onClick={handleMigrateServer}>
-                    <Server className="mr-2 h-4 w-4" />
-                    Iniciar Migração
-                  </Button>
-                </CardFooter>
               </Card>
             </TabsContent>
             

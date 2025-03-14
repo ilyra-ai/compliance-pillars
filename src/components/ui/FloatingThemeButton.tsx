@@ -1,8 +1,7 @@
 
 import React from 'react';
-import { Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { Palette } from 'lucide-react';
 import { useThemeDialog } from '@/hooks/use-theme-dialog';
 
 interface FloatingThemeButtonProps {
@@ -10,20 +9,9 @@ interface FloatingThemeButtonProps {
 }
 
 const FloatingThemeButton: React.FC<FloatingThemeButtonProps> = ({ onClick }) => {
-  const isMobile = useIsMobile();
-  const { handleOpenUITheme, isThemeConfiguratorPage } = useThemeDialog();
+  const { handleOpenUITheme } = useThemeDialog();
   
-  // Hide button on theme configurator pages
-  if (isThemeConfiguratorPage) {
-    return null;
-  }
-  
-  const handleButtonClick = (e: React.MouseEvent) => {
-    if (e) {
-      e.preventDefault(); // Prevent any default behavior
-      e.stopPropagation(); // Stop event propagation
-    }
-    
+  const handleButtonClick = () => {
     if (onClick) {
       onClick();
     } else {
@@ -32,14 +20,12 @@ const FloatingThemeButton: React.FC<FloatingThemeButtonProps> = ({ onClick }) =>
   };
   
   return (
-    <Button 
-      className="fixed bottom-6 right-6 rounded-full shadow-lg z-50 w-12 h-12 p-0 flex items-center justify-center"
+    <Button
       onClick={handleButtonClick}
+      className="fixed bottom-4 right-4 z-50 rounded-full shadow-lg p-0 w-12 h-12 flex items-center justify-center"
       size="icon"
-      variant="default"
-      type="button"
     >
-      <Palette className="h-6 w-6" />
+      <Palette className="h-5 w-5" />
       <span className="sr-only">Personalizar UI</span>
     </Button>
   );
