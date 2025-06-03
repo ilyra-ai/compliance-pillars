@@ -66,8 +66,8 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <ThemeDialogProvider>
-          <BrowserRouter>
+        <BrowserRouter>
+          <ThemeDialogProvider>
             <SidebarProvider>
               <DndProvider backend={HTML5Backend}>
                 <TooltipProvider>
@@ -290,9 +290,9 @@ const App = () => {
                   <FloatingThemeButton />
                 </TooltipProvider>
               </DndProvider>
-            </SidebarProvider>
-          </BrowserRouter>
-        </ThemeDialogProvider>
+              </SidebarProvider>
+          </ThemeDialogProvider>
+        </BrowserRouter>
       </AuthProvider>
     </QueryClientProvider>
   );
