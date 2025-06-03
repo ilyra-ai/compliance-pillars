@@ -23,17 +23,19 @@ const PillarManagement = () => {
 
   function getPillarNameFromSlug(slug: string): string {
     const pillarNames: Record<string, string> = {
-      'leadership': 'Liderança',
-      'risk': 'Riscos',
-      'policies': 'Políticas e Procedimentos',
-      'controls': 'Controles',
-      'training': 'Treinamentos',
+      'templates': 'Templates',
+      'leadership': 'Comprometimento da Alta Administração',
+      'risk': 'Gestão de Riscos',
+      'policies': 'Políticas, Procedimentos e Manuais',
+      'controls': 'Controles Internos',
+      'training': 'Treinamento e Comunicações',
       'complaints': 'Canal de Denúncias',
-      'investigations': 'Investigações',
+      'investigations': 'Investigações Internas',
       'due-diligence': 'Due Diligence',
-      'audits': 'Auditorias',
-      'monitoring': 'Monitoramento',
-      'lgpd': 'LGPD e Privacidade'
+      'audits': 'Gestão das Auditorias Adquirentes',
+      'monitoring': 'Monitoramento dos Riscos de Compliance',
+      'lgpd': 'LGPD',
+      'improvements': 'Melhorias Contínuas'
     };
     
     return pillarNames[slug] || 'Pilar de Compliance';
