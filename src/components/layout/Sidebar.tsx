@@ -128,6 +128,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onItemClick }) => {
         {hasRequiredRole(['admin', 'gestor']) && (
           <SidebarCategory title="Administração">
             <SidebarLink to="/admin/users" icon={<Users size={18} />} text="Usuários" onClick={onItemClick} />
+            <SidebarLink to="/admin/access" icon={<Shield size={18} />} text="Gestão de Acessos" onClick={onItemClick} />
             <SidebarLink to="/admin/kpis" icon={<Gauge size={18} />} text="Indicadores (KPIs)" onClick={onItemClick} />
             <SidebarLink to="/admin/database" icon={<Database size={18} />} text="Banco de Dados" onClick={onItemClick} />
             <SidebarLink to="/admin/docker" icon={<Container size={18} />} text="Estivador" onClick={onItemClick} />

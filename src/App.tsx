@@ -35,6 +35,7 @@ import { themeService } from "./services/theme-service";
 import DueDiligencePage from "./pages/DueDiligencePage";
 import TemplatesPage from "./pages/TemplatesPage";
 import ContinuousImprovementPage from "./pages/ContinuousImprovementPage";
+import AccessControlPage from "./pages/AccessControlPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -211,6 +212,12 @@ const App = () => {
                         <UserManagement />
                       </ProtectedRoute>
                     } />
+
+                    <Route path="/admin/access" element={
+                      <ProtectedRoute requiredRoles={['admin', 'gestor']}>
+                        <AccessControlPage />
+                      </ProtectedRoute>
+                    } />
                     
                     <Route path="/admin/kpis" element={
                       <ProtectedRoute requiredRoles={['admin', 'gestor']}>
@@ -270,6 +277,7 @@ const App = () => {
                     <Route path="/database" element={<Navigate to="/admin/database" replace />} />
                     <Route path="/docker" element={<Navigate to="/admin/docker" replace />} />
                     <Route path="/users" element={<Navigate to="/admin/users" replace />} />
+                    <Route path="/access" element={<Navigate to="/admin/access" replace />} />
                     <Route path="/chatbot" element={<Navigate to="/assist/chatbot" replace />} />
                     <Route path="/analytics" element={<Navigate to="/analytics/data" replace />} />
                     <Route path="/ui/customize" element={<Navigate to="/settings/theme" replace />} />

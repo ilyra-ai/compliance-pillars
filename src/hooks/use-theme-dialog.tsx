@@ -18,14 +18,8 @@ export const ThemeDialogProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [themeDialogOpen, setThemeDialogOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState('');
   
-  // Use React Router's useLocation hook safely with error handling
-  let location;
-  try {
-    location = useLocation();
-  } catch (error) {
-    // Silent fail if used outside Router context
-    console.debug('ThemeDialogProvider used outside Router context');
-  }
+  // Use React Router's useLocation hook
+  const location = useLocation();
 
   // Update current path whenever location changes or on initial render
   useEffect(() => {
