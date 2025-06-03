@@ -59,7 +59,7 @@ const Navbar: React.FC = () => {
               Pilares
             </Link>
             <Link
-              to="/reports"
+              to="/reports/builder"
               className={cn(
                 'nav-item px-3 py-2 text-sm font-medium rounded-md hover:bg-secondary transition-colors',
                 location.pathname.includes('/reports') && 'bg-secondary/70 text-foreground'

@@ -115,7 +115,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onItemClick }) => {
         </SidebarCategory>
         
         <SidebarCategory title="Ferramentas">
-          <SidebarLink to="/reports/view" icon={<FileText size={18} />} text="Relatórios" onClick={onItemClick} />
+          <SidebarLink to="/reports/builder" icon={<FileText size={18} />} text="Relatórios" onClick={onItemClick} />
           <SidebarLink to="/reports/builder" icon={<FileUp size={18} />} text="Construtor de Relatórios" onClick={onItemClick} />
           <SidebarLink to="/documents/editor" icon={<Edit3 size={18} />} text="Editor de Documentos" onClick={onItemClick} />
           <SidebarLink to="/documents/advanced" icon={<File size={18} />} text="Documentos Avançados" onClick={onItemClick} />
