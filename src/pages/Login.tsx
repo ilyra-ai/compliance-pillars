@@ -60,7 +60,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-background to-muted/40 p-4">
+    <div className="flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-b from-background to-muted/40 p-4">
       <div className="mb-8">
         <AnimatedLogo />
       </div>

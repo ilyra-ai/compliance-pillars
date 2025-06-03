@@ -161,11 +161,7 @@ const App = () => {
                       </ProtectedRoute>
                     } />
                     
-                    <Route path="/reports/view" element={
-                      <ProtectedRoute>
-                        <Index />
-                      </ProtectedRoute>
-                    } />
+                    <Route path="/reports" element={<Navigate to="/reports/builder" replace />} />
                     <Route path="/reports/builder" element={
                       <ProtectedRoute>
                         <ReportBuilder />
