@@ -36,6 +36,12 @@ npm i
 npm run dev
 ```
 
+Alternatively, start everything using the `iniciar.py` helper script:
+
+```sh
+python iniciar.py
+```
+
 **Edit a file directly in GitHub**
 
 - Navigate to the desired file(s).
