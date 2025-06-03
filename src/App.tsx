@@ -66,8 +66,8 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <ThemeDialogProvider>
-          <BrowserRouter>
+        <BrowserRouter>
+          <ThemeDialogProvider>
             <SidebarProvider>
               <DndProvider backend={HTML5Backend}>
                 <TooltipProvider>
@@ -161,11 +161,7 @@ const App = () => {
                       </ProtectedRoute>
                     } />
                     
-                    <Route path="/reports/view" element={
-                      <ProtectedRoute>
-                        <Index />
-                      </ProtectedRoute>
-                    } />
+                    <Route path="/reports" element={<Navigate to="/reports/builder" replace />} />
                     <Route path="/reports/builder" element={
                       <ProtectedRoute>
                         <ReportBuilder />
@@ -290,9 +286,9 @@ const App = () => {
                   <FloatingThemeButton />
                 </TooltipProvider>
               </DndProvider>
-            </SidebarProvider>
-          </BrowserRouter>
-        </ThemeDialogProvider>
+              </SidebarProvider>
+          </ThemeDialogProvider>
+        </BrowserRouter>
       </AuthProvider>
     </QueryClientProvider>
   );
