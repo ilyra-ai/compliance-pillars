@@ -33,6 +33,8 @@ import AnalyticsPage from "./pages/Analytics";
 import { useEffect } from "react";
 import { themeService } from "./services/theme-service";
 import DueDiligencePage from "./pages/DueDiligencePage";
+import TemplatesPage from "./pages/TemplatesPage";
+import ContinuousImprovementPage from "./pages/ContinuousImprovementPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -90,6 +92,12 @@ const App = () => {
                         <Pillars />
                       </ProtectedRoute>
                     } />
+
+                    <Route path="/pillars/templates" element={
+                      <ProtectedRoute>
+                        <TemplatesPage />
+                      </ProtectedRoute>
+                    } />
                     
                     <Route path="/pillars/leadership" element={
                       <ProtectedRoute>
@@ -144,6 +152,11 @@ const App = () => {
                     <Route path="/pillars/lgpd" element={
                       <ProtectedRoute>
                         <PillarManagement />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/pillars/improvements" element={
+                      <ProtectedRoute>
+                        <ContinuousImprovementPage />
                       </ProtectedRoute>
                     } />
                     

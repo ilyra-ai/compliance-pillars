@@ -23,6 +23,7 @@ import {
   Shield,
   CheckCircle,
   Activity,
+  RefreshCcw,
   Gauge,
   LayoutDashboard
 } from 'lucide-react';
@@ -98,17 +99,19 @@ const Sidebar: React.FC<SidebarProps> = ({ onItemClick }) => {
         
         <SidebarCategory title="Pilares de Compliance">
           <SidebarLink to="/pillars" icon={<Shield size={18} />} text="Visão Geral dos Pilares" onClick={onItemClick} />
+          <SidebarLink to="/pillars/templates" icon={<File size={18} />} text="Templates" onClick={onItemClick} />
           <SidebarLink to="/pillars/leadership" icon={<Shield size={18} />} text="Comprometimento da Alta Administração" onClick={onItemClick} />
           <SidebarLink to="/pillars/risk" icon={<AlertTriangle size={18} />} text="Gestão de Riscos" onClick={onItemClick} />
-          <SidebarLink to="/pillars/policies" icon={<FileText size={18} />} text="Políticas e Procedimentos" onClick={onItemClick} />
+          <SidebarLink to="/pillars/policies" icon={<FileText size={18} />} text="Políticas, Procedimentos e Manuais" onClick={onItemClick} />
           <SidebarLink to="/pillars/controls" icon={<CheckCircle size={18} />} text="Controles Internos" onClick={onItemClick} />
-          <SidebarLink to="/pillars/training" icon={<BookOpen size={18} />} text="Treinamento e Comunicação" onClick={onItemClick} />
+          <SidebarLink to="/pillars/training" icon={<BookOpen size={18} />} text="Treinamento e Comunicações" onClick={onItemClick} />
           <SidebarLink to="/pillars/complaints" icon={<MessageSquare size={18} />} text="Canal de Denúncias" onClick={onItemClick} />
           <SidebarLink to="/pillars/investigations" icon={<Activity size={18} />} text="Investigações Internas" onClick={onItemClick} />
           <SidebarLink to="/pillars/due-diligence" icon={<File size={18} />} text="Due Diligence" onClick={onItemClick} />
-          <SidebarLink to="/pillars/audits" icon={<LayoutList size={18} />} text="Auditorias" onClick={onItemClick} />
-          <SidebarLink to="/pillars/monitoring" icon={<BarChart3 size={18} />} text="Monitoramento" onClick={onItemClick} />
+          <SidebarLink to="/pillars/audits" icon={<LayoutList size={18} />} text="Gestão das Auditorias Adquirentes" onClick={onItemClick} />
+          <SidebarLink to="/pillars/monitoring" icon={<BarChart3 size={18} />} text="Monitoramento dos Riscos" onClick={onItemClick} />
           <SidebarLink to="/pillars/lgpd" icon={<Shield size={18} />} text="LGPD e Privacidade" onClick={onItemClick} />
+          <SidebarLink to="/pillars/improvements" icon={<RefreshCcw size={18} />} text="Melhorias Contínuas" onClick={onItemClick} />
         </SidebarCategory>
         
         <SidebarCategory title="Ferramentas">
