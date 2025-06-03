@@ -15,6 +15,8 @@ import {
   CheckSquare,
   AlertTriangle,
   FileCheck,
+  File,
+  RefreshCcw,
   Eye,
   Lock,
   Palette
@@ -52,9 +54,16 @@ const Pillars = () => {
 
   const pillars = [
     {
+      id: 'templates',
+      name: 'Templates',
+      description: 'Modelos de documentos e políticas',
+      icon: <File className="h-8 w-8" />,
+      color: 'bg-slate-500'
+    },
+    {
       id: 'leadership',
-      name: 'Liderança',
-      description: 'Compromisso e exemplaridade da Alta Direção',
+      name: 'Comprometimento da Alta Administração',
+      description: 'Exemplo e suporte da liderança',
       icon: <Shield className="h-8 w-8" />,
       color: 'bg-indigo-500'
     },
@@ -67,22 +76,22 @@ const Pillars = () => {
     },
     {
       id: 'policies',
-      name: 'Políticas',
-      description: 'Políticas e procedimentos de compliance',
+      name: 'Políticas, Procedimentos e Manuais',
+      description: 'Documentação formal do programa',
       icon: <FileText className="h-8 w-8" />,
       color: 'bg-blue-500'
     },
     {
       id: 'controls',
-      name: 'Controles',
-      description: 'Monitoramento e controles internos',
+      name: 'Controles Internos',
+      description: 'Testes e melhorias dos processos',
       icon: <CheckSquare className="h-8 w-8" />,
       color: 'bg-green-500'
     },
     {
       id: 'training',
-      name: 'Treinamentos',
-      description: 'Comunicação e capacitação',
+      name: 'Treinamento e Comunicações',
+      description: 'Capacitação contínua dos colaboradores',
       icon: <BookOpen className="h-8 w-8" />,
       color: 'bg-orange-500'
     },
@@ -109,15 +118,15 @@ const Pillars = () => {
     },
     {
       id: 'audits',
-      name: 'Auditorias',
-      description: 'Auditorias e verificações',
+      name: 'Gestão das Auditorias Adquirentes',
+      description: 'Planejamento e acompanhamento das auditorias',
       icon: <Eye className="h-8 w-8" />,
       color: 'bg-cyan-500'
     },
     {
       id: 'monitoring',
-      name: 'Monitoramento',
-      description: 'Monitoramento contínuo do programa',
+      name: 'Monitoramento dos Riscos de Compliance',
+      description: 'Acompanhamento e reporte de métricas',
       icon: <BarChart4 className="h-8 w-8" />,
       color: 'bg-emerald-500'
     },
@@ -127,6 +136,13 @@ const Pillars = () => {
       description: 'Lei Geral de Proteção de Dados',
       icon: <Lock className="h-8 w-8" />,
       color: 'bg-violet-500'
+    },
+    {
+      id: 'improvements',
+      name: 'Melhorias Contínuas',
+      description: 'Evolução constante do programa de compliance',
+      icon: <RefreshCcw className="h-8 w-8" />,
+      color: 'bg-pink-500'
     }
   ];
 

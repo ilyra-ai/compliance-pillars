@@ -33,6 +33,9 @@ import AnalyticsPage from "./pages/Analytics";
 import { useEffect } from "react";
 import { themeService } from "./services/theme-service";
 import DueDiligencePage from "./pages/DueDiligencePage";
+import TemplatesPage from "./pages/TemplatesPage";
+import ContinuousImprovementPage from "./pages/ContinuousImprovementPage";
+import AccessControlPage from "./pages/AccessControlPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -88,6 +91,12 @@ const App = () => {
                     <Route path="/pillars" element={
                       <ProtectedRoute>
                         <Pillars />
+                      </ProtectedRoute>
+                    } />
+
+                    <Route path="/pillars/templates" element={
+                      <ProtectedRoute>
+                        <TemplatesPage />
                       </ProtectedRoute>
                     } />
                     
@@ -146,6 +155,11 @@ const App = () => {
                         <PillarManagement />
                       </ProtectedRoute>
                     } />
+                    <Route path="/pillars/improvements" element={
+                      <ProtectedRoute>
+                        <ContinuousImprovementPage />
+                      </ProtectedRoute>
+                    } />
                     
                     <Route path="/reports/view" element={
                       <ProtectedRoute>
@@ -196,6 +210,12 @@ const App = () => {
                     <Route path="/admin/users" element={
                       <ProtectedRoute requiredRoles={['admin', 'gestor']}>
                         <UserManagement />
+                      </ProtectedRoute>
+                    } />
+
+                    <Route path="/admin/access" element={
+                      <ProtectedRoute requiredRoles={['admin', 'gestor']}>
+                        <AccessControlPage />
                       </ProtectedRoute>
                     } />
                     
@@ -257,6 +277,7 @@ const App = () => {
                     <Route path="/database" element={<Navigate to="/admin/database" replace />} />
                     <Route path="/docker" element={<Navigate to="/admin/docker" replace />} />
                     <Route path="/users" element={<Navigate to="/admin/users" replace />} />
+                    <Route path="/access" element={<Navigate to="/admin/access" replace />} />
                     <Route path="/chatbot" element={<Navigate to="/assist/chatbot" replace />} />
                     <Route path="/analytics" element={<Navigate to="/analytics/data" replace />} />
                     <Route path="/ui/customize" element={<Navigate to="/settings/theme" replace />} />
