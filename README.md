@@ -18,3 +18,5 @@ streamlit run app.py
 ```
 
 The interface will be available at `http://localhost:8501`.
+
+The UI uses Horizon's layout with a purple gradient theme. Switch between light and dark modes from the sidebar.
