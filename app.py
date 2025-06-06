@@ -43,9 +43,9 @@ if 'transformations' not in st.session_state:
 if 'theme' not in st.session_state:
     st.session_state.theme = 'dark'
 if 'primary_color' not in st.session_state:
-    st.session_state.primary_color = '#667eea'
+    st.session_state.primary_color = '#422AFB'
 if 'secondary_color' not in st.session_state:
-    st.session_state.secondary_color = '#764ba2'
+    st.session_state.secondary_color = '#7551FF'
 if 'dashboard_layouts' not in st.session_state:
     st.session_state.dashboard_layouts = {}
 if 'saved_reports' not in st.session_state:
@@ -67,10 +67,11 @@ def get_dynamic_css():
         text_color = "#000000"
     return f"""
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap');
         .stApp {{
             background: {bg_color};
             color: {text_color};
-            font-family: 'Inter', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }}
         .main-header {{
             font-size: clamp(2rem, 5vw, 3rem);
@@ -238,7 +239,7 @@ class ReportGenerator:
                 'CustomTitle',
                 parent=self.styles['Heading1'],
                 fontSize=24,
-                textColor=colors.HexColor('#667eea'),
+                textColor=colors.HexColor('#422AFB'),
                 spaceAfter=30,
                 alignment=1
             ),
@@ -246,7 +247,7 @@ class ReportGenerator:
                 'CustomHeading',
                 parent=self.styles['Heading2'],
                 fontSize=18,
-                textColor=colors.HexColor('#764ba2'),
+                textColor=colors.HexColor('#7551FF'),
                 spaceAfter=20
             ),
             'Normal': ParagraphStyle(
