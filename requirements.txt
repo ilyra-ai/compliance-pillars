@@ -1,0 +1,10 @@
+streamlit
+pandas
+numpy
+plotly
+mysql-connector-python
+openpyxl
+streamlit-elements
+streamlit-option-menu
+reportlab
+pillow
