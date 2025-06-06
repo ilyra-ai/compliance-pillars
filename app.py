@@ -54,13 +54,13 @@ if 'saved_reports' not in st.session_state:
 
 def get_dynamic_css():
     if st.session_state.theme == 'dark':
-        bg_color = "linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%)"
-        card_bg = "rgba(255, 255, 255, 0.05)"
-        text_color = "white"
+        bg_color = "#1e1e1e"
+        card_bg = "#2b2b2b"
+        text_color = "#ffffff"
     elif st.session_state.theme == 'light':
-        bg_color = "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)"
-        card_bg = "rgba(0, 0, 0, 0.05)"
-        text_color = "#333"
+        bg_color = "#ffffff"
+        card_bg = "#f0f0f0"
+        text_color = "#000000"
     else:
         bg_color = "#000000"
         card_bg = "#FFFFFF"
@@ -503,8 +503,23 @@ def main():
                 }
             }
         )
+        theme_toggle = st.toggle("Modo Claro", value=st.session_state.theme == "light")
+        if theme_toggle and st.session_state.theme != "light":
+            st.session_state.theme = "light"
+            st.experimental_rerun()
+        if not theme_toggle and st.session_state.theme != "dark":
+            st.session_state.theme = "dark"
+            st.experimental_rerun()
+        pillar_choice = "Visão Geral"
+        if selected == "📊 Dashboard":
+            pillar_options = ["Visão Geral"] + list(create_compliance_pillars().keys())
+            pillar_choice = st.selectbox("Detalhamento por Pilar", pillar_options)
     if selected == "📊 Dashboard":
-        render_dashboard()
+        if pillar_choice == "Visão Geral":
+            render_dashboard()
+        else:
+            pillars = create_compliance_pillars()
+            render_pillar_dashboard(pillar_choice, pillars[pillar_choice])
     elif selected == "🔗 Conexões":
         render_connections()
     elif selected == "🔄 Transformações":
@@ -598,13 +613,6 @@ def render_dashboard():
                                 mui.TableCell(f"Ação de compliance {i+1}")
                                 mui.TableCell("Alta" if i < 2 else "Média")
                                 mui.TableCell(f"{i+5} dias")
-    st.markdown("### 📋 Detalhamento por Pilar")
-    pillars = create_compliance_pillars()
-    tab_names = [f"{pillars[p]['icon']} {p}" for p in pillars.keys()]
-    tabs = st.tabs(tab_names)
-    for idx, (pillar_name, pillar_data) in enumerate(pillars.items()):
-        with tabs[idx]:
-            render_pillar_dashboard(pillar_name, pillar_data)
 
 
 def render_pillar_dashboard(pillar_name, pillar_data):
@@ -885,6 +893,24 @@ def render_transformations():
 
 def render_visualizations():
     st.markdown("## 📈 Criador de Visualizações")
+    if not st.session_state.data_sources:
+        st.warning("⚠️ Nenhum dado carregado. Por favor, carregue dados primeiro.")
+        return
+    data_name = st.selectbox("Fonte de Dados:", list(st.session_state.data_sources.keys()))
+    df = st.session_state.data_sources[data_name]
+    chart_type = st.selectbox("Tipo de Gráfico:", ["Linha", "Barra", "Pizza", "Área"])
+    x_axis = st.selectbox("Eixo X:", df.columns)
+    y_axis = st.selectbox("Eixo Y:", df.columns)
+    if st.button("Gerar Gráfico"):
+        if chart_type == "Linha":
+            fig = px.line(df, x=x_axis, y=y_axis)
+        elif chart_type == "Barra":
+            fig = px.bar(df, x=x_axis, y=y_axis)
+        elif chart_type == "Pizza":
+            fig = px.pie(df, names=x_axis, values=y_axis)
+        else:
+            fig = px.area(df, x=x_axis, y=y_axis)
+        st.plotly_chart(fig, use_container_width=True)
 
 
 def render_settings():
