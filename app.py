@@ -54,13 +54,13 @@ if 'saved_reports' not in st.session_state:
 
 def get_dynamic_css():
     if st.session_state.theme == 'dark':
-        bg_color = "#1e1e1e"
-        card_bg = "#2b2b2b"
-        text_color = "#ffffff"
+        bg_color = "#343541"
+        card_bg = "#444654"
+        text_color = "#ececf1"
     elif st.session_state.theme == 'light':
         bg_color = "#ffffff"
-        card_bg = "#f0f0f0"
-        text_color = "#000000"
+        card_bg = "#f7f7f8"
+        text_color = "#202123"
     else:
         bg_color = "#000000"
         card_bg = "#FFFFFF"
@@ -69,6 +69,8 @@ def get_dynamic_css():
     <style>
         .stApp {{
             background: {bg_color};
+            color: {text_color};
+            font-family: 'Inter', sans-serif;
         }}
         .main-header {{
             font-size: clamp(2rem, 5vw, 3rem);
@@ -480,10 +482,14 @@ def main():
     st.markdown('<h1 class="main-header">🛡️ Compliance Analytics Platform</h1>', unsafe_allow_html=True)
     with st.sidebar:
         st.markdown("## 🎯 Menu Principal")
+        pillars = create_compliance_pillars()
+        pillar_labels = [f"{data['icon']} {name}" for name, data in pillars.items()]
+        pillar_map = {label: name for label, name in zip(pillar_labels, pillars.keys())}
+        menu_items = ["Visão Geral"] + pillar_labels + ["🔗 Conexões", "🔄 Transformações", "📈 Visualizações", "📑 Relatórios", "⚙️ Configurações"]
         selected = option_menu.option_menu(
             menu_title=None,
-            options=["📊 Dashboard", "🔗 Conexões", "🔄 Transformações", "📈 Visualizações", "📑 Relatórios", "⚙️ Configurações"],
-            icons=["graph-up", "link-45deg", "arrow-repeat", "bar-chart-line", "file-text", "gear"],
+            options=menu_items,
+            icons=["graph-up"] + ["" for _ in pillar_labels] + ["link-45deg", "arrow-repeat", "bar-chart-line", "file-text", "gear"],
             menu_icon="cast",
             default_index=0,
             styles={
@@ -510,16 +516,12 @@ def main():
         if not theme_toggle and st.session_state.theme != "dark":
             st.session_state.theme = "dark"
             st.experimental_rerun()
-        pillar_choice = "Visão Geral"
-        if selected == "📊 Dashboard":
-            pillar_options = ["Visão Geral"] + list(create_compliance_pillars().keys())
-            pillar_choice = st.selectbox("Detalhamento por Pilar", pillar_options)
-    if selected == "📊 Dashboard":
-        if pillar_choice == "Visão Geral":
-            render_dashboard()
-        else:
-            pillars = create_compliance_pillars()
-            render_pillar_dashboard(pillar_choice, pillars[pillar_choice])
+    if selected == "Visão Geral":
+        render_dashboard()
+    elif selected in pillar_map:
+        pillars = create_compliance_pillars()
+        key = pillar_map[selected]
+        render_pillar_dashboard(key, pillars[key])
     elif selected == "🔗 Conexões":
         render_connections()
     elif selected == "🔄 Transformações":
